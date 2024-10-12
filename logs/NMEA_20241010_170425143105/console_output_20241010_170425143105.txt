@@ -1,7 +1,0 @@
-2024-10-10 17:04:25,147 [ERROR] An unexpected error occurred: Can't find a usable init.tcl in the following directories: 
-    C:/Users/Ade/AppData/Local/Programs/Python/Python313/lib/tcl8.6 C:/NMEA-Parser-GUI/.venv/lib/tcl8.6 C:/NMEA-Parser-GUI/lib/tcl8.6 C:/NMEA-Parser-GUI/.venv/library C:/NMEA-Parser-GUI/library C:/NMEA-Parser-GUI/tcl8.6.14/library C:/tcl8.6.14/library
-
-
-
-This probably means that Tcl wasn't installed properly.
-
