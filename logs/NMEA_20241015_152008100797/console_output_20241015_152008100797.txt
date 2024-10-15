@@ -1,0 +1,1 @@
+2024-10-15 15:20:08,102 [INFO] Logging setup complete. Logs are being saved to logs/NMEA_20241015_152008100797/console_output_20241015_152008100797.txt
