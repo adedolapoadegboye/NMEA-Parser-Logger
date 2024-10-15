@@ -10,9 +10,24 @@ import pandas as pd
 from nmea_data import NMEAData
 
 
-# main.py
+def setup_logging(log_folder, timestamp):
+    """Setup logging to both console and file."""
+    os.makedirs(log_folder, exist_ok=True)
+
+    log_file = f"{log_folder}/console_output_{timestamp}.txt"
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        handlers=[
+            logging.FileHandler(log_file, 'a', encoding='utf-8'),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    logging.info(f"Logging setup complete. Logs are being saved to {log_file}")
+
 
 def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, reference_point=None):
+    """Reads live NMEA data from serial port and processes it."""
     parsed_sentences = []  # Initialize a list to store NMEA data
     start_time = time()  # Record the start time
     nmea_data = NMEAData(None, None, parsed_sentences)  # Create a new instance for each thread
@@ -101,76 +116,142 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
 
     nmea_data.write_to_excel(port, baudrate, timestamp, cep_value)
 
-
 def parse_nmea_from_log(file_path):
-    """Reads a log file in .txt, .csv or Excel format, parses valid NMEA sentences"""
+    """Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences"""
     parsed_sentences = []
+    coordinates = []
 
-    # Handle .txt and .log files
-    if file_path.endswith('.txt') | file_path.endswith('.log'):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+    logging.info(f"Processing log file: {file_path}")
+
+    # Handle plain text files (.txt, .log, .nmea)
+    if file_path.endswith(('.txt', '.log', '.nmea')):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            logging.info(f"Total lines read from file: {len(lines)}")
+        except Exception as e:
+            logging.error(f"Failed to read file: {file_path}. Error: {e}")
+            return parsed_sentences, coordinates
 
         for nmea_sentence in lines:
             nmea_sentence = nmea_sentence.strip()
-            if nmea_sentence.startswith('$G'):
+            logging.debug(f"Processing sentence: {nmea_sentence}")
+            if nmea_sentence.startswith('$G'):  # Check if it's a standard NMEA sentence
                 try:
                     msg = pynmea2.parse(nmea_sentence)
                     parsed_sentences.append(msg)
-                except pynmea2.ParseError:
-                    logging.error(f"Parse error for sentence: {nmea_sentence}")
+                    logging.info(f"Parsed sentence: {msg}")
+
+                    # Extract coordinates if it's a GGA sentence
+                    if msg.sentence_type == "GGA":
+                        coordinates.append((msg.latitude, msg.longitude))
+
+                except pynmea2.ParseError as e:
+                    logging.error(f"Parse error for sentence: {nmea_sentence} - {e}")
                     continue
             else:
-                logging.info(f"Ignored non-standard sentence: {nmea_sentence}")
+                logging.warning(f"Ignored non-standard or proprietary sentence: {nmea_sentence}")
 
-    # Handle .csv and .xlsx files
+    # Handle .csv files
     elif file_path.endswith('.csv'):
-        df = pd.read_csv(file_path, header=None)  # Assuming no headers
+        try:
+            df = pd.read_csv(file_path, header=None)
+            logging.info(f"Total lines read from CSV: {len(df)}")
+        except Exception as e:
+            logging.error(f"Failed to read CSV file: {file_path}. Error: {e}")
+            return parsed_sentences, coordinates
+
         for _, row in df.iterrows():
             nmea_sentence = str(row[0]).strip()
+            logging.debug(f"Processing sentence: {nmea_sentence}")
             if nmea_sentence.startswith('$G'):
                 try:
                     msg = pynmea2.parse(nmea_sentence)
                     parsed_sentences.append(msg)
-                except pynmea2.ParseError:
-                    logging.error(f"Parse error for sentence: {nmea_sentence}")
+                    logging.info(f"Parsed sentence: {msg}")
+
+                    # Extract coordinates if it's a GGA sentence
+                    if msg.sentence_type == "GGA":
+                        coordinates.append((msg.latitude, msg.longitude))
+
+                except pynmea2.ParseError as e:
+                    logging.error(f"Parse error for sentence: {nmea_sentence} - {e}")
                     continue
 
+    # Handle .xlsx files
     elif file_path.endswith('.xlsx'):
-        df = pd.read_excel(file_path, header=None)
+        try:
+            df = pd.read_excel(file_path, header=None)
+            logging.info(f"Total lines read from Excel: {len(df)}")
+        except Exception as e:
+            logging.error(f"Failed to read Excel file: {file_path}. Error: {e}")
+            return parsed_sentences, coordinates
+
         for _, row in df.iterrows():
             nmea_sentence = str(row[0]).strip()
+            logging.debug(f"Processing sentence: {nmea_sentence}")
             if nmea_sentence.startswith('$G'):
                 try:
                     msg = pynmea2.parse(nmea_sentence)
                     parsed_sentences.append(msg)
-                except pynmea2.ParseError:
-                    logging.error(f"Parse error for sentence: {nmea_sentence}")
+                    logging.info(f"Parsed sentence: {msg}")
+
+                    # Extract coordinates if it's a GGA sentence
+                    if msg.sentence_type == "GGA":
+                        coordinates.append((msg.latitude, msg.longitude))
+
+                except pynmea2.ParseError as e:
+                    logging.error(f"Parse error for sentence: {nmea_sentence} - {e}")
                     continue
 
     else:
+        logging.error(f"Unsupported file type: {file_path}")
         raise ValueError("Unsupported file type. Supported formats: .txt, .log, .nmea, .csv, .xlsx")
 
-    return parsed_sentences
-
+    logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
+    logging.info(f"Total coordinates collected: {len(coordinates)}")
+    return parsed_sentences, coordinates
 
 def process_nmea_log(file_path, reference_point=None):
     """Process pre-collected NMEA log file and calculate CEP"""
+    logging.info(f"Starting log processing for file: {file_path}")
+
+    # Check if the file exists (for debugging)
+    if not os.path.exists(file_path):
+        logging.error(f"File does not exist: {file_path}")
+        return
+
+    # Process the file to get parsed sentences
     parsed_sentences = parse_nmea_from_log(file_path)
 
     if not parsed_sentences:
-        logging.info(f"No valid NMEA sentences found in log file: {file_path}")
+        logging.error(f"No valid NMEA sentences found in log file: {file_path}")
         return
+
+    logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
 
     # Initialize NMEAData instance with parsed sentences
     nmea_data = NMEAData(None, None, parsed_sentences)
 
-    # Process the parsed sentences for CEP and satellite summary
+    # Ask for custom reference point if not provided
+    if reference_point is None:
+        logging.info("Calculating the mean point from data for CEP.")
+        reference_point = nmea_data.calculate_mean_point()
+
+    if reference_point is None:
+        logging.error("No valid coordinates found for CEP calculation.")
+        return
+
+    # Calculate CEP based on the reference point
     cep_value = nmea_data.calculate_cep(reference_point)
 
     if cep_value:
         logging.info(f"CEP statistics for {file_path}: {cep_value}")
-        nmea_data.write_to_excel('N/A', 'N/A', datetime.now().strftime('%Y%m%d_%H%M%S'), cep_value, filename='processed_log')
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        nmea_data.write_to_excel('N/A', 'N/A', timestamp, cep_value, filename='processed_log')
+    else:
+        logging.info(f"No CEP data generated for {file_path}.")
+
 
 
 if __name__ == "__main__":
@@ -237,8 +318,19 @@ if __name__ == "__main__":
             except Exception as e:
                 logging.error(f"An unexpected error occurred: {e}")
         elif mode == '2':
-            file_path = input("Enter the path to the log file (.txt, .log, .nmea, .csv, or .xlsx): ")
+            file_path = input("Enter the path to the log file (.txt, .log, .nmea, .csv, or .xlsx): \n").strip('"')
             reference_point = None
+
+            # Ask for reference point
+            use_custom_reference = input(
+                "Do you want to provide a custom reference point for CEP calculations? (y/n): ")
+
+            if use_custom_reference.lower() == 'y':
+                ref_lat = float(input("Enter reference latitude: "))
+                ref_lon = float(input("Enter reference longitude: "))
+                reference_point = (ref_lat, ref_lon)
+
+            # Process the log file and calculate CEP
             process_nmea_log(file_path, reference_point)
         else:
             print("Invalid input. Please enter 1 or 2.")
@@ -246,3 +338,4 @@ if __name__ == "__main__":
         activeProgram = input("Do you want to quit the program? (y/n): \n")
         if activeProgram.lower() != 'n':
             break
+
