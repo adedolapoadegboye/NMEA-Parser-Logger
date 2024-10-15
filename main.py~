@@ -282,8 +282,6 @@ def process_nmea_log(file_path, reference_point=None):
 
     logging.info(f"Finished log processing for file: {file_path}")
 
-    nmea_data.write_to_excel_mode_2(timestamp, cep_value)
-
 
 if __name__ == "__main__":
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')

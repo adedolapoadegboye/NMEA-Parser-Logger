@@ -366,7 +366,7 @@ class NMEAData:
 
     def write_to_excel_mode_1(self, port, baudrate, timestamp, cep_value, filename="nmea_data_mode_1"):
         """
-        MODE 1:Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
+        Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
         Also includes a new sheet "Satellites summary" for satellite CNR summary.
         """
         try:
@@ -516,7 +516,7 @@ class NMEAData:
 
     def write_to_excel_mode_2(self, timestamp, cep_value, filename="nmea_data_mode_2"):
         """
-        MODE 2: Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
+        Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
         Also includes a new sheet "Satellites summary" for satellite CNR summary.
         """
         try:
