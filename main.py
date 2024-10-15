@@ -119,6 +119,8 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
 def parse_nmea_from_log(file_path):
     """Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences"""
     parsed_sentences = []
+    nmea_data = NMEAData(None, None, parsed_sentences)  # Create a new instance for each thread
+
 
     logging.info(f"Processing log file: {file_path}")
 
@@ -134,17 +136,32 @@ def parse_nmea_from_log(file_path):
 
         for nmea_sentence in lines:
             nmea_sentence = nmea_sentence.strip()
-            logging.debug(f"Processing sentence: {nmea_sentence}")
-            if nmea_sentence.startswith('$G'):  # Check if it's a standard NMEA sentence
+            logging.info(f"Processing sentence: {nmea_sentence}")
+
+            # Skip proprietary sentences like $PAIR or $PQTM
+            if nmea_sentence.startswith('$P'):
+                logging.info(f"Proprietary sentence ignored: {nmea_sentence}")
+                continue
+
+            if nmea_sentence.startswith('$G'):
+                logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
+
+                # Parse the NMEA sentence using pynmea2
                 try:
                     msg = pynmea2.parse(nmea_sentence)
-                    parsed_sentences.append(msg)
-                    logging.info(f"Parsed sentence: {msg}")
+
+                    # Create a NMEAData object and add coordinates
+                    nmea_data.sentence_type = msg.sentence_type
+                    nmea_data.data = msg
+                    nmea_data.add_sentence_data()
+                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    logging.info(nmea_data)
+
                 except pynmea2.ParseError as e:
-                    logging.error(f"Parse error for sentence: {nmea_sentence} - {e}")
-                    continue
+                    logging.info(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+
             else:
-                logging.warning(f"Ignored non-standard or proprietary sentence: {nmea_sentence}")
+                logging.info(f"Received Unknown Message: {nmea_sentence}")
 
     # Handle .csv files
     elif file_path.endswith('.csv'):
@@ -158,14 +175,30 @@ def parse_nmea_from_log(file_path):
         for _, row in df.iterrows():
             nmea_sentence = str(row[0]).strip()
             logging.debug(f"Processing sentence: {nmea_sentence}")
+            # Skip proprietary sentences like $PAIR or $PQTM
+            if nmea_sentence.startswith('$P'):
+                logging.info(f"Proprietary sentence ignored: {nmea_sentence}")
+                continue
+
             if nmea_sentence.startswith('$G'):
+                logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
+
+                # Parse the NMEA sentence using pynmea2
                 try:
                     msg = pynmea2.parse(nmea_sentence)
-                    parsed_sentences.append(msg)
-                    logging.info(f"Parsed sentence: {msg}")
+
+                    # Create a NMEAData object and add coordinates
+                    nmea_data.sentence_type = msg.sentence_type
+                    nmea_data.data = msg
+                    nmea_data.add_sentence_data()
+                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    logging.info(nmea_data)
+
                 except pynmea2.ParseError as e:
-                    logging.error(f"Parse error for sentence: {nmea_sentence} - {e}")
-                    continue
+                    logging.info(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+
+            else:
+                logging.info(f"Received Unknown Message: {nmea_sentence}")
 
     # Handle .xlsx files
     elif file_path.endswith('.xlsx'):
@@ -179,14 +212,30 @@ def parse_nmea_from_log(file_path):
         for _, row in df.iterrows():
             nmea_sentence = str(row[0]).strip()
             logging.debug(f"Processing sentence: {nmea_sentence}")
+            # Skip proprietary sentences like $PAIR or $PQTM
+            if nmea_sentence.startswith('$P'):
+                logging.info(f"Proprietary sentence ignored: {nmea_sentence}")
+                continue
+
             if nmea_sentence.startswith('$G'):
+                logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
+
+                # Parse the NMEA sentence using pynmea2
                 try:
                     msg = pynmea2.parse(nmea_sentence)
-                    parsed_sentences.append(msg)
-                    logging.info(f"Parsed sentence: {msg}")
+
+                    # Create a NMEAData object and add coordinates
+                    nmea_data.sentence_type = msg.sentence_type
+                    nmea_data.data = msg
+                    nmea_data.add_sentence_data()
+                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    logging.info(nmea_data)
+
                 except pynmea2.ParseError as e:
-                    logging.error(f"Parse error for sentence: {nmea_sentence} - {e}")
-                    continue
+                    logging.info(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+
+            else:
+                logging.info(f"Received Unknown Message: {nmea_sentence}")
 
     else:
         logging.error(f"Unsupported file type: {file_path}")
@@ -239,6 +288,10 @@ def process_nmea_log(file_path, reference_point=None):
 
 
 if __name__ == "__main__":
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
+    log_folder = f"logs/NMEA_{timestamp}"
+
+    setup_logging(log_folder, timestamp)
 
     activeProgram = True
 
@@ -246,8 +299,6 @@ if __name__ == "__main__":
         mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Log file\n")
         if mode == '1':
             try:
-                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
-                log_folder = f"logs/NMEA_{timestamp}"
 
                 # Prompt the user for a reference point or use the mean point
                 use_custom_reference = input(
@@ -322,4 +373,3 @@ if __name__ == "__main__":
         activeProgram = input("Do you want to quit the program? (y/n): \n")
         if activeProgram.lower() != 'n':
             break
-
