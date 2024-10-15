@@ -144,7 +144,8 @@ The program supports the following reference points:
 - **Mean Point of dataset**: The mean point of the GPS data. A key indicator for precision estimation.
 - **True Point**: The true reference point provided by the user. A key indicator for accuracy estimation.
 
-
+### Custom Reference Point:
+You can provide a reference latitude and longitude or let the program calculate the mean point of the GPS data.
 
 ---
 

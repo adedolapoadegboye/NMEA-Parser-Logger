@@ -300,11 +300,11 @@ if __name__ == "__main__":
 
                 # Prompt the user for a reference point or use the mean point
                 use_custom_reference = input(
-                    "Do you want to provide a custom reference point for CEP calculations? (y/n): ")
+                    "Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
 
                 if use_custom_reference.lower() == 'y':
-                    ref_lat = float(input("Enter reference latitude: "))
-                    ref_lon = float(input("Enter reference longitude: "))
+                    ref_lat = float(input("Enter reference latitude: \n"))
+                    ref_lon = float(input("Enter reference longitude: \n"))
                     reference_point = (ref_lat, ref_lon)
                 else:
                     reference_point = None
@@ -356,11 +356,11 @@ if __name__ == "__main__":
 
             # Prompt the user for a reference point or use the mean point
             use_custom_reference = input(
-                "Do you want to provide a custom reference point for CEP calculations? (y/n): ")
+                "Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
 
             if use_custom_reference.lower() == 'y':
-                ref_lat = float(input("Enter reference latitude: "))
-                ref_lon = float(input("Enter reference longitude: "))
+                ref_lat = float(input("Enter reference latitude: \n"))
+                ref_lon = float(input("Enter reference longitude: \n"))
                 reference_point = (ref_lat, ref_lon)
             else:
                 reference_point = None
