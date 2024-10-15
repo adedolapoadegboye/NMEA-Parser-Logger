@@ -120,8 +120,6 @@ def parse_nmea_from_log(file_path):
     """Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences"""
     parsed_sentences = []
     nmea_data = NMEAData(None, None, parsed_sentences)  # Create a new instance for each thread
-
-
     logging.info(f"Processing log file: {file_path}")
 
     # Handle plain text files (.txt, .log, .nmea)
@@ -242,7 +240,7 @@ def parse_nmea_from_log(file_path):
         raise ValueError("Unsupported file type. Supported formats: .txt, .log, .nmea, .csv, .xlsx")
 
     logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
-    return parsed_sentences
+    return parsed_sentences, nmea_data
 
 
 def process_nmea_log(file_path, reference_point=None):
@@ -255,7 +253,7 @@ def process_nmea_log(file_path, reference_point=None):
         return
 
     # Process the file to get parsed sentences
-    parsed_sentences = parse_nmea_from_log(file_path)
+    parsed_sentences, nmea_data = parse_nmea_from_log(file_path)
 
     if not parsed_sentences:
         logging.error(f"No valid NMEA sentences found in log file: {file_path}")
@@ -263,28 +261,26 @@ def process_nmea_log(file_path, reference_point=None):
 
     logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
 
-    # Initialize NMEAData instance with parsed sentences
-    nmea_data = NMEAData(None, None, parsed_sentences)
-
     # Ask for custom reference point if not provided
     if reference_point is None:
-        logging.info("Calculating the mean point from data for CEP.")
+        logging.info("Calculating the mean point from log data for CEP Analysis.")
         reference_point = nmea_data.calculate_mean_point()
-
-    if reference_point is None:
-        logging.error("No valid coordinates found for CEP calculation.")
-        return
-
-    # Calculate CEP based on the reference point
-    cep_value = nmea_data.calculate_cep(reference_point)
-
-    if cep_value:
-        logging.info(f"CEP statistics for {file_path}: {cep_value}")
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        nmea_data.write_to_excel('N/A', 'N/A', timestamp, cep_value, filename='processed_log')
     else:
-        logging.info(f"No CEP data generated for {file_path}.")
+        logging.info(f"Using provided reference point: {reference_point}")
 
+    # Calculate CEP for this thread's data
+    cep_value = nmea_data.calculate_cep(reference_point)
+    if cep_value is not None:
+        logging.info(f"CEP statistics for logfile {file_path}:")
+        logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
+        logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
+        logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
+        logging.info(f"CEP95: {cep_value['CEP95']:.2f} meters")
+        logging.info(f"CEP99: {cep_value['CEP99']:.2f} meters")
+    else:
+        logging.info(f"No coordinates available for CEP calculation for log {file_path}.")
+
+    logging.info(f"Finished log processing for file: {file_path}")
 
 
 if __name__ == "__main__":
@@ -356,7 +352,7 @@ if __name__ == "__main__":
             file_path = input("Enter the path to the log file (.txt, .log, .nmea, .csv, or .xlsx): \n").strip('"')
             reference_point = None
 
-            # Ask for reference point
+            # Prompt the user for a reference point or use the mean point
             use_custom_reference = input(
                 "Do you want to provide a custom reference point for CEP calculations? (y/n): ")
 
@@ -364,6 +360,8 @@ if __name__ == "__main__":
                 ref_lat = float(input("Enter reference latitude: "))
                 ref_lon = float(input("Enter reference longitude: "))
                 reference_point = (ref_lat, ref_lon)
+            else:
+                reference_point = None
 
             # Process the log file and calculate CEP
             process_nmea_log(file_path, reference_point)
