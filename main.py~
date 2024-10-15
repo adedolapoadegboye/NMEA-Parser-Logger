@@ -103,17 +103,17 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
 
 
 def parse_nmea_from_log(file_path):
-    """Reads a log file in .txt, .log, .nmea, .csv or Excel format and parses valid NMEA sentences"""
+    """Reads a log file in .txt, .csv or Excel format, parses valid NMEA sentences"""
     parsed_sentences = []
 
-    # Handle plain text files (.txt, .log, .nmea)
-    if file_path.endswith(('.txt', '.log', '.nmea')):
+    # Handle .txt and .log files
+    if file_path.endswith('.txt') | file_path.endswith('.log'):
         with open(file_path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
 
         for nmea_sentence in lines:
             nmea_sentence = nmea_sentence.strip()
-            if nmea_sentence.startswith('$G'):  # Check if it's a standard NMEA sentence
+            if nmea_sentence.startswith('$G'):
                 try:
                     msg = pynmea2.parse(nmea_sentence)
                     parsed_sentences.append(msg)
@@ -123,7 +123,7 @@ def parse_nmea_from_log(file_path):
             else:
                 logging.info(f"Ignored non-standard sentence: {nmea_sentence}")
 
-    # Handle .csv files
+    # Handle .csv and .xlsx files
     elif file_path.endswith('.csv'):
         df = pd.read_csv(file_path, header=None)  # Assuming no headers
         for _, row in df.iterrows():
@@ -136,7 +136,6 @@ def parse_nmea_from_log(file_path):
                     logging.error(f"Parse error for sentence: {nmea_sentence}")
                     continue
 
-    # Handle .xlsx files
     elif file_path.endswith('.xlsx'):
         df = pd.read_excel(file_path, header=None)
         for _, row in df.iterrows():
