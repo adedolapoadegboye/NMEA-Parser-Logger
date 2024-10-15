@@ -36,7 +36,7 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
     if not os.path.exists(log_folder):
         os.makedirs(log_folder)
 
-    raw_nmea_log = open(f"{log_folder}/nmea_raw_log_{port}_{baudrate}_{timestamp}.txt", "a", encoding="utf-8")
+    raw_nmea_log = open(f"{log_folder}/nmea_raw_log_mode_1_{port}_{baudrate}_{timestamp}.txt", "a", encoding="utf-8")
 
     try:
         # Configure the serial port
@@ -105,7 +105,7 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
     # Calculate CEP for this thread's data
     cep_value = nmea_data.calculate_cep(reference_point)
     if cep_value is not None:
-        logging.info(f"CEP statistics for port {port}:")
+        logging.info(f"Mode 1: CEP statistics for port {port}:")
         logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
         logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
         logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
@@ -271,7 +271,7 @@ def process_nmea_log(file_path, reference_point=None):
     # Calculate CEP for this thread's data
     cep_value = nmea_data.calculate_cep(reference_point)
     if cep_value is not None:
-        logging.info(f"CEP statistics for logfile {file_path}:")
+        logging.info(f"Mode 2: CEP statistics for logfile {file_path}:")
         logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
         logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
         logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
@@ -297,10 +297,20 @@ if __name__ == "__main__":
         mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Log file\n")
         if mode == '1':
             try:
+                # Prompt the user for the port, baudrate, timeout, and duration
+                num_devices = int(input("How many devices would you like to configure? (e.g., 1, 2, 3)\n"))
+
+                devices = {}
+                for i in range(1, num_devices + 1):
+                    print(f"Configure device {i}:")
+                    port = input(f"Enter the port for device {i} (e.g., COM9): \n")
+                    baudrate = int(input(f"Enter the baudrate for device {i} (e.g., 115200): \n"))
+                    timeout = float(input(f"Enter the timeout for device {i} (in seconds, e.g., 1): \n"))
+                    duration = float(input(f"Enter the test duration for device {i} (in seconds): \n"))
+                    devices[f"device {i}"] = {"port": port, "baudrate": baudrate, "timeout": timeout, "duration": duration}
 
                 # Prompt the user for a reference point or use the mean point
-                use_custom_reference = input(
-                    "Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
+                use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
 
                 if use_custom_reference.lower() == 'y':
                     ref_lat = float(input("Enter reference latitude: \n"))
@@ -322,12 +332,6 @@ if __name__ == "__main__":
                     ]
                 )
 
-                devices = {
-                    "device 1": {"port": "COM9", "baudrate": 115200, "timeout": 1, "duration": 10},
-                    "device 2": {"port": "COM7", "baudrate": 115200, "timeout": 1, "duration": 20},
-                    "device 3": {"port": "COM10", "baudrate": 921600, "timeout": 1, "duration": 30}
-                }
-
                 threads = []
 
                 for device, config in devices.items():
@@ -335,8 +339,7 @@ if __name__ == "__main__":
                         # Pass reference_point and timestamp to each thread
                         thread = threading.Thread(target=read_nmea_data, args=(
                             config["port"], config["baudrate"], config["timeout"], config["duration"], log_folder,
-                            timestamp,
-                            reference_point))
+                            timestamp, reference_point))
                         threads.append(thread)
                         thread.start()
                     except Exception as e:
@@ -355,8 +358,7 @@ if __name__ == "__main__":
             reference_point = None
 
             # Prompt the user for a reference point or use the mean point
-            use_custom_reference = input(
-                "Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
+            use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
 
             if use_custom_reference.lower() == 'y':
                 ref_lat = float(input("Enter reference latitude: \n"))

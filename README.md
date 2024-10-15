@@ -74,18 +74,35 @@ In **Mode 1**, the program reads live NMEA data from one or more defined serial 
 4. **Test Duration** (e.g., 10, 30, 60): Test duration in seconds. The program will continuously read and parse NMEA sentences until the specified duration is reached.
 5. **Custom Reference Point**: You can either provide a true test point (latitude and longitude) or let the program calculate the mean point of the GPS data. This point will be used as the reference point for CEP calculation.
 
-Once the configuration is set, the program will continuously read and parse NMEA sentences and log the raw and parsed data for the defined Test Duration. An example is shown below:
+Once the configuration is set, the program will continuously read and parse NMEA sentences and log the raw and parsed data for the defined Test Duration. An example on how to configure two serial ports is shown below:
 
 ```console
-2024-10-15 15:45:06,268 [INFO] Logging setup complete. Logs are being saved to logs/NMEA_20241015_154506268246/console_output_20241015_154506268246.txt
+C:\PythonProjects\NMEA-Parser-Logger\.venv\Scripts\python.exe C:\PythonProjects\NMEA-Parser-Logger\main.py 
+2024-10-15 16:15:41,040 [INFO] Logging setup complete. Logs are being saved to logs/NMEA_20241015_161541039428/console_output_20241015_161541039428.txt
 Choose data input mode: 1 = Live Serial Data, 2 = Log file
 1
+How many devices would you like to configure? (e.g., 1, 2, 3)
+2
+Configure device 1:
+Enter the port for device 1 (e.g., COM9): 
+COM9
+Enter the baudrate for device 1 (e.g., 115200): 
+115200
+Enter the timeout for device 1 (in seconds, e.g., 1): 
+1
+Enter the test duration for device 1 (in seconds): 
+60
+Configure device 2:
+Enter the port for device 2 (e.g., COM9): 
+COM10
+Enter the baudrate for device 2 (e.g., 115200): 
+115200
+Enter the timeout for device 2 (in seconds, e.g., 1): 
+1
+Enter the test duration for device 2 (in seconds): 
+60
 Do you want to provide a custom reference point for CEP calculations? (y/n): 
-y
-Enter reference latitude: 
-49.0000000
-Enter reference longitude: 
-123.00000000
+n
 ```
 
 
@@ -132,6 +149,23 @@ This program supports parsing the following NMEA sentence types:
 
 Each sentence is parsed into its respective fields and stored for further processing. The full parsed sentence is saved in the `logs/{.xlsx}` directory.
 
+Example showing fully parsed GGA sentence:
+
+```console
+2024-10-15 16:17:51,985 [INFO] Received Standard NMEA Message: $GNGGA,231752.000,4910.428474,N,12304.404546,W,2,21,0.64,5.644,M,-16.817,M,,*43
+2024-10-15 16:17:51,985 [INFO] GGA - Fix Data:
+  Timestamp: 23:17:52+00:00
+  Latitude: 49.1738079 N
+  Longitude: -123.0734091 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 21
+  Horizontal Dilution of Precision (HDOP): 0.64
+  Antenna Altitude (Above Mean Sea Level): 5.644 M
+  Geoidal Separation: -16.817 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+```
+
 ---
 
 ## CEP Calculation
@@ -144,7 +178,16 @@ The program supports the following reference points:
 - **Mean Point of dataset**: The mean point of the GPS data. A key indicator for precision estimation.
 - **True Point**: The true reference point provided by the user. A key indicator for accuracy estimation.
 
+Example of CEP statistics for a live serial data port:
 
+```console
+2024-10-15 16:17:52,001 [INFO] CEP statistics for port COM9:
+2024-10-15 16:17:52,002 [INFO] CEP50: 2.05 meters
+2024-10-15 16:17:52,002 [INFO] CEP68: 2.18 meters
+2024-10-15 16:17:52,002 [INFO] CEP90: 2.98 meters
+2024-10-15 16:17:52,002 [INFO] CEP95: 3.50 meters
+2024-10-15 16:17:52,002 [INFO] CEP99: 3.77 meters
+```
 
 ---
 
