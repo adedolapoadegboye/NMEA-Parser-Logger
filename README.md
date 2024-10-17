@@ -224,6 +224,13 @@ All NMEA raw sentences and detailed execution logs are stored for post-processin
 
 ---
 
+## Known Limitations
+
+- **Checksum Check**: The program does not support checksum check for NMEA sentences so ensure sentences are properly formatted.
+- **Data Plotting**: The program does not support data plotting.
+
+---
+
 ## License
 
 This project is licensed under the MIT License.
