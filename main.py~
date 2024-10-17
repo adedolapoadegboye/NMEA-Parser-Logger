@@ -271,7 +271,7 @@ def process_nmea_log(file_path, reference_point=None):
     # Calculate CEP for this thread's data
     cep_value = nmea_data.calculate_cep(reference_point)
     if cep_value is not None:
-        logging.info(f"CEP statistics for logfile {file_path}:")
+        logging.info(f"Mode 2: CEP statistics for logfile {file_path}:")
         logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
         logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
         logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
