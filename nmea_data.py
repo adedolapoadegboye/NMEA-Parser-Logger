@@ -373,7 +373,7 @@ class NMEAData:
             # Ensure reference point is properly formatted
             ref_point = cep_value['reference_point']
             if ref_point:
-                formatted_ref_point = f"({float(ref_point[0]):.6f}, {float(ref_point[1]):.7f})"
+                formatted_ref_point = f"({float(ref_point[0]):.7f}, {float(ref_point[1]):.7f})"
             else:
                 formatted_ref_point = ''
 
@@ -523,7 +523,7 @@ class NMEAData:
             # Ensure reference point is properly formatted
             ref_point = cep_value['reference_point']
             if ref_point:
-                formatted_ref_point = f"({float(ref_point[0]):.6f}, {float(ref_point[1]):.7f})"
+                formatted_ref_point = f"({float(ref_point[0]):.7f}, {float(ref_point[1]):.7f})"
             else:
                 formatted_ref_point = ''
 
