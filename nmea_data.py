@@ -489,25 +489,30 @@ class NMEAData:
 
             # Write data to Excel
             filepath = f"logs/NMEA_{timestamp}/{filename}_{port}_{baudrate}_{timestamp}.xlsx"
+            max_rows = 1048576  # Excel row limit
+
             with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
-                # Write parsed sentences to the default sheet
-                df_parsed.to_excel(writer, index=False, sheet_name="Parsed Sentences")
+                # Write parsed sentences, splitting across multiple sheets if necessary
+                for i in range(0, len(df_parsed), max_rows):
+                    chunk = df_parsed.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"Parsed_{i // max_rows + 1}")
 
                 # Write summary data to a new sheet called "CEP Summary"
                 df_summary.to_excel(writer, index=False, sheet_name="CEP Summary")
 
-                # Write data points with timestamps and distances to the summary sheet
-                if not df_data_points.empty:
-                    df_data_points.to_excel(writer, index=False, sheet_name="CEP Summary", startrow=len(df_summary) + 2)
+                # Write data points with distances, splitting across multiple sheets if necessary
+                for i in range(0, len(df_data_points), max_rows):
+                    chunk = df_data_points.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"DataPoints_{i // max_rows + 1}")
 
-                # Write satellite summary data to a new sheet called "Satellites summary"
+                # Write satellite summary, splitting if necessary
+                for i in range(0, len(df_sat_summary), max_rows):
+                    chunk = df_sat_summary.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"SatSummary_{i // max_rows + 1}")
+
+                # Write satellite summary statistics (if any)
                 if not df_sat_summary_stats.empty:
-                    # Write the summary first at the top (starting at row 0)
-                    df_sat_summary_stats.to_excel(writer, index=False, sheet_name="Satellites summary")
-
-                if not df_sat_summary.empty:
-                    # Then write the satellite data starting right after the summary
-                    df_sat_summary.to_excel(writer, index=False, sheet_name="Satellites summary", startrow=len(df_sat_summary_stats) + 2)
+                    df_sat_summary_stats.to_excel(writer, index=False, sheet_name="SatSummaryStats")
 
             logging.info(f"Data written to {filepath}")
 
@@ -634,25 +639,30 @@ class NMEAData:
 
             # Write data to Excel
             filepath = f"logs/NMEA_{timestamp}/{filename}_{timestamp}.xlsx"
+            max_rows = 1048576  # Excel row limit
+
             with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
-                # Write parsed sentences to the default sheet
-                df_parsed.to_excel(writer, index=False, sheet_name="Parsed Sentences")
+                # Write parsed sentences, splitting across multiple sheets if necessary
+                for i in range(0, len(df_parsed), max_rows):
+                    chunk = df_parsed.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"Parsed_{i // max_rows + 1}")
 
-                # Write summary data to a new sheet called "CEP Summary"
-                df_summary.to_excel(writer, index=False, sheet_name="CEP Summary")
+                    # Write summary data to a new sheet called "CEP Summary"
+                df_summary.to_excel(writer, index=False, sheet_name="CEPSummaryStats")
 
-                # Write data points with timestamps and distances to the summary sheet
-                if not df_data_points.empty:
-                    df_data_points.to_excel(writer, index=False, sheet_name="CEP Summary", startrow=len(df_summary) + 2)
+                # Write data points with distances, splitting across multiple sheets if necessary
+                for i in range(0, len(df_data_points), max_rows):
+                    chunk = df_data_points.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"CEPDataPoints_{i // max_rows + 1}")
 
-                # Write satellite summary data to a new sheet called "Satellites summary"
+                # Write satellite summary, splitting if necessary
+                for i in range(0, len(df_sat_summary), max_rows):
+                    chunk = df_sat_summary.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"SatDataPoints_{i // max_rows + 1}")
+
+                # Write satellite summary statistics (if any)
                 if not df_sat_summary_stats.empty:
-                    # Write the summary first at the top (starting at row 0)
-                    df_sat_summary_stats.to_excel(writer, index=False, sheet_name="Satellites summary")
-
-                if not df_sat_summary.empty:
-                    # Then write the satellite data starting right after the summary
-                    df_sat_summary.to_excel(writer, index=False, sheet_name="Satellites summary", startrow=len(df_sat_summary_stats) + 2)
+                        df_sat_summary_stats.to_excel(writer, index=False, sheet_name="SatSummaryStats")
 
             logging.info(f"Data written to {filepath}")
 
