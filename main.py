@@ -11,7 +11,7 @@ from nmea_data import NMEAData
 
 
 def setup_logging(log_folder, timestamp):
-    """Setup logging to both console and file."""
+    """Setup logging to both console and file"""
     os.makedirs(log_folder, exist_ok=True)
 
     log_file = f"{log_folder}/console_output_{timestamp}.txt"
