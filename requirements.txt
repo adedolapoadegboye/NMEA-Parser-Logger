@@ -15,7 +15,7 @@ pefile==2023.2.7
 pillow==11.0.0
 pyinstaller==6.11.0
 pyinstaller-hooks-contrib==2024.9
-pynmea2==1.19.0
+pynmea2 @ git+https://github.com/adedolapoadegboye/pynmea2.git@80cf27f9fb3ecbe1973d3fb95a2015c616dac6a5
 pyparsing==3.2.0
 pyserial==3.5
 python-dateutil==2.9.0.post0
