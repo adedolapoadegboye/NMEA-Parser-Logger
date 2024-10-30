@@ -4,6 +4,7 @@ import pandas as pd
 import logging
 import numpy as np
 
+# noinspection PyCompatibility
 class NMEAData:
     def __init__(self, sentence_type, data, parsed_sentences):
         self.baudrate = None
@@ -14,7 +15,6 @@ class NMEAData:
         self.coordinates = []  # To store latitude and longitude tuples
         self.MIN_POINTS_FOR_CEP = 50  # Minimum number of points for CEP calculation
         self.satellite_info = []  # To store satellite CNR and related info from GSV sentences
-
 
 
     def __str__(self):
@@ -33,7 +33,6 @@ class NMEAData:
                 f"  Age of Differential GPS Data: {self.data.age_gps_data}\n"
                 f"  Differential Reference Station ID: {self.data.ref_station_id}\n"
             )
-
         elif self.sentence_type == "RMC":
             return (
                 f"RMC - Recommended Minimum:\n"
@@ -135,8 +134,200 @@ class NMEAData:
                 f"  Beacon ID: {self.data.beacon_id}\n"
                 f"  Message Code: {self.data.message_code}\n"
             )
+        elif self.sentence_type == "VERNO":
+            return (
+                f"VERNO - Version Information:\n"
+                f"  Version: {self.data.version}\n"
+                f"  Build Date: {self.data.build_date}\n"
+                f"  Build Time: {self.data.build_time}\n"
+            )
+        elif self.sentence_type == "SAVEPAR":
+            return (
+                f"SAVEPAR - Save Parameters:\n"
+                f"  Status: {self.data.status}\n"
+            )
+        elif self.sentence_type == "RESTOREPAR":
+            return (
+                f"RESTOREPAR - Restore Parameters:\n"
+                f"  Status: {self.data.status}\n"
+            )
+        elif self.sentence_type == "EPE":
+            return (
+                f"EPE - Estimated Position Error:\n"
+                f"  Version: {self.data.msg_ver}\n"
+                f"  EPE North: {self.data.epe_north} m\n"
+                f"  EPE East: {self.data.epe_east} m\n"
+                f"  EPE Down: {self.data.epe_down} m\n"
+                f"  EPE 2D: {self.data.epe_2d} m\n"
+                f"  EPE 3D: {self.data.epe_3d} m\n"
+            )
+        elif self.sentence_type == "CFGGEOFENCE":
+            return (
+                f"CFGGEOFENCE - Geofence Configuration:\n"
+                f"  Status: {self.data.status}\n"
+                f"  Index: {self.data.index}\n"
+                f"  Enabled: {self.data.enabled}\n"
+                f"  Shape: {self.data.shape}\n"
+                f"  Latitude 0: {self.data.lat0}\n"
+                f"  Longitude 0: {self.data.lon0}\n"
+                f"  Radius/Lat1: {self.data.lat1_or_radius}\n"
+                f"  Longitude 1: {self.data.lon1}\n"
+                f"  Latitude 2: {self.data.lat2}\n"
+                f"  Longitude 2: {self.data.lon2}\n"
+                f"  Latitude 3: {self.data.lat3}\n"
+                f"  Longitude 3: {self.data.lon3}\n"
+            )
+        elif self.sentence_type == "GEOFENCESTATUS":
+            return (
+                f"GEOFENCESTATUS - Geofence Status:\n"
+                f"  Time: {self.data.time}\n"
+                f"  State 0: {self.data.state0}\n"
+                f"  State 1: {self.data.state1}\n"
+                f"  State 2: {self.data.state2}\n"
+                f"  State 3: {self.data.state3}\n"
+            )
+        elif self.sentence_type == "CFGSVIN":
+            return (
+                f"CFGSVIN - Survey-In Configuration:\n"
+                f"  Status: {self.data.status}\n"
+                f"  Mode: {self.data.mode}\n"
+                f"  Minimum Duration: {self.data.min_dur} s\n"
+                f"  Accuracy Limit: {self.data.acc_limit} m\n"
+                f"  ECEF X: {self.data.ecef_x} m\n"
+                f"  ECEF Y: {self.data.ecef_y} m\n"
+                f"  ECEF Z: {self.data.ecef_z} m\n"
+            )
+        elif self.sentence_type == "SVINSTATUS":
+            return (
+                f"SVINSTATUS - Survey-In Status:\n"
+                f"  Time of Week (TOW): {self.data.tow} ms\n"
+                f"  Validity: {self.data.valid}\n"
+                f"  Observations: {self.data.obs}\n"
+                f"  Duration: {self.data.cfg_dur} s\n"
+                f"  Mean X: {self.data.mean_x} m\n"
+                f"  Mean Y: {self.data.mean_y} m\n"
+                f"  Mean Z: {self.data.mean_z} m\n"
+                f"  Mean Accuracy: {self.data.mean_acc} m\n"
+            )
+        elif self.sentence_type == "GNSSSTART":
+            return (
+                f"GNSSSTART - Start GNSS Engine:\n"
+                f"  Status: {self.data.status}\n"
+            )
+        elif self.sentence_type == "GNSSSTOP":
+            return (
+                f"GNSSSTOP - Stop GNSS Engine:\n"
+                f"  Status: {self.data.status}\n"
+            )
+        elif self.sentence_type == "PVT":
+            return (
+                f"PVT - Position, Velocity, Time:\n"
+                f"  TOW: {self.data.tow}\n"
+                f"  Date: {self.data.date}\n"
+                f"  Time: {self.data.time}\n"
+                f"  Latitude: {self.data.lat}\n"
+                f"  Longitude: {self.data.lon}\n"
+                f"  Altitude: {self.data.alt} m\n"
+                f"  Speed: {self.data.spd} m/s\n"
+                f"  Heading: {self.data.heading}°\n"
+                f"  Number of Satellites Used: {self.data.num_sat_used}\n"
+                f"  HDOP: {self.data.hdop}\n"
+                f"  PDOP: {self.data.pdop}\n"
+            )
+        elif self.sentence_type == "CFGNMEADP":
+            return (
+                f"CFGNMEADP - NMEA Decimal Places Configuration:\n"
+                f"  Status: {self.data.status}\n"
+                f"  UTC Decimal Places: {self.data.utc_dp}\n"
+                f"  Position Decimal Places: {self.data.pos_dp}\n"
+                f"  Altitude Decimal Places: {self.data.alt_dp}\n"
+                f"  DOP Decimal Places: {self.data.dop_dp}\n"
+                f"  Speed Decimal Places: {self.data.spd_dp}\n"
+                f"  Course Decimal Places: {self.data.cog_dp}\n"
+            )
+        elif self.sentence_type == "CFGRCVRMODE":
+            return (
+                f"CFGRCVRMODE - Receiver Mode Configuration:\n"
+                f"  Status: {self.data.status}\n"
+                f"  Mode: {self.data.mode}\n"
+                f"  Mode Description: {self.data.get_mode_description()}\n"
+            )
+        elif self.sentence_type == "PL":
+            return (
+                f"PL - Protection Levels:\n"
+                f"  TOW: {self.data.tow} ms\n"
+                f"  Position North: {self.data.pl_posn} mm\n"
+                f"  Position East: {self.data.pl_pose} mm\n"
+                f"  Position Down: {self.data.pl_posd} mm\n"
+                f"  Velocity North: {self.data.pl_veln} mm/s\n"
+                f"  Velocity East: {self.data.pl_vele} mm/s\n"
+                f"  Velocity Down: {self.data.pl_veld} mm/s\n"
+                f"  Time: {self.data.pl_time}\n"
+            )
+        elif self.sentence_type == "CFGSBAS":
+            return (
+                f"CFGSBAS - SBAS Configuration:\n"
+                f"  Status: {self.data.status}\n"
+                f"  Value: {self.data.value}\n"
+                f"  SBAS Description: {self.data.get_sbas_description()}\n"
+            )
+        elif self.sentence_type == "CFGCNST":
+            return (
+                f"CFGCNST - Constellation Configuration:\n"
+                f"  GPS Enabled: {self.data.gps}\n"
+                f"  GLONASS Enabled: {self.data.glonass}\n"
+                f"  Galileo Enabled: {self.data.galileo}\n"
+                f"  BDS Enabled: {self.data.bds}\n"
+                f"  QZSS Enabled: {self.data.qzss}\n"
+            )
+        elif self.sentence_type == "DOP":
+            return (
+                f"DOP - Dilution of Precision:\n"
+                f"  TOW: {self.data.tow} ms\n"
+                f"  GDOP: {self.data.gdop}\n"
+                f"  PDOP: {self.data.pdop}\n"
+                f"  HDOP: {self.data.hdop}\n"
+                f"  VDOP: {self.data.vdop}\n"
+                f"  NDOP: {self.data.ndop}\n"
+                f"  EDOP: {self.data.edop}\n"
+            )
+        elif self.sentence_type == "CFGFIXRATE":
+            return (
+                f"CFGFIXRATE - Fix Rate Configuration:\n"
+                f"  Status: {self.data.status}\n"
+            )
+        elif self.sentence_type == "VEL":
+            return (
+                f"VEL - Velocity Information:\n"
+                f"  Time: {self.data.time}\n"
+                f"  North Velocity: {self.data.vel_n} m/s\n"
+                f"  East Velocity: {self.data.vel_e} m/s\n"
+                f"  Down Velocity: {self.data.vel_d} m/s\n"
+                f"  Ground Speed: {self.data.grd_spd} m/s\n"
+                f"  Speed: {self.data.spd} m/s\n"
+                f"  Heading: {self.data.heading}°\n"
+                f"  Ground Speed Accuracy: {self.data.grd_spd_acc} m/s\n"
+                f"  Speed Accuracy: {self.data.spd_acc} m/s\n"
+                f"  Heading Accuracy: {self.data.heading_acc}°\n"
+            )
+        elif self.sentence_type == "CFGODO":
+            return (
+                f"CFGODO - Odometer Configuration:\n"
+                f"  Status: {self.data.status}\n"
+                f"  State: {self.data.state}\n"
+                f"  Initial Distance: {self.data.init_dist} m\n"
+                f"  State Description: {self.data.get_state_description()}\n"
+            )
+        elif self.sentence_type == "ODO":
+            return (
+                f"ODO - Odometer Information:\n"
+                f"  Time: {self.data.time}\n"
+                f"  State: {self.data.state}\n"
+                f"  Distance: {self.data.dist} m\n"
+                f"  State Description: {self.data.get_state_description()}\n"
+            )
         else:
-            return f"Unsupported NMEA sentence type: {self.sentence_type}"
+            return f"Unsupported NMEA sentence type: {self.sentence_type}\n"
 
     def add_sentence_data(self):
         # Pretty print the data based on sentence type
@@ -266,7 +457,6 @@ class NMEAData:
                 "Age of Differential Data": self.data.age_gps_data,
                 "Differential Reference Station ID": self.data.differential
             })
-
         elif self.sentence_type == "GST":
             self.parsed_sentences.append({
                 "Type": "GST",
@@ -279,7 +469,6 @@ class NMEAData:
                 "Longitude Error": self.data.std_dev_longitude,
                 "Altitude Error": self.data.std_dev_altitude
             })
-
         elif self.sentence_type == "GRS":
             self.parsed_sentences.append({
                 "Type": "GRS",
@@ -295,6 +484,210 @@ class NMEAData:
                 "Beacon ID": self.data.beacon_id,
                 "Message Code": self.data.message_code
             })
+        elif self.sentence_type == "VERNO":
+            self.parsed_sentences.append({
+                "Version": self.data.version,
+                "Build Date": self.data.build_date,
+                "Build Time": self.data.build_time
+            })
+        elif self.sentence_type == "SAVEPAR":
+            self.parsed_sentences.append({
+                "Status": self.data.status
+            })
+
+        elif self.sentence_type == "RESTOREPAR":
+            self.parsed_sentences.append({
+                "Status": self.data.status
+            })
+
+        elif self.sentence_type == "EPE":
+            self.parsed_sentences.append({
+                "Version": self.data.msg_ver,
+                "EPE North": f"{self.data.epe_north} m",
+                "EPE East": f"{self.data.epe_east} m",
+                "EPE Down": f"{self.data.epe_down} m",
+                "EPE 2D": f"{self.data.epe_2d} m",
+                "EPE 3D": f"{self.data.epe_3d} m"
+            })
+
+        elif self.sentence_type == "CFGGEOFENCE":
+            self.parsed_sentences.append({
+                "Status": self.data.status,
+                "Index": self.data.index,
+                "Enabled": self.data.enabled,
+                "Shape": self.data.shape,
+                "Latitude 0": self.data.lat0,
+                "Longitude 0": self.data.lon0,
+                "Latitude 1 / Radius": self.data.lat1_or_radius,
+                "Longitude 1": self.data.lon1,
+                "Latitude 2": self.data.lat2,
+                "Longitude 2": self.data.lon2,
+                "Latitude 3": self.data.lat3,
+                "Longitude 3": self.data.lon3
+            })
+
+        elif self.sentence_type == "GEOFENCESTATUS":
+            self.parsed_sentences.append({
+                "Time": self.data.time,
+                "State 0": self.data.state0,
+                "State 1": self.data.state1,
+                "State 2": self.data.state2,
+                "State 3": self.data.state3
+            })
+
+        elif self.sentence_type == "CFGSVIN":
+            self.parsed_sentences.append({
+                "Status": self.data.status,
+                "Mode": self.data.mode,
+                "Minimum Duration": f"{self.data.min_dur} s",
+                "Accuracy Limit": f"{self.data.acc_limit} m",
+                "ECEF X": f"{self.data.ecef_x} m",
+                "ECEF Y": f"{self.data.ecef_y} m",
+                "ECEF Z": f"{self.data.ecef_z} m"
+        })
+
+        elif self.sentence_type == "SVINSTATUS":
+            self.parsed_sentences.append({
+                "Time of Week": f"{self.data.tow} ms",
+                "Validity": self.data.valid,
+                "Observations": self.data.obs,
+                "Duration": f"{self.data.cfg_dur} s",
+                "Mean X": f"{self.data.mean_x} m",
+                "Mean Y": f"{self.data.mean_y} m",
+                "Mean Z": f"{self.data.mean_z} m",
+                "Mean Accuracy": f"{self.data.mean_acc} m"
+            })
+
+        elif self.sentence_type == "GNSSSTART":
+            self.parsed_sentences.append({
+                "Status": self.data.status
+            })
+
+        elif self.sentence_type == "GNSSSTOP":
+            self.parsed_sentences.append({
+                "Status": self.data.status
+            })
+
+        elif self.sentence_type == "PVT":
+            self.parsed_sentences.append({
+                "Time of Week": self.data.tow,
+                "Date": self.data.date,
+                "Time": self.data.time,
+                "Latitude": self.data.lat,
+                "Longitude": self.data.lon,
+                "Altitude": f"{self.data.alt} m",
+                "Separation": f"{self.data.sep} m",
+                "Velocity North": f"{self.data.vel_n} m/s",
+                "Velocity East": f"{self.data.vel_e} m/s",
+                "Velocity Down": f"{self.data.vel_d} m/s",
+                "Speed": f"{self.data.spd} m/s",
+                "Heading": f"{self.data.heading}°",
+                "HDOP": self.data.hdop,
+                "PDOP": self.data.pdop
+            })
+
+        elif self.sentence_type == "CFGNMEADP":
+            self.parsed_sentences.append({
+                "Status": self.data.status,
+                "UTC Decimal Places": self.data.utc_dp,
+                "Position Decimal Places": self.data.pos_dp,
+                "Altitude Decimal Places": self.data.alt_dp,
+                "DOP Decimal Places": self.data.dop_dp,
+                "Speed Decimal Places": self.data.spd_dp,
+                "COG Decimal Places": self.data.cog_dp
+            })
+
+        elif self.sentence_type == "CFGRCVRMODE":
+            self.parsed_sentences.append({
+                "Status": self.data.status,
+                "Mode": self.data.mode,
+                "Mode Description": self.data.get_mode_description()
+            })
+
+        elif self.sentence_type == "PL":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Time of Week": self.data.tow,
+                "Protection Level": f"{self.data.pul} m",
+                "Position North": f"{self.data.pl_posn} mm",
+                "Position East": f"{self.data.pl_pose} mm",
+                "Position Down": f"{self.data.pl_posd} mm",
+                "Velocity North": f"{self.data.pl_veln} mm/s",
+                "Velocity East": f"{self.data.pl_vele} mm/s",
+                "Velocity Down": f"{self.data.pl_veld} mm/s"
+            })
+
+        elif self.sentence_type == "CFGSBAS":
+            self.parsed_sentences.append({
+                "Status": self.data.status,
+                "SBAS Value": self.data.value,
+                "SBAS Description": self.data.get_sbas_description()
+            })
+
+        elif self.sentence_type == "CFGCNST":
+            self.parsed_sentences.append({
+                "Status": self.data.status,
+                "GPS Enabled": self.data.gps,
+                "GLONASS Enabled": self.data.glonass,
+                "Galileo Enabled": self.data.galileo,
+                "BDS Enabled": self.data.bds,
+                "QZSS Enabled": self.data.qzss,
+                "Reserved": self.data.reserved,
+                "Constellation Status": self.data.get_constellation_status()
+            })
+
+        elif self.sentence_type == "DOP":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Time of Week": self.data.tow,
+                "GDOP": self.data.gdop,
+                "PDOP": self.data.pdop,
+                "TDOP": self.data.tdop,
+                "VDOP": self.data.vdop,
+                "HDOP": self.data.hdop,
+                "NDOP": self.data.ndop,
+                "EDOP": self.data.edop,
+                "DOP Status": self.data.get_dop_status(self.data.gdop)
+            })
+
+        elif self.sentence_type == "CFGFIXRATE":
+            self.parsed_sentences.append({
+                "Status": self.data.status
+            })
+
+        elif self.sentence_type == "VEL":
+            self.parsed_sentences.append({
+                "Message Version": self.data.version,
+                "Time": self.data.time,
+                "North Velocity": f"{self.data.vel_n} m/s",
+                "East Velocity": f"{self.data.vel_e} m/s",
+                "Down Velocity": f"{self.data.vel_d} m/s",
+                "Ground Speed": f"{self.data.grd_spd} m/s",
+                "Speed": f"{self.data.spd} m/s",
+                "Heading": f"{self.data.heading}°",
+                "Ground Speed Accuracy": f"{self.data.grd_spd_acc} m/s",
+                "Speed Accuracy": f"{self.data.spd_acc} m/s",
+                "Heading Accuracy": f"{self.data.heading_acc}°"
+            })
+
+        elif self.sentence_type == "CFGODO":
+            self.parsed_sentences.append({
+                "Status": self.data.status,
+                "State": self.data.state,
+                "Initial Distance": f"{self.data.init_dist} m",
+                "State Description": self.data.get_state_description()
+            })
+
+        elif self.sentence_type == "ODO":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Time": self.data.time,
+                "State": self.data.state,
+                "Distance": f"{self.data.dist} m",
+                "State Description": self.data.get_state_description()
+            })
+
+
         else:
             return f"Unsupported NMEA sentence type: {self.sentence_type}"
 
@@ -658,7 +1051,7 @@ class NMEAData:
                 # Write satellite summary, splitting if necessary
                 for i in range(0, len(df_sat_summary), max_rows):
                     chunk = df_sat_summary.iloc[i:i + max_rows]
-                    chunk.to_excel(writer, index=False, sheet_name=f"SatSummary_{i // max_rows + 1}")
+                    chunk.to_excel(writer, index=False, sheet_name=f"SatDataPoints_{i // max_rows + 1}")
 
                 # Write satellite summary statistics (if any)
                 if not df_sat_summary_stats.empty:

@@ -10,8 +10,9 @@ import pandas as pd
 from nmea_data import NMEAData
 
 
+# noinspection PyCompatibility
 def setup_logging(log_folder, timestamp):
-    """Setup logging to both console and file."""
+    """Setup logging to both console and file"""
     os.makedirs(log_folder, exist_ok=True)
 
     log_file = f"{log_folder}/console_output_{timestamp}.txt"
@@ -26,6 +27,7 @@ def setup_logging(log_folder, timestamp):
     logging.info(f"Logging setup complete. Logs are being saved to {log_file}")
 
 
+# noinspection PyCompatibility
 def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, reference_point=None):
     """Reads live NMEA data from serial port and processes it."""
     parsed_sentences = []  # Initialize a list to store NMEA data
@@ -66,10 +68,23 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
                     logging.error(f"Error writing NMEA sentence to log file: {e}")
 
                 # Skip proprietary sentences like $PAIR or $PQTM
-                if nmea_sentence.startswith('$P'):
-                    logging.info(f"Proprietary sentence ignored: {nmea_sentence}")
+                if nmea_sentence.startswith('$PQTM'):
+                    logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
+                    # Parse the proprietary NMEA sentence using pynmea2
+                    try:
+                        msg = pynmea2.parse(nmea_sentence)
+                        # Create a NMEAData object and add coordinates if applicable
+                        nmea_data.sentence_type = msg.subtype
+                        nmea_data.data = msg.data
+                        nmea_data.add_sentence_data()
+                        nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                        logging.info(nmea_data)
+
+                    except pynmea2.ParseError as e:
+                        logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                     continue
 
+                # Skip proprietary sentences like $PAIR or $PQTM
                 if nmea_sentence.startswith('$G'):
                     logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
 
@@ -116,6 +131,8 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
 
     nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
 
+
+# noinspection PyCompatibility
 def parse_nmea_from_log(file_path):
     """Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences"""
     parsed_sentences = []
@@ -138,7 +155,20 @@ def parse_nmea_from_log(file_path):
 
             # Skip proprietary sentences like $PAIR or $PQTM
             if nmea_sentence.startswith('$P'):
-                logging.info(f"Proprietary sentence ignored: {nmea_sentence}")
+                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
+
+                # Parse the proprietary NMEA sentence using pynmea2
+                try:
+                    msg = pynmea2.parse(nmea_sentence)
+                    # Create a NMEAData object and add coordinates
+                    # nmea_data.sentence_type = msg.sentence_type
+                    nmea_data.data = msg
+                    # nmea_data.add_sentence_data()
+                    # nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    logging.info(nmea_data)
+
+                except pynmea2.ParseError as e:
+                    logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                 continue
 
             if nmea_sentence.startswith('$G'):
@@ -175,7 +205,20 @@ def parse_nmea_from_log(file_path):
             logging.debug(f"Processing sentence: {nmea_sentence}")
             # Skip proprietary sentences like $PAIR or $PQTM
             if nmea_sentence.startswith('$P'):
-                logging.info(f"Proprietary sentence ignored: {nmea_sentence}")
+                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
+
+                # Parse the proprietary NMEA sentence using pynmea2
+                try:
+                    msg = pynmea2.parse(nmea_sentence)
+                    # Create a NMEAData object and add coordinates
+                    # nmea_data.sentence_type = msg.sentence_type
+                    nmea_data.data = msg
+                    # nmea_data.add_sentence_data()
+                    # nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    logging.info(nmea_data)
+
+                except pynmea2.ParseError as e:
+                    logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                 continue
 
             if nmea_sentence.startswith('$G'):
@@ -212,7 +255,20 @@ def parse_nmea_from_log(file_path):
             logging.debug(f"Processing sentence: {nmea_sentence}")
             # Skip proprietary sentences like $PAIR or $PQTM
             if nmea_sentence.startswith('$P'):
-                logging.info(f"Proprietary sentence ignored: {nmea_sentence}")
+                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
+
+                # Parse the proprietary NMEA sentence using pynmea2
+                try:
+                    msg = pynmea2.parse(nmea_sentence)
+                    # Create a NMEAData object and add coordinates
+                    #nmea_data.sentence_type = msg.sentence_type
+                    nmea_data.data = msg
+                    # nmea_data.add_sentence_data()
+                    # nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    logging.info(nmea_data)
+
+                except pynmea2.ParseError as e:
+                    logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                 continue
 
             if nmea_sentence.startswith('$G'):
@@ -243,6 +299,7 @@ def parse_nmea_from_log(file_path):
     return parsed_sentences, nmea_data
 
 
+# noinspection PyCompatibility
 def process_nmea_log(file_path, reference_point=None):
     """Process pre-collected NMEA log file and calculate CEP"""
     logging.info(f"Starting log processing for file: {file_path}")
@@ -287,6 +344,7 @@ def process_nmea_log(file_path, reference_point=None):
 
 if __name__ == "__main__":
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
+    # noinspection PyCompatibility
     log_folder = f"logs/NMEA_{timestamp}"
 
     setup_logging(log_folder, timestamp)
@@ -302,6 +360,7 @@ if __name__ == "__main__":
 
                 devices = {}
                 for i in range(1, num_devices + 1):
+                    # noinspection PyCompatibility
                     print(f"Configure device {i}:")
                     port = input(f"Enter the port for device {i} (e.g., COM9): \n")
                     baudrate = int(input(f"Enter the baudrate for device {i} (e.g., 115200): \n"))
