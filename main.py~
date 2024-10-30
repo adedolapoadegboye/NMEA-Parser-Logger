@@ -9,6 +9,7 @@ import logging
 import pandas as pd
 from nmea_data import NMEAData
 
+
 # noinspection PyCompatibility
 def setup_logging(log_folder, timestamp):
     """Setup logging to both console and file"""
