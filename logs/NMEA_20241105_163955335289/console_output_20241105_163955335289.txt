@@ -1,0 +1,4 @@
+2024-11-05 16:39:55,335 [INFO] Logging setup complete. Logs are being saved to logs/NMEA_20241105_163955335289/console_output_20241105_163955335289.txt
+2024-11-05 16:40:35,528 [INFO] Starting log processing for file: C:\Users\Ade\OneDrive - Quectel Wireless Solutions\Desktop\Workflow\Westgate\Separated Power\Westgate Device Testlog\Static Test\Reference Device\LC29HEA-1101_152348_COM3(V1.10).log
+2024-11-05 16:40:35,529 [INFO] Processing log file: C:\Users\Ade\OneDrive - Quectel Wireless Solutions\Desktop\Workflow\Westgate\Separated Power\Westgate Device Testlog\Static Test\Reference Device\LC29HEA-1101_152348_COM3(V1.10).log
+2024-11-05 16:40:35,531 [ERROR] Failed to read file: C:\Users\Ade\OneDrive - Quectel Wireless Solutions\Desktop\Workflow\Westgate\Separated Power\Westgate Device Testlog\Static Test\Reference Device\LC29HEA-1101_152348_COM3(V1.10).log. Error: 'utf-8' codec can't decode byte 0x80 in position 14: invalid start byte

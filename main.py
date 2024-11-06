@@ -72,6 +72,11 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
                     # Parse the proprietary NMEA sentence using pynmea2
                     try:
                         msg = pynmea2.parse(nmea_sentence)
+
+                        # Check if the parsed sentence has a valid sentence_type
+                        if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                            raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
+
                         # Create a NMEAData object and add coordinates if applicable
                         nmea_data.sentence_type = msg.sentence_type
                         nmea_data.data = msg
@@ -146,24 +151,27 @@ def parse_nmea_from_log(file_path):
             logging.info(f"Total lines read from file: {len(lines)}")
         except Exception as e:
             logging.error(f"Failed to read file: {file_path}. Error: {e}")
-            return []
+            return parsed_sentences, nmea_data
 
         for nmea_sentence in lines:
             nmea_sentence = nmea_sentence.strip()
             logging.info(f"Processing sentence: {nmea_sentence}")
 
-            # Skip proprietary sentences like $PAIR or $PQTM
-            if nmea_sentence.startswith('$P'):
+            if nmea_sentence.startswith('$PQTM'):
                 logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
-
                 # Parse the proprietary NMEA sentence using pynmea2
                 try:
                     msg = pynmea2.parse(nmea_sentence)
-                    # Create a NMEAData object and add coordinates
-                    # nmea_data.sentence_type = msg.sentence_type
+
+                    # Check if the parsed sentence has a valid sentence_type
+                    if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                        raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
+
+                    # Create a NMEAData object and add coordinates if applicable
+                    nmea_data.sentence_type = msg.sentence_type
                     nmea_data.data = msg
-                    # nmea_data.add_sentence_data()
-                    # nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    nmea_data.add_sentence_data()
+                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
                     logging.info(nmea_data)
 
                 except pynmea2.ParseError as e:
@@ -197,23 +205,27 @@ def parse_nmea_from_log(file_path):
             logging.info(f"Total lines read from CSV: {len(df)}")
         except Exception as e:
             logging.error(f"Failed to read CSV file: {file_path}. Error: {e}")
-            return []
+            return parsed_sentences, nmea_data
 
         for _, row in df.iterrows():
             nmea_sentence = str(row[0]).strip()
             logging.debug(f"Processing sentence: {nmea_sentence}")
-            # Skip proprietary sentences like $PAIR or $PQTM
-            if nmea_sentence.startswith('$P'):
-                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
 
+            if nmea_sentence.startswith('$PQTM'):
+                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
                 # Parse the proprietary NMEA sentence using pynmea2
                 try:
                     msg = pynmea2.parse(nmea_sentence)
-                    # Create a NMEAData object and add coordinates
-                    # nmea_data.sentence_type = msg.sentence_type
+
+                    # Check if the parsed sentence has a valid sentence_type
+                    if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                        raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
+
+                    # Create a NMEAData object and add coordinates if applicable
+                    nmea_data.sentence_type = msg.sentence_type
                     nmea_data.data = msg
-                    # nmea_data.add_sentence_data()
-                    # nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    nmea_data.add_sentence_data()
+                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
                     logging.info(nmea_data)
 
                 except pynmea2.ParseError as e:
@@ -247,23 +259,27 @@ def parse_nmea_from_log(file_path):
             logging.info(f"Total lines read from Excel: {len(df)}")
         except Exception as e:
             logging.error(f"Failed to read Excel file: {file_path}. Error: {e}")
-            return []
+            return parsed_sentences, nmea_data
 
         for _, row in df.iterrows():
             nmea_sentence = str(row[0]).strip()
             logging.debug(f"Processing sentence: {nmea_sentence}")
-            # Skip proprietary sentences like $PAIR or $PQTM
-            if nmea_sentence.startswith('$P'):
-                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
 
+            if nmea_sentence.startswith('$PQTM'):
+                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
                 # Parse the proprietary NMEA sentence using pynmea2
                 try:
                     msg = pynmea2.parse(nmea_sentence)
-                    # Create a NMEAData object and add coordinates
-                    #nmea_data.sentence_type = msg.sentence_type
+
+                    # Check if the parsed sentence has a valid sentence_type
+                    if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                        raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
+
+                    # Create a NMEAData object and add coordinates if applicable
+                    nmea_data.sentence_type = msg.sentence_type
                     nmea_data.data = msg
-                    # nmea_data.add_sentence_data()
-                    # nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    nmea_data.add_sentence_data()
+                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
                     logging.info(nmea_data)
 
                 except pynmea2.ParseError as e:
