@@ -1,46 +1,77 @@
-import serial
-import pynmea2
+# Standard Library Imports
 import os
 import sys
-from datetime import datetime
 import threading
-from time import time
 import logging
+from datetime import datetime
+from time import time
+
+# Third-Party Library Imports
+import serial
+import pynmea2
 import pandas as pd
+
+# Local Application Imports
 from nmea_data import NMEAData
 
 # noinspection PyCompatibility
 def setup_logging(log_folder, timestamp):
-    """Setup logging to both console and file"""
+    """
+    Sets up logging to output to both the console and a log file.
+
+    Args:
+        log_folder (str): Directory to save log files.
+        timestamp (str): Timestamp to append to the log file name.
+    """
+    # Ensure the log directory exists
     os.makedirs(log_folder, exist_ok=True)
 
-    log_file = f"{log_folder}/console_output_{timestamp}.txt"
+    # Define the log file path
+    log_file = os.path.join(log_folder, f"console_output_{timestamp}.txt")
+
+    # Configure logging with both file and console handlers
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s [%(levelname)s] %(message)s',
         handlers=[
-            logging.FileHandler(log_file, 'a', encoding='utf-8'),
+            logging.FileHandler(log_file, mode='a', encoding='utf-8'),
             logging.StreamHandler(sys.stdout)
         ]
     )
-    logging.info(f"Logging setup complete. Logs are being saved to {log_file}")
 
+    logging.info(f"Logging setup complete. Logs are being saved to {log_file}")
 
 # noinspection PyCompatibility
 def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, reference_point=None):
-    """Reads live NMEA data from serial port and processes it."""
-    parsed_sentences = []  # Initialize a list to store NMEA data
-    start_time = time()  # Record the start time
-    nmea_data = NMEAData(None, None, parsed_sentences)  # Create a new instance for each thread
+    """
+    Reads live NMEA data from a serial port and processes it.
 
-    # Ensure the log directories exist
-    if not os.path.exists(log_folder):
-        os.makedirs(log_folder)
+    Args:
+        port (str): Serial port to read from (e.g., "COM3").
+        baudrate (int): Baud rate for serial communication.
+        timeout (float): Timeout for serial port reads (in seconds).
+        duration (float): Duration to read data (in seconds).
+        log_folder (str): Directory to save log files.
+        timestamp (str): Timestamp to append to file names.
+        reference_point (tuple, optional): Custom reference point for CEP calculation.
+    """
+    parsed_sentences = []
+    start_time = time()
+    nmea_data = NMEAData(None, None, parsed_sentences)
 
-    raw_nmea_log = open(f"{log_folder}/nmea_raw_log_mode_1_{port}_{baudrate}_{timestamp}.txt", "a", encoding="utf-8")
+    # Ensure log folder exists
+    os.makedirs(log_folder, exist_ok=True)
+
+    # Open raw NMEA log file
+    raw_nmea_log_path = os.path.join(log_folder, f"nmea_raw_log_mode_1_{port}_{baudrate}_{timestamp}.txt")
+    try:
+        raw_nmea_log = open(raw_nmea_log_path, "a", encoding="utf-8")
+    except Exception as e:
+        logging.error(f"Error opening log file {raw_nmea_log_path}: {e}")
+        return
 
     try:
-        # Configure the serial port
+        # Attempt to configure and open the serial port
         try:
             ser = serial.Serial(
                 port=port,
@@ -53,12 +84,11 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
             logging.info(f"Connected to serial port {port} with baudrate {baudrate}.")
         except serial.SerialException as e:
             logging.error(f"Error opening serial port {port}: {e}")
-            return  # Exit function if the port cannot be opened
+            return  # Exit function if serial port cannot be opened
 
-        # Continuously read from the serial port
+        # Continuously read from serial port until duration expires
         while time() - start_time < duration:
             try:
-                # Read a line of NMEA data from the serial port
                 nmea_sentence = ser.readline().decode('ascii', errors='replace').strip()
 
                 try:
@@ -66,64 +96,56 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
                 except Exception as e:
                     logging.error(f"Error writing NMEA sentence to log file: {e}")
 
-                # Skip proprietary sentences like $PAIR or $PQTM
+                # Handle proprietary NMEA sentences
                 if nmea_sentence.startswith('$PQTM'):
                     logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
-                    # Parse the proprietary NMEA sentence using pynmea2
                     try:
                         msg = pynmea2.parse(nmea_sentence)
-
-                        # Check if the parsed sentence has a valid sentence_type
                         if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
                             raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
 
-                        # Create a NMEAData object and add coordinates if applicable
                         nmea_data.sentence_type = msg.sentence_type
                         nmea_data.data = msg
                         nmea_data.add_sentence_data()
-                        nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                        nmea_data.add_coordinates()
                         logging.info(nmea_data)
-
                     except pynmea2.ParseError as e:
-                        logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                        logging.warning(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                     continue
 
-                # Skip proprietary sentences like $PAIR or $PQTM
+                # Handle standard NMEA sentences
                 if nmea_sentence.startswith('$G'):
-                    logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
-
-                    # Parse the NMEA sentence using pynmea2
+                    logging.info(f"Standard NMEA Message: {nmea_sentence}")
                     try:
                         msg = pynmea2.parse(nmea_sentence)
+                        if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                            raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
 
-                        # Create a NMEAData object and add coordinates
                         nmea_data.sentence_type = msg.sentence_type
                         nmea_data.data = msg
                         nmea_data.add_sentence_data()
-                        nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                        nmea_data.add_coordinates()
                         logging.info(nmea_data)
-
                     except pynmea2.ParseError as e:
-                        logging.info(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
-
+                        logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
                 else:
-                    logging.info(f"Received Unknown Message: {nmea_sentence}")
+                    logging.info(f"Unknown Message: {nmea_sentence}")
 
             except serial.SerialException as e:
-                logging.info(f"Error reading from serial port: {e}")
+                logging.error(f"Error reading from serial port: {e}")
                 break
 
-    except serial.SerialException as e:
-        logging.info(f"Error opening serial port: {e}")
+    except Exception as e:
+        logging.error(f"Unexpected error during serial read: {e}")
 
-    # After reading all raw sentences, write to the log file created
-    logging.info(
-        f"Standard and Proprietary logs written to {raw_nmea_log.name} for port {port} with baudrate {baudrate}")
-    raw_nmea_log.close()
+    finally:
+        # Ensure the log file is closed properly
+        raw_nmea_log.close()
+        logging.info(f"Log file {raw_nmea_log_path} closed.")
 
-    # Calculate CEP for this thread's data
+    # Calculate CEP and log the results
     cep_value = nmea_data.calculate_cep(reference_point)
-    if cep_value is not None:
+    if cep_value:
         logging.info(f"Mode 1: CEP statistics for port {port}:")
         logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
         logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
@@ -133,199 +155,110 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
     else:
         logging.info(f"No coordinates available for CEP calculation for port {port}.")
 
+    # Save parsed data to Excel
     nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
-
 
 # noinspection PyCompatibility
 def parse_nmea_from_log(file_path):
-    """Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences"""
+    """
+    Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences.
+
+    Args:
+        file_path (str): Path to the log file to be parsed.
+
+    Returns:
+        tuple: A list of parsed sentences and an NMEAData object.
+    """
     parsed_sentences = []
-    nmea_data = NMEAData(None, None, parsed_sentences)  # Create a new instance for each thread
+    nmea_data = NMEAData(None, None, parsed_sentences)
     logging.info(f"Processing log file: {file_path}")
 
-    # Handle plain text files (.txt, .log, .nmea)
-    if file_path.endswith(('.txt', '.log', '.nmea')):
-        try:
+    try:
+        # Handle different file types based on the file extension
+        if file_path.endswith(('.txt', '.log', '.nmea')):
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             logging.info(f"Total lines read from file: {len(lines)}")
-        except Exception as e:
-            logging.error(f"Failed to read file: {file_path}. Error: {e}")
-            return parsed_sentences, nmea_data
 
+        elif file_path.endswith('.csv'):
+            df = pd.read_csv(file_path, header=None)
+            lines = df[0].astype(str).tolist()
+            logging.info(f"Total lines read from CSV: {len(df)}")
+
+        elif file_path.endswith('.xlsx'):
+            df = pd.read_excel(file_path, header=None)
+            lines = df[0].astype(str).tolist()
+            logging.info(f"Total lines read from Excel: {len(df)}")
+
+        else:
+            logging.error(f"Unsupported file type: {file_path}")
+            raise ValueError("Unsupported file type. Supported formats: .txt, .log, .nmea, .csv, .xlsx")
+
+        # Process each line in the file
         for nmea_sentence in lines:
             nmea_sentence = nmea_sentence.strip()
-            logging.info(f"Processing sentence: {nmea_sentence}")
-
-            if nmea_sentence.startswith('$PQTM'):
-                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
-                # Parse the proprietary NMEA sentence using pynmea2
-                try:
-                    msg = pynmea2.parse(nmea_sentence)
-
-                    # Check if the parsed sentence has a valid sentence_type
-                    if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
-                        raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
-
-                    # Create a NMEAData object and add coordinates if applicable
-                    nmea_data.sentence_type = msg.sentence_type
-                    nmea_data.data = msg
-                    nmea_data.add_sentence_data()
-                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
-                    logging.info(nmea_data)
-
-                except pynmea2.ParseError as e:
-                    logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
-                continue
-
-            if nmea_sentence.startswith('$G'):
-                logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
-
-                # Parse the NMEA sentence using pynmea2
-                try:
-                    msg = pynmea2.parse(nmea_sentence)
-
-                    # Create a NMEAData object and add coordinates
-                    nmea_data.sentence_type = msg.sentence_type
-                    nmea_data.data = msg
-                    nmea_data.add_sentence_data()
-                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
-                    logging.info(nmea_data)
-
-                except pynmea2.ParseError as e:
-                    logging.info(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
-
-            else:
-                logging.info(f"Received Unknown Message: {nmea_sentence}")
-
-    # Handle .csv files
-    elif file_path.endswith('.csv'):
-        try:
-            df = pd.read_csv(file_path, header=None)
-            logging.info(f"Total lines read from CSV: {len(df)}")
-        except Exception as e:
-            logging.error(f"Failed to read CSV file: {file_path}. Error: {e}")
-            return parsed_sentences, nmea_data
-
-        for _, row in df.iterrows():
-            nmea_sentence = str(row[0]).strip()
             logging.debug(f"Processing sentence: {nmea_sentence}")
 
-            if nmea_sentence.startswith('$PQTM'):
-                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
-                # Parse the proprietary NMEA sentence using pynmea2
-                try:
+            try:
+                if nmea_sentence.startswith('$PQTM'):
+                    logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
                     msg = pynmea2.parse(nmea_sentence)
 
-                    # Check if the parsed sentence has a valid sentence_type
                     if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
                         raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
 
-                    # Create a NMEAData object and add coordinates if applicable
                     nmea_data.sentence_type = msg.sentence_type
                     nmea_data.data = msg
                     nmea_data.add_sentence_data()
-                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    nmea_data.add_coordinates()
                     logging.info(nmea_data)
 
-                except pynmea2.ParseError as e:
-                    logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
-                continue
-
-            if nmea_sentence.startswith('$G'):
-                logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
-
-                # Parse the NMEA sentence using pynmea2
-                try:
+                elif nmea_sentence.startswith('$G'):
+                    logging.info(f"Standard NMEA Message: {nmea_sentence}")
                     msg = pynmea2.parse(nmea_sentence)
 
-                    # Create a NMEAData object and add coordinates
-                    nmea_data.sentence_type = msg.sentence_type
-                    nmea_data.data = msg
-                    nmea_data.add_sentence_data()
-                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
-                    logging.info(nmea_data)
-
-                except pynmea2.ParseError as e:
-                    logging.info(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
-
-            else:
-                logging.info(f"Received Unknown Message: {nmea_sentence}")
-
-    # Handle .xlsx files
-    elif file_path.endswith('.xlsx'):
-        try:
-            df = pd.read_excel(file_path, header=None)
-            logging.info(f"Total lines read from Excel: {len(df)}")
-        except Exception as e:
-            logging.error(f"Failed to read Excel file: {file_path}. Error: {e}")
-            return parsed_sentences, nmea_data
-
-        for _, row in df.iterrows():
-            nmea_sentence = str(row[0]).strip()
-            logging.debug(f"Processing sentence: {nmea_sentence}")
-
-            if nmea_sentence.startswith('$PQTM'):
-                logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
-                # Parse the proprietary NMEA sentence using pynmea2
-                try:
-                    msg = pynmea2.parse(nmea_sentence)
-
-                    # Check if the parsed sentence has a valid sentence_type
                     if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
                         raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
 
-                    # Create a NMEAData object and add coordinates if applicable
                     nmea_data.sentence_type = msg.sentence_type
                     nmea_data.data = msg
                     nmea_data.add_sentence_data()
-                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
+                    nmea_data.add_coordinates()
                     logging.info(nmea_data)
 
-                except pynmea2.ParseError as e:
-                    logging.info(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
-                continue
+                else:
+                    logging.info(f"Received Unknown Message: {nmea_sentence}")
 
-            if nmea_sentence.startswith('$G'):
-                logging.info(f"Received Standard NMEA Message: {nmea_sentence}")
+            except pynmea2.ParseError as e:
+                logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
 
-                # Parse the NMEA sentence using pynmea2
-                try:
-                    msg = pynmea2.parse(nmea_sentence)
-
-                    # Create a NMEAData object and add coordinates
-                    nmea_data.sentence_type = msg.sentence_type
-                    nmea_data.data = msg
-                    nmea_data.add_sentence_data()
-                    nmea_data.add_coordinates()  # Store coordinates from GLL or GGA sentences
-                    logging.info(nmea_data)
-
-                except pynmea2.ParseError as e:
-                    logging.info(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
-
-            else:
-                logging.info(f"Received Unknown Message: {nmea_sentence}")
-
-    else:
-        logging.error(f"Unsupported file type: {file_path}")
-        raise ValueError("Unsupported file type. Supported formats: .txt, .log, .nmea, .csv, .xlsx")
+    except Exception as e:
+        logging.error(f"Failed to read or process file: {file_path}. Error: {e}")
 
     logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
     return parsed_sentences, nmea_data
-
-
 # noinspection PyCompatibility
 def process_nmea_log(file_path, reference_point=None):
-    """Process pre-collected NMEA log file and calculate CEP"""
+    """
+    Process pre-collected NMEA log file and calculate CEP.
+
+    Args:
+        file_path (str): Path to the NMEA log file.
+        reference_point (tuple, optional): Custom reference point (latitude, longitude). Defaults to None.
+    """
     logging.info(f"Starting log processing for file: {file_path}")
 
-    # Check if the file exists (for debugging)
+    # Check if the file exists
     if not os.path.exists(file_path):
         logging.error(f"File does not exist: {file_path}")
         return
 
     # Process the file to get parsed sentences
-    parsed_sentences, nmea_data = parse_nmea_from_log(file_path)
+    try:
+        parsed_sentences, nmea_data = parse_nmea_from_log(file_path)
+    except Exception as e:
+        logging.error(f"Error during parsing NMEA log file: {file_path}. Exception: {e}")
+        return
 
     if not parsed_sentences:
         logging.error(f"No valid NMEA sentences found in log file: {file_path}")
@@ -333,119 +266,127 @@ def process_nmea_log(file_path, reference_point=None):
 
     logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
 
-    # Ask for custom reference point if not provided
+    # Determine or calculate the reference point
     if reference_point is None:
-        logging.info("Calculating the mean point from log data for CEP Analysis.")
-        reference_point = nmea_data.calculate_mean_point()
+        try:
+            logging.info("Calculating the mean point from log data for CEP Analysis.")
+            reference_point = nmea_data.calculate_mean_point()
+        except Exception as e:
+            logging.error(f"Error calculating mean point: {e}")
+            return
     else:
         logging.info(f"Using provided reference point: {reference_point}")
 
-    # Calculate CEP for this thread's data
-    cep_value = nmea_data.calculate_cep(reference_point)
-    if cep_value is not None:
-        logging.info(f"Mode 2: CEP statistics for logfile {file_path}:")
-        logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
-        logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
-        logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
-        logging.info(f"CEP95: {cep_value['CEP95']:.2f} meters")
-        logging.info(f"CEP99: {cep_value['CEP99']:.2f} meters")
-    else:
-        logging.info(f"No coordinates available for CEP calculation for log {file_path}.")
+    # Calculate CEP values
+    try:
+        cep_value = nmea_data.calculate_cep(reference_point)
+        if cep_value is not None:
+            logging.info(f"Mode 2: CEP statistics for logfile {file_path}:")
+            logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
+            logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
+            logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
+            logging.info(f"CEP95: {cep_value['CEP95']:.2f} meters")
+            logging.info(f"CEP99: {cep_value['CEP99']:.2f} meters")
+        else:
+            logging.info(f"No coordinates available for CEP calculation for log {file_path}.")
+    except Exception as e:
+        logging.error(f"Error calculating CEP values: {e}")
+        return
 
     logging.info(f"Finished log processing for file: {file_path}")
 
-    nmea_data.write_to_excel_mode_2(timestamp, cep_value)
-
+    # Write results to an Excel file
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        nmea_data.write_to_excel_mode_2(timestamp, cep_value)
+        logging.info(f"Data successfully written to Excel file with timestamp: {timestamp}")
+    except Exception as e:
+        logging.error(f"Error writing to Excel file: {e}")
 
 if __name__ == "__main__":
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
-    # noinspection PyCompatibility
-    log_folder = f"logs/NMEA_{timestamp}"
+    try:
+        # Setup timestamp and log folder
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
+        log_folder = f"logs/NMEA_{timestamp}"
+        setup_logging(log_folder, timestamp)
 
-    setup_logging(log_folder, timestamp)
+        active_program = True
 
-    activeProgram = True
+        while active_program:
+            mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Log file\n").strip()
 
-    while activeProgram:
-        mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Log file\n")
-        if mode == '1':
-            try:
-                # Prompt the user for the port, baudrate, timeout, and duration
-                num_devices = int(input("How many devices would you like to configure? (e.g., 1, 2, 3)\n"))
+            if mode == '1':
+                try:
+                    # Gather device configurations from the user
+                    num_devices = int(input("How many devices would you like to configure? (e.g., 1, 2, 3)\n"))
+                    devices = {}
 
-                devices = {}
-                for i in range(1, num_devices + 1):
-                    # noinspection PyCompatibility
-                    print(f"Configure device {i}:")
-                    port = input(f"Enter the port for device {i} (e.g., COM9): \n")
-                    baudrate = int(input(f"Enter the baudrate for device {i} (e.g., 115200): \n"))
-                    timeout = float(input(f"Enter the timeout for device {i} (in seconds, e.g., 1): \n"))
-                    duration = float(input(f"Enter the test duration for device {i} (in seconds): \n"))
-                    devices[f"device {i}"] = {"port": port, "baudrate": baudrate, "timeout": timeout, "duration": duration}
+                    for i in range(1, num_devices + 1):
+                        print(f"Configure device {i}:")
+                        port = input(f"Enter the port for device {i} (e.g., COM9): \n").strip()
+                        baudrate = int(input(f"Enter the baudrate for device {i} (e.g., 115200): \n").strip())
+                        timeout = float(input(f"Enter the timeout for device {i} (in seconds, e.g., 1): \n").strip())
+                        duration = float(input(f"Enter the test duration for device {i} (in seconds): \n").strip())
+                        devices[f"device {i}"] = {"port": port, "baudrate": baudrate, "timeout": timeout, "duration": duration}
 
-                # Prompt the user for a reference point or use the mean point
-                use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
+                    # Get reference point from the user
+                    use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n").strip().lower()
+                    if use_custom_reference == 'y':
+                        ref_lat = float(input("Enter reference latitude: \n").strip())
+                        ref_lon = float(input("Enter reference longitude: \n").strip())
+                        reference_point = (ref_lat, ref_lon)
+                    else:
+                        reference_point = None
 
-                if use_custom_reference.lower() == 'y':
-                    ref_lat = float(input("Enter reference latitude: \n"))
-                    ref_lon = float(input("Enter reference longitude: \n"))
-                    reference_point = (ref_lat, ref_lon)
-                else:
-                    reference_point = None
+                    threads = []
 
-                # Create the log folder for each test run
-                os.makedirs(log_folder, exist_ok=True)
+                    # Start a thread for each configured device
+                    for device_name, config in devices.items():
+                        try:
+                            thread = threading.Thread(
+                                target=read_nmea_data,
+                                args=(config["port"], config["baudrate"], config["timeout"], config["duration"], log_folder, timestamp, reference_point)
+                            )
+                            threads.append(thread)
+                            thread.start()
+                        except Exception as e:
+                            logging.error(f"Failed to start thread for {device_name}: {e}")
 
-                # Configure logging to both file and console
-                logging.basicConfig(
-                    level=logging.INFO,
-                    format='%(asctime)s [%(levelname)s] %(message)s',
-                    handlers=[
-                        logging.FileHandler(f"{log_folder}/console_output_{timestamp}.txt", 'a', encoding='utf-8'),
-                        logging.StreamHandler(sys.stdout)
-                    ]
-                )
+                    # Wait for all threads to finish
+                    for thread in threads:
+                        try:
+                            thread.join()
+                        except Exception as e:
+                            logging.error(f"Error while waiting for thread to finish: {e}")
 
-                threads = []
+                except ValueError as e:
+                    logging.error(f"Invalid input: {e}")
+                except Exception as e:
+                    logging.error(f"An unexpected error occurred: {e}")
 
-                for device, config in devices.items():
-                    try:
-                        # Pass reference_point and timestamp to each thread
-                        thread = threading.Thread(target=read_nmea_data, args=(
-                            config["port"], config["baudrate"], config["timeout"], config["duration"], log_folder,
-                            timestamp, reference_point))
-                        threads.append(thread)
-                        thread.start()
-                    except Exception as e:
-                        logging.error(f"Failed to start thread for {device}: {e}")
+            elif mode == '2':
+                try:
+                    file_path = input("Enter the path to the log file (.txt, .log, .nmea, .csv, or .xlsx): \n").strip('"')
+                    use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n").strip().lower()
 
-                for thread in threads:
-                    try:
-                        thread.join()
-                    except Exception as e:
-                        logging.error(f"Error while waiting for thread to finish: {e}")
+                    if use_custom_reference == 'y':
+                        ref_lat = float(input("Enter reference latitude: \n").strip())
+                        ref_lon = float(input("Enter reference longitude: \n").strip())
+                        reference_point = (ref_lat, ref_lon)
+                    else:
+                        reference_point = None
 
-            except Exception as e:
-                logging.error(f"An unexpected error occurred: {e}")
-        elif mode == '2':
-            file_path = input("Enter the path to the log file (.txt, .log, .nmea, .csv, or .xlsx): \n").strip('"')
-            reference_point = None
+                    # Process the log file and calculate CEP
+                    process_nmea_log(file_path, reference_point)
 
-            # Prompt the user for a reference point or use the mean point
-            use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n")
+                except Exception as e:
+                    logging.error(f"An error occurred while processing the log file: {e}")
 
-            if use_custom_reference.lower() == 'y':
-                ref_lat = float(input("Enter reference latitude: \n"))
-                ref_lon = float(input("Enter reference longitude: \n"))
-                reference_point = (ref_lat, ref_lon)
             else:
-                reference_point = None
+                print("Invalid input. Please enter 1 or 2.")
 
-            # Process the log file and calculate CEP
-            process_nmea_log(file_path, reference_point)
-        else:
-            print("Invalid input. Please enter 1 or 2.")
+            # Check if the user wants to continue
+            active_program = input("Do you want to quit the program? (y/n): \n").strip().lower() != 'n'
 
-        activeProgram = input("Do you want to quit the program? (y/n): \n")
-        if activeProgram.lower() != 'n':
-            break
+    except Exception as e:
+        logging.error(f"Critical error in main execution: {e}")
