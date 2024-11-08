@@ -326,6 +326,171 @@ class NMEAData:
                 f"  Distance: {self.data.dist} m\n"
                 f"  State Description: {self.data.get_state_description()}\n"
             )
+        elif self.sentence_type == "LS":
+            return (
+                f"MLS - Leap Second Information:\n"
+                f"  Message Version: {self.data.msg_ver}\n"
+                f"  Time of Week: {self.data.tow} seconds\n"
+                f"  Leap Second Reference: {self.data.ls_ref}\n"
+                f"  UTC Reference Week Number: {self.data.wn}\n"
+                f"  Current Leap Seconds: {self.data.ls} seconds\n"
+                f"  Leap Second Flag: {self.data.flag}\n"
+                f"  Leap Second Forecast Reference: {self.data.lsf_ref}\n"
+                f"  Week Number for New Leap Second: {self.data.wnlsf}\n"
+                f"  Day of Week for New Leap Second: {self.data.dn}\n"
+                f"  Future Leap Seconds: {self.data.lsf}\n"
+            )
+        elif self.sentence_type == "DRCAL":
+            return (
+                f"DRCAL - DR Calibration State:\n"
+                f"  Message Version: {self.data.msg_ver}\n"
+                f"  Calibration State: {self.data.cal_state}\n"
+                f"  Navigation Type: {self.data.nav_type}\n"
+            )
+        elif self.sentence_type == "IMUTYPE":
+            return (
+                f"IMUTYPE - IMU Initialization Status:\n"
+                f"  Message Version: {self.data.msg_ver}\n"
+                f"  IMU Status: {self.data.status}\n"
+            )
+        elif self.sentence_type == "VEHMSG":
+            details = f"  Message Version: {self.data.msg_ver}\n  Timestamp: {self.data.timestamp} ms\n"
+            if self.data.msg_ver == "1":
+                details += f"  Vehicle Speed: {self.data.parameters['VehSpeed']} m/s\n"
+            elif self.data.msg_ver == "2":
+                details += (
+                    f"  Wheel Tick Count: {self.data.parameters['WheelTickCNT']}\n"
+                    f"  Forward/Backward Indicator: {self.data.parameters['FWD_Ind']}\n"
+                )
+            elif self.data.msg_ver == "3":
+                details += (
+                    f"  LF Speed: {self.data.parameters['LF_Spd']} m/s\n"
+                    f"  RF Speed: {self.data.parameters['RF_Spd']} m/s\n"
+                    f"  LR Speed: {self.data.parameters['LR_Spd']} m/s\n"
+                    f"  RR Speed: {self.data.parameters['RR_Spd']} m/s\n"
+                )
+            elif self.data.msg_ver == "4":
+                details += (
+                    f"  LF Tick Count: {self.data.parameters['LF_TickCNT']}\n"
+                    f"  RF Tick Count: {self.data.parameters['RF_TickCNT']}\n"
+                    f"  LR Tick Count: {self.data.parameters['LR_TickCNT']}\n"
+                    f"  RR Tick Count: {self.data.parameters['RR_TickCNT']}\n"
+                    f"  Forward/Backward Indicator: {self.data.parameters['FWD_Ind']}\n"
+                )
+            return "VEHMSG - Vehicle Information:\n" + details
+        elif self.sentence_type == "INS":
+            return (
+                f"INS - Inertial Navigation Solution:\n"
+                f"  Timestamp: {self.data.timestamp} ms\n"
+                f"  Solution Type: {self.data.sol_type}\n"
+                f"  Latitude: {self.data.latitude}°\n"
+                f"  Longitude: {self.data.longitude}°\n"
+                f"  Height: {self.data.height} m\n"
+                f"  North Velocity: {self.data.vel_n} m/s\n"
+                f"  East Velocity: {self.data.vel_e} m/s\n"
+                f"  Down Velocity: {self.data.vel_d} m/s\n"
+                f"  Roll: {self.data.roll}°\n"
+                f"  Pitch: {self.data.pitch}°\n"
+                f"  Yaw: {self.data.yaw}°\n"
+            )
+        elif self.sentence_type == "GPS":
+            return (
+                f"GPS - GNSS Position Status:\n"
+                f"  Timestamp: {self.data.timestamp} ms\n"
+                f"  Time of Week: {self.data.tow} s\n"
+                f"  Latitude: {self.data.latitude}°\n"
+                f"  Longitude: {self.data.longitude}°\n"
+                f"  Altitude: {self.data.altitude} m\n"
+                f"  Speed: {self.data.speed} m/s\n"
+                f"  Heading: {self.data.heading}°\n"
+                f"  Accuracy: {self.data.accuracy} m\n"
+                f"  HDOP: {self.data.hdop}\n"
+                f"  PDOP: {self.data.pdop}\n"
+                f"  Satellites Used: {self.data.num_sat_used}\n"
+                f"  Fix Mode: {self.data.fix_mode}\n"
+            )
+        elif self.sentence_type == "VEHMOT":
+            details = f"  Message Version: {self.data.msg_ver}\n"
+            if self.data.msg_ver == "1":
+                details += (
+                    f"  Peak Acceleration: {self.data.peak_acceleration} m/s²\n"
+                    f"  Peak Angular Rate: {self.data.peak_angular_rate} deg/s\n"
+                )
+            elif self.data.msg_ver == "2":
+                details += (
+                    f"  UTC: {self.data.utc}\n"
+                    f"  Vehicle Type: {self.data.parse_veh_type()}\n"
+                    f"  Motion State: {self.data.parse_mot_state()}\n"
+                    f"  Acceleration Status: {self.data.parse_acc_status()}\n"
+                    f"  Turning Status: {self.data.parse_turning_status()}\n"
+                )
+            return "VEHMOT - Vehicle Motion Information:\n" + details
+        elif self.sentence_type == "SENMSG":
+            return (
+                f"SENMSG - IMU Sensor Data:\n"
+                f"  Message Version: {self.data.msg_ver}\n"
+                f"  Timestamp: {self.data.timestamp} ms\n"
+                f"  IMU Temperature: {self.data.imu_temp}°C\n"
+                f"  IMU Gyro X: {self.data.imu_gyro_x} dps\n"
+                f"  IMU Gyro Y: {self.data.imu_gyro_y} dps\n"
+                f"  IMU Gyro Z: {self.data.imu_gyro_z} dps\n"
+                f"  IMU Acc X: {self.data.imu_acc_x} g\n"
+                f"  IMU Acc Y: {self.data.imu_acc_y} g\n"
+                f"  IMU Acc Z: {self.data.imu_acc_z} g\n"
+            )
+        elif self.sentence_type == "DRPVA":
+            return (
+                f"DRPVA - DR Position, Velocity, and Attitude:\n"
+                f"  Message Version: {self.data.msg_ver}\n"
+                f"  Timestamp: {self.data.timestamp} ms\n"
+                f"  UTC Time: {self.data.time}\n"
+                f"  Solution Type: {self.data.sol_type}\n"
+                f"  Latitude: {self.data.latitude}°\n"
+                f"  Longitude: {self.data.longitude}°\n"
+                f"  Altitude: {self.data.altitude} m\n"
+                f"  Geoidal Separation: {self.data.sep} m\n"
+                f"  North Velocity: {self.data.vel_n} m/s\n"
+                f"  East Velocity: {self.data.vel_e} m/s\n"
+                f"  Down Velocity: {self.data.vel_d} m/s\n"
+                f"  Ground Speed: {self.data.speed} m/s\n"
+                f"  Roll: {self.data.roll}°\n"
+                f"  Pitch: {self.data.pitch}°\n"
+                f"  Heading: {self.data.heading}°\n"
+            )
+        elif self.sentence_type == "VEHATT":
+            return (
+                f"VEHATT - Vehicle Attitude:\n"
+                f"  Message Version: {self.data.msg_ver}\n"
+                f"  Timestamp: {self.data.timestamp} ms\n"
+                f"  Roll: {self.data.roll}°\n"
+                f"  Pitch: {self.data.pitch}°\n"
+                f"  Heading: {self.data.heading}°\n"
+                f"  Roll Accuracy: {self.data.acc_roll}°\n"
+                f"  Pitch Accuracy: {self.data.acc_pitch}°\n"
+                f"  Heading Accuracy: {self.data.acc_heading}°\n"
+            )
+        elif self.sentence_type == "ANTENNASTATUS":
+            return (
+                f"ANTENNASTATUS - Antenna Status Information:\n"
+                f"  Message Version: {self.data.msg_ver} (Always 3)\n"
+                f"  Antenna Status: {self.data.ant_status}\n"
+                f"  Antenna Power Indicator: {self.data.ant_power_ind}\n"
+                f"  Antenna Mode Indicator: {self.data.mode_ind}\n"
+            )
+        elif self.sentence_type == "JAMMINGSTATUS":
+            return (
+                f"JAMMINGSTATUS - Jamming Detection Status:\n"
+                f"  Message Version: {self.data.msg_ver} (Always 1)\n"
+                f"  Status: {self.data.status}\n"
+                f"  Description: {self.data.status}\n"
+            )
+        elif self.sentence_type == "UNIQID":
+            return (
+                f"UNIQID - Chip Unique ID Information:\n"
+                f"  Response: {self.data.response} (Should be 'OK')\n"
+                f"  Length: {self.data.length} bytes\n"
+                f"  Chip ID: {self.data.chip_id}\n"
+            )
         else:
             return f"Unsupported NMEA sentence type: {self.sentence_type}\n"
 
@@ -666,6 +831,160 @@ class NMEAData:
                 "State": self.data.state,
                 "Distance": f"{self.data.dist} m",
                 "State Description": self.data.get_state_description()
+            })
+        elif self.sentence_type == "LS":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Time of Week": f"{self.data.tow} seconds",
+                "Leap Second Reference": self.data.ls_ref,
+                "UTC Reference Week Number": self.data.wn,
+                "Current Leap Seconds": f"{self.data.ls} seconds",
+                "Leap Second Flag": self.data.flag,
+                "Leap Second Forecast Reference": self.data.lsf_ref,
+                "Week Number for New Leap Second": self.data.wnlsf,
+                "Day of Week for New Leap Second": self.data.dn,
+                "Future Leap Seconds": self.data.lsf
+            })
+        elif self.sentence_type == "DRCAL":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Calibration State": self.data.cal_state,
+                "Navigation Type": self.data.nav_type
+            })
+        elif self.sentence_type == "IMUTYPE":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "IMU Status": self.data.status
+            })
+        elif self.sentence_type == "VEHMSG":
+            details = {
+                "Message Version": self.data.msg_ver,
+                "Timestamp": f"{self.data.timestamp} ms"
+            }
+            if self.data.msg_ver == "1":
+                details["Vehicle Speed"] = f"{self.data.parameters['VehSpeed']} m/s"
+            elif self.data.msg_ver == "2":
+                details["Wheel Tick Count"] = self.data.parameters['WheelTickCNT']
+                details["Forward/Backward Indicator"] = self.data.parameters['FWD_Ind']
+            elif self.data.msg_ver == "3":
+                details.update({
+                    "LF Speed": f"{self.data.parameters['LF_Spd']} m/s",
+                    "RF Speed": f"{self.data.parameters['RF_Spd']} m/s",
+                    "LR Speed": f"{self.data.parameters['LR_Spd']} m/s",
+                    "RR Speed": f"{self.data.parameters['RR_Spd']} m/s"
+                })
+            elif self.data.msg_ver == "4":
+                details.update({
+                    "LF Tick Count": self.data.parameters['LF_TickCNT'],
+                    "RF Tick Count": self.data.parameters['RF_TickCNT'],
+                    "LR Tick Count": self.data.parameters['LR_TickCNT'],
+                    "RR Tick Count": self.data.parameters['RR_TickCNT'],
+                    "Forward/Backward Indicator": self.data.parameters['FWD_Ind']
+                })
+            self.parsed_sentences.append(details)
+        elif self.sentence_type == "INS":
+            self.parsed_sentences.append({
+                "Timestamp": f"{self.data.timestamp} ms",
+                "Solution Type": self.data.sol_type,
+                "Latitude": f"{self.data.latitude}°",
+                "Longitude": f"{self.data.longitude}°",
+                "Height": f"{self.data.height} m",
+                "North Velocity": f"{self.data.vel_n} m/s",
+                "East Velocity": f"{self.data.vel_e} m/s",
+                "Down Velocity": f"{self.data.vel_d} m/s",
+                "Roll": f"{self.data.roll}°",
+                "Pitch": f"{self.data.pitch}°",
+                "Yaw": f"{self.data.yaw}°"
+            })
+        elif self.sentence_type == "GPS":
+            self.parsed_sentences.append({
+                "Timestamp": f"{self.data.timestamp} ms",
+                "Time of Week": f"{self.data.tow} s",
+                "Latitude": f"{self.data.latitude}°",
+                "Longitude": f"{self.data.longitude}°",
+                "Altitude": f"{self.data.altitude} m",
+                "Speed": f"{self.data.speed} m/s",
+                "Heading": f"{self.data.heading}°",
+                "Accuracy": f"{self.data.accuracy} m",
+                "HDOP": self.data.hdop,
+                "PDOP": self.data.pdop,
+                "Satellites Used": self.data.num_sat_used,
+                "Fix Mode": self.data.fix_mode
+            })
+        elif self.sentence_type == "VEHMOT":
+            details = {"Message Version": self.data.msg_ver}
+            if self.data.msg_ver == "1":
+                details.update({
+                    "Peak Acceleration": f"{self.data.peak_acceleration} m/s²",
+                    "Peak Angular Rate": f"{self.data.peak_angular_rate} deg/s"
+                })
+            elif self.data.msg_ver == "2":
+                details.update({
+                    "UTC": self.data.utc,
+                    "Vehicle Type": self.data.veh_type,
+                    "Motion State": self.data.mot_state,
+                    "Acceleration Status": self.data.acc_status,
+                    "Turning Status": self.data.turning_status
+                })
+            self.parsed_sentences.append(details)
+        elif self.sentence_type == "SENMSG":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Timestamp": f"{self.data.timestamp} ms",
+                "IMU Temperature": f"{self.data.imu_temp}°C",
+                "IMU Gyro X": f"{self.data.imu_gyro_x} dps",
+                "IMU Gyro Y": f"{self.data.imu_gyro_y} dps",
+                "IMU Gyro Z": f"{self.data.imu_gyro_z} dps",
+                "IMU Acc X": f"{self.data.imu_acc_x} g",
+                "IMU Acc Y": f"{self.data.imu_acc_y} g",
+                "IMU Acc Z": f"{self.data.imu_acc_z} g"
+            })
+        elif self.sentence_type == "DRPVA":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Timestamp": f"{self.data.timestamp} ms",
+                "UTC Time": self.data.time,
+                "Solution Type": self.data.sol_type,
+                "Latitude": f"{self.data.latitude}°",
+                "Longitude": f"{self.data.longitude}°",
+                "Altitude": f"{self.data.altitude} m",
+                "Geoidal Separation": f"{self.data.sep} m",
+                "North Velocity": f"{self.data.vel_n} m/s",
+                "East Velocity": f"{self.data.vel_e} m/s",
+                "Down Velocity": f"{self.data.vel_d} m/s",
+                "Ground Speed": f"{self.data.speed} m/s",
+                "Roll": f"{self.data.roll}°",
+                "Pitch": f"{self.data.pitch}°",
+                "Heading": f"{self.data.heading}°"
+            })
+        elif self.sentence_type == "VEHATT":
+            self.parsed_sentences.append({
+                "Message Version": self.data.msg_ver,
+                "Timestamp": f"{self.data.timestamp} ms",
+                "Roll": f"{self.data.roll}°",
+                "Pitch": f"{self.data.pitch}°",
+                "Heading": f"{self.data.heading}°",
+                "Roll Accuracy": f"{self.data.acc_roll}°",
+                "Pitch Accuracy": f"{self.data.acc_pitch}°",
+                "Heading Accuracy": f"{self.data.acc_heading}°"
+            })
+        elif self.sentence_type == "ANTENNASTATUS":
+            self.parsed_sentences.append({
+                "Message Version": f"{self.data.msg_ver} (Always 3)",
+                "Antenna Status": self.data.ant_status,
+                "Antenna Power Indicator": self.data.ant_power_ind,
+                "Antenna Mode Indicator": self.data.mode_ind
+            })
+        elif self.sentence_type == "JAMMINGSTATUS":
+            self.parsed_sentences.append({
+                "Message Version": f"{self.data.msg_ver} (Always 1)",
+                "Status": self.data.status
+            })
+        elif self.sentence_type == "UNIQID":
+            self.parsed_sentences.append({
+                "Response": f"{self.data.response} (Should be 'OK')",
+                "Length": f"{self.data.length} bytes",
+                "Chip ID": self.data.chip_id
             })
         else:
             return f"Unsupported NMEA sentence type: {self.sentence_type}"

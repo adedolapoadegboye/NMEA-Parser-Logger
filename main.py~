@@ -313,28 +313,65 @@ if __name__ == "__main__":
         active_program = True
 
         while active_program:
-            mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Log file\n").strip()
+            # Prompt the user to choose a data input mode
+            while True:
+                mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Load log file\n").strip()
+                if mode in ['1', '2']:
+                    break
+                else:
+                    logging.error("Invalid input. Please enter '1' or '2'.")
 
             if mode == '1':
                 try:
                     # Gather device configurations from the user
-                    num_devices = int(input("How many devices would you like to configure? (e.g., 1, 2, 3)\n"))
-                    devices = {}
+                    while True:
+                        try:
+                            num_devices = int(input("How many devices would you like to configure? (e.g., 1, 2, 3)\n").strip())
+                            if num_devices > 0:
+                                break
+                            else:
+                                logging.error("Number of devices must be greater than 0.")
+                        except ValueError:
+                            logging.error("Invalid input. Please enter a valid integer for the number of devices.")
 
+                    devices = {}
                     for i in range(1, num_devices + 1):
-                        print(f"Configure device {i}:")
-                        port = input(f"Enter the port for device {i} (e.g., COM9): \n").strip()
-                        baudrate = int(input(f"Enter the baudrate for device {i} (e.g., 115200): \n").strip())
-                        timeout = float(input(f"Enter the timeout for device {i} (in seconds, e.g., 1): \n").strip())
-                        duration = float(input(f"Enter the test duration for device {i} (in seconds): \n").strip())
-                        devices[f"device {i}"] = {"port": port, "baudrate": baudrate, "timeout": timeout, "duration": duration}
+                        while True:
+                            try:
+                                print(f"Configure device {i}:")
+                                port = input(f"Enter the port for device {i} (e.g., 'COM9' or '/dev/ttyUSB0'): \n").strip()
+                                baudrate = int(input(f"Enter the baudrate for device {i} (e.g., 115200): \n").strip())
+                                timeout = float(input(f"Enter the timeout for device {i} (in seconds, e.g., 1.0): \n").strip())
+                                duration = float(input(f"Enter the test duration for device {i} (in seconds, e.g., 60.0): \n").strip())
+
+                                # Store the device configuration
+                                devices[f"device {i}"] = {
+                                    "port": port,
+                                    "baudrate": baudrate,
+                                    "timeout": timeout,
+                                    "duration": duration
+                                }
+                                break  # Break the loop if all inputs are valid
+                            except ValueError:
+                                logging.error("Invalid input. Please enter the values as guided (e.g., integers for baudrate and floats for timeout and duration).")
 
                     # Get reference point from the user
-                    use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n").strip().lower()
+                    while True:
+                        use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n, e.g., 'y' or 'n'):\n").strip().lower()
+                        if use_custom_reference in ['y', 'n']:
+                            break
+                        else:
+                            logging.error("Invalid input. Please enter 'y' or 'n'.")
+
                     if use_custom_reference == 'y':
-                        ref_lat = float(input("Enter reference latitude: \n").strip())
-                        ref_lon = float(input("Enter reference longitude: \n").strip())
-                        reference_point = (ref_lat, ref_lon)
+                        while True:
+                            try:
+                                ref_lat = float(input("Enter reference latitude (e.g., 37.7749): \n").strip())
+                                ref_lon = float(input("Enter reference longitude (e.g., -122.4194): \n").strip())
+                                reference_point = (ref_lat, ref_lon)
+                                break
+                            except ValueError:
+                                logging.error("Invalid input. Please enter valid float values for latitude and longitude.")
                     else:
                         reference_point = None
 
@@ -345,7 +382,8 @@ if __name__ == "__main__":
                         try:
                             thread = threading.Thread(
                                 target=read_nmea_data,
-                                args=(config["port"], config["baudrate"], config["timeout"], config["duration"], log_folder, timestamp, reference_point)
+                                args=(config["port"], config["baudrate"], config["timeout"], config["duration"],
+                                      log_folder, timestamp, reference_point)
                             )
                             threads.append(thread)
                             thread.start()
@@ -359,20 +397,34 @@ if __name__ == "__main__":
                         except Exception as e:
                             logging.error(f"Error while waiting for thread to finish: {e}")
 
-                except ValueError as e:
-                    logging.error(f"Invalid input: {e}")
                 except Exception as e:
-                    logging.error(f"An unexpected error occurred: {e}")
+                    logging.error(f"An unexpected error occurred in mode 1: {e}")
 
             elif mode == '2':
                 try:
-                    file_path = input("Enter the path to the log file (.txt, .log, .nmea, .csv, or .xlsx): \n").strip('"')
-                    use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n): \n").strip().lower()
+                    while True:
+                        file_path = input("Enter the path to the log file (e.g., 'C:/path/to/file.txt'):\n").strip('"')
+                        if os.path.exists(file_path):
+                            break
+                        else:
+                            logging.error("The file path provided does not exist. Please enter a valid path.")
+
+                    while True:
+                        use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n):\n").strip().lower()
+                        if use_custom_reference in ['y', 'n']:
+                            break
+                        else:
+                            logging.error("Invalid input. Please enter 'y' or 'n'.")
 
                     if use_custom_reference == 'y':
-                        ref_lat = float(input("Enter reference latitude: \n").strip())
-                        ref_lon = float(input("Enter reference longitude: \n").strip())
-                        reference_point = (ref_lat, ref_lon)
+                        while True:
+                            try:
+                                ref_lat = float(input("Enter reference latitude (e.g., 37.7749): \n").strip())
+                                ref_lon = float(input("Enter reference longitude (e.g., -122.4194): \n").strip())
+                                reference_point = (ref_lat, ref_lon)
+                                break
+                            except ValueError:
+                                logging.error("Invalid input. Please enter valid float values for latitude and longitude.")
                     else:
                         reference_point = None
 
@@ -380,13 +432,11 @@ if __name__ == "__main__":
                     process_nmea_log(file_path, reference_point)
 
                 except Exception as e:
-                    logging.error(f"An error occurred while processing the log file: {e}")
-
-            else:
-                print("Invalid input. Please enter 1 or 2.")
+                    logging.error(f"An error occurred while processing the log file in mode 2: {e}")
 
             # Check if the user wants to continue
-            active_program = input("Do you want to quit the program? (y/n): \n").strip().lower() != 'y'
+            active_program = input("Do you want to quit the program? (y/n, e.g., 'y' to quit, 'n' to continue): \n").strip().lower() != 'y'
 
     except Exception as e:
         logging.error(f"Critical error in main execution: {e}")
+

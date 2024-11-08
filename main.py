@@ -315,7 +315,7 @@ if __name__ == "__main__":
         while active_program:
             # Prompt the user to choose a data input mode
             while True:
-                mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Log file (e.g., '1' or '2')\n").strip()
+                mode = input("Choose data input mode: 1 = Live Serial Data, 2 = Load log file\n").strip()
                 if mode in ['1', '2']:
                     break
                 else:
@@ -410,7 +410,7 @@ if __name__ == "__main__":
                             logging.error("The file path provided does not exist. Please enter a valid path.")
 
                     while True:
-                        use_custom_reference = input("Do you want to provide a custom reference point for CEP calculations? (y/n, e.g., 'y' or 'n'):\n").strip().lower()
+                        use_custom_reference = input("Do you want to provide a true reference point for CEP calculations? (y/n):\n").strip().lower()
                         if use_custom_reference in ['y', 'n']:
                             break
                         else:
@@ -419,8 +419,8 @@ if __name__ == "__main__":
                     if use_custom_reference == 'y':
                         while True:
                             try:
-                                ref_lat = float(input("Enter reference latitude (e.g., 37.7749): \n").strip())
-                                ref_lon = float(input("Enter reference longitude (e.g., -122.4194): \n").strip())
+                                ref_lat = float(input("Enter reference latitude (e.g., 37.7749123): \n").strip())
+                                ref_lon = float(input("Enter reference longitude (e.g., -122.4194123): \n").strip())
                                 reference_point = (ref_lat, ref_lon)
                                 break
                             except ValueError:
