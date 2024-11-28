@@ -1255,6 +1255,7 @@ class NMEAData:
             data_points = []
             if reference_point:
                 ref_lat, ref_lon = reference_point
+
                 # Collect the data points along with calculated distances
                 for entry in self.parsed_sentences:
                     if "Latitude" in entry and "Longitude" in entry:
@@ -1343,22 +1344,22 @@ class NMEAData:
                     chunk = df_parsed.iloc[i:i + max_rows]
                     chunk.to_excel(writer, index=False, sheet_name=f"Parsed_{i // max_rows + 1}")
 
-                    # Write summary data to a new sheet called "CEP Summary"
-                df_summary.to_excel(writer, index=False, sheet_name="CEPSummaryStats")
+                # Write summary data to a new sheet called "CEP Summary"
+                df_summary.to_excel(writer, index=False, sheet_name="CEP Summary")
 
                 # Write data points with distances, splitting across multiple sheets if necessary
                 for i in range(0, len(df_data_points), max_rows):
                     chunk = df_data_points.iloc[i:i + max_rows]
-                    chunk.to_excel(writer, index=False, sheet_name=f"CEPDataPoints_{i // max_rows + 1}")
+                    chunk.to_excel(writer, index=False, sheet_name=f"DataPoints_{i // max_rows + 1}")
 
                 # Write satellite summary, splitting if necessary
                 for i in range(0, len(df_sat_summary), max_rows):
                     chunk = df_sat_summary.iloc[i:i + max_rows]
-                    chunk.to_excel(writer, index=False, sheet_name=f"SatDataPoints_{i // max_rows + 1}")
+                    chunk.to_excel(writer, index=False, sheet_name=f"SatSummary_{i // max_rows + 1}")
 
                 # Write satellite summary statistics (if any)
                 if not df_sat_summary_stats.empty:
-                        df_sat_summary_stats.to_excel(writer, index=False, sheet_name="SatSummaryStats")
+                    df_sat_summary_stats.to_excel(writer, index=False, sheet_name="SatSummaryStats")
 
             logging.info(f"Data written to {filepath}")
 

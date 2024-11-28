@@ -297,9 +297,7 @@ def process_nmea_log(file_path, reference_point=None):
 
     # Write results to an Excel file
     try:
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         nmea_data.write_to_excel_mode_2(timestamp, cep_value)
-        logging.info(f"Data successfully written to Excel file with timestamp: {timestamp}")
     except Exception as e:
         logging.error(f"Error writing to Excel file: {e}")
 
