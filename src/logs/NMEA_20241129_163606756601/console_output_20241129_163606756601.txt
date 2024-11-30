@@ -1,3 +1,0 @@
-2024-11-29 16:36:06,759 [INFO] Logging setup complete. Logs are being saved to logs/NMEA_20241129_163606756601\console_output_20241129_163606756601.txt
-2024-11-29 16:36:06,764 [ERROR] Error opening serial port COM17 - Silicon Labs CP210x USB to UART Bridge (COM17): could not open port 'COM17 - Silicon Labs CP210x USB to UART Bridge (COM17)': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
-2024-11-29 16:36:06,764 [INFO] Log file logs/NMEA_20241129_163606756601\nmea_raw_log_mode_1_COM17 - Silicon Labs CP210x USB to UART Bridge (COM17)_115200_20241129_163606756601.txt closed.

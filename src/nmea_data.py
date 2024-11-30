@@ -1,7 +1,6 @@
 # nmea_data.py
-
-import pandas as pd
 import logging
+import pandas as pd
 import numpy as np
 
 # noinspection PyCompatibility

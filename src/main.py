@@ -39,7 +39,7 @@ def setup_logging(log_folder, timestamp):
         ]
     )
 
-    logging.info(f"Logging setup complete. Logs are being saved to {log_file}")
+    logging.info(f"Console logging setup complete. Logs are being saved to {log_file}")
 
 # noinspection PyCompatibility
 def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, reference_point=None, stop_event=None):
@@ -63,8 +63,10 @@ def read_nmea_data(port, baudrate, timeout, duration, log_folder, timestamp, ref
     # Ensure log folder exists
     os.makedirs(log_folder, exist_ok=True)
 
+    safe_port = port.replace("/", "_")
+
     # Open raw NMEA log file
-    raw_nmea_log_path = os.path.join(log_folder, f"nmea_raw_log_mode_1_{port}_{baudrate}_{timestamp}.txt")
+    raw_nmea_log_path = os.path.join(log_folder, f"nmea_raw_log_mode_1_{safe_port}_{baudrate}_{timestamp}.txt")
     try:
         raw_nmea_log = open(raw_nmea_log_path, "a", encoding="utf-8")
     except Exception as e:
@@ -442,4 +444,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         logging.error(f"Critical error in main execution: {e}")
-

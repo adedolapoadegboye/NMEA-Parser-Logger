@@ -41,36 +41,54 @@ class GNSSTestTool:
         self.create_widgets()
 
     def create_widgets(self):
-        # Title
-        title = tk.Label(
-            self.root, text="GNSS Test Tool", font=("Arial", 18, "bold"), bg="#B8D8D8", fg="#FE5F55"
+        # Configure root grid layout
+        self.root.grid_rowconfigure(0, weight=1)  # Row 0 (Test Config) gets 10% height
+        self.root.grid_rowconfigure(1, weight=9)  # Row 1 (Test Setup) gets 90% height
+        self.root.grid_columnconfigure(0, weight=1)  # Col 1 (left side)
+        self.root.grid_columnconfigure(1, weight=9)  # Col 2 (right side)
+
+        # Combined Frame for Test Type and Mode Selection (Col 1, Row 0)
+        combined_frame = ttk.LabelFrame(self.root, text="General Configuration", padding=10)
+        combined_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        # Configure rows and columns inside combined_frame for alignment
+        combined_frame.grid_rowconfigure(0, weight=1)  # Row for Test Type
+        combined_frame.grid_rowconfigure(1, weight=1)  # Row for Test Mode
+        combined_frame.grid_columnconfigure(0, weight=1)  # Label columns
+        combined_frame.grid_columnconfigure(1, weight=1)  # Input widgets/buttons
+
+        # Test Type inside the combined frame
+        ttk.Label(combined_frame, text="Test Type:", font=("Arial", 10)).grid(
+            row=0, column=0, padx=10, pady=5, sticky="w"
         )
-        title.pack(pady=5)
-
-        # Test Type Selection
-        test_type_frame = ttk.LabelFrame(self.root, text="Select Type", padding=10)
-        test_type_frame.pack(fill="x", padx=10, pady=10)
-
-        ttk.Label(test_type_frame, text="Test Type:", font=("Arial", 10)).pack(side="left", padx=10, pady=10)
         self.test_type = tk.StringVar(value="Static (fixed reference point)")
         ttk.Combobox(
-            test_type_frame, textvariable=self.test_type, values=["Static (fixed reference point)", "Dynamic (moving reference point)"], state="readonly", width=35
-        ).pack(side="left", padx=10, pady=10)
+            combined_frame, textvariable=self.test_type,
+            values=["Static (fixed reference point)", "Dynamic (moving reference point)"],
+            state="readonly", width=25
+        ).grid(row=0, column=1, padx=10, pady=0, sticky="w")
 
-        # Mode Selection Frame
-        mode_frame = ttk.LabelFrame(self.root, text="Select Mode", padding=10)
-        mode_frame.pack(fill="x", padx=15, pady=10)
+        # Test Mode inside the combined frame
+        ttk.Label(combined_frame, text="Test Mode:", font=("Arial", 10)).grid(
+            row=1, column=0, padx=10, pady=5, sticky="w"
+        )
+        button_frame = ttk.Frame(combined_frame)  # Frame to group buttons closer together
+        button_frame.grid(row=1, column=1, sticky="w")
+        ttk.Button(button_frame, text="Process Live Data", command=self.show_live_mode).pack(
+            side="left", padx=5, pady=5
+        )
+        ttk.Button(button_frame, text="Process Log File", command=self.show_file_mode).pack(
+            side="left", padx=5, pady=5)
 
-        ttk.Button(mode_frame, text="Process Live Data", command=self.show_live_mode).pack(side="left", padx=10, pady=5)
-        ttk.Button(mode_frame, text="Process Log File", command=self.show_file_mode).pack(side="left", padx=10, pady=5)
 
-        # Left Frame for Setup
-        self.setup_frame = ttk.Frame(self.root, padding=10)
-        self.setup_frame.pack(side="left", fill="both", expand=False, padx=10, pady=10)
+        # Setup Frame (Col 1, Row 1)
+        self.setup_frame = ttk.LabelFrame(self.root, text="Test Setup", padding=10)
+        self.setup_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        ttk.Label(self.setup_frame, text="Select Test Type and mode to configure").pack(padx=10, pady=10)
 
-        # Right Frame for Results
-        self.result_frame = ttk.Frame(self.root, padding=10)
-        self.result_frame.pack(side="left", fill="both", expand=False, padx=10, pady=10)
+        # Results Frame (Col 2, Spans both rows in Col 2)
+        self.result_frame = ttk.LabelFrame(self.root, text="Results", padding=10)
+        self.result_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=10, pady=10)
 
     def show_live_mode(self):
         if self.test_type.get() == "Static (fixed reference point)":
@@ -106,7 +124,7 @@ class GNSSTestTool:
                 general_config_frame,
                 text="Use Custom Reference Point",
                 variable=self.use_reference,
-                command=self.toggle_reference_entries
+                command=self.toggle_reference_entries,
             )
             use_reference_checkbox.grid(row=1, column=0, sticky="w", padx=10, pady=5)
 
@@ -145,14 +163,14 @@ class GNSSTestTool:
             self.clear_result_content()
 
             # Header
-            tk.Label(self.setup_frame, text="Live Dynamic Test Data", font=("Arial", 18, "bold"), fg="#FE5F55").pack(pady=10)
+            tk.Label(self.setup_frame, text="Live Dynamic Test Data", font=("Arial", 14, "bold"), fg="#FE5F55").pack(pady=5, padx=5)
 
             # General Configuration
-            general_config_frame = ttk.LabelFrame(self.setup_frame, text="General Configuration", padding=10)
+            general_config_frame = ttk.LabelFrame(self.setup_frame, text="Device Configuration", padding=10)
             general_config_frame.pack(fill="x", padx=10, pady=10)
 
             # Number of devices
-            ttk.Label(general_config_frame, text="Number of Test Devices:", font=("Arial", 8)).grid(row=0, column=0,
+            ttk.Label(general_config_frame, text="Number of Test Devices:", font=("Arial", 10)).grid(row=0, column=0,
                                                                                                     sticky="w",
                                                                                                     padx=10, pady=5)
             self.num_devices_var = tk.DoubleVar(value=1)
@@ -161,7 +179,7 @@ class GNSSTestTool:
                 textvariable=self.num_devices_var,
                 state="readonly",
                 values=[str(i) for i in range(1, 11)],
-                width=20,
+                width=10,
             )
             self.num_devices_dropdown.grid(row=0, column=1, padx=10, pady=5)
             self.num_devices_dropdown.bind("<<ComboboxSelected>>", self.update_serial_config_dynamic_frames)
@@ -190,17 +208,17 @@ class GNSSTestTool:
             config_frame.pack(fill="x", padx=10, pady=5)
 
             # Serial Port
-            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 8)).grid(row=0, column=0, sticky="w",
+            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w",
                                                                                  padx=10,
                                                                                  pady=5)
             self.port_var = tk.StringVar(value="Select Port")
-            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30, font=("Arial", 8)
+            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30, font=("Arial", 10)
 )
             port_dropdown.grid(row=0, column=1, padx=10, pady=5)
             self.refresh_serial_ports(port_dropdown)
 
             # Baudrate
-            ttk.Label(config_frame, text="Baudrate:", font=("Arial", 8)).grid(row=1, column=0, sticky="w", padx=10,
+            ttk.Label(config_frame, text="Baudrate:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10,
                                                                               pady=5)
             baudrates = ["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"]
             self.baudrate_var = tk.IntVar(value=115200)  # Default value
@@ -210,27 +228,27 @@ class GNSSTestTool:
                 state="readonly",
                 values=baudrates,
                 width=30,
-                font=("Arial", 8)
+                font=("Arial", 10)
             )
             baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
 
             # Timeout
-            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 8)).grid(row=2, column=0, sticky="w",
+            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
                                                                                  padx=10,
                                                                                  pady=5)
             self.timeout_var = tk.DoubleVar(value=1)
-            ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 8)).grid(row=2, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 10)).grid(row=2, column=1, padx=10, pady=5)
 
             # Duration
-            ttk.Label(config_frame, text="Duration (s):", font=("Arial", 8)).grid(row=3, column=0, sticky="w",
+            ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
                                                                                   padx=10,
                                                                                   pady=5)
             self.duration_var = tk.DoubleVar(value=30)
-            ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 8)).grid(row=3, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 10)).grid(row=3, column=1, padx=10, pady=5)
 
             # Save device configuration variables
             config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var, "timeout_var": self.timeout_var,
-                                 "duration_var": self.duration_var}
+                                 "duration_var": self.duration_var, "device_index": device_index}
 
         # Frame to hold the buttons
         button_frame = ttk.Frame(self.serial_config_frame_holder)
@@ -267,17 +285,18 @@ class GNSSTestTool:
             )
             config_frame.pack(fill="x", padx=10, pady=5)
 
-            # Serial Port
-            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 8)).grid(row=0, column=0, sticky="w",
+           # Serial Port
+            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w",
                                                                                  padx=10,
                                                                                  pady=5)
             self.port_var = tk.StringVar(value="Select Port")
-            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=20)
+            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30, font=("Arial", 10)
+)
             port_dropdown.grid(row=0, column=1, padx=10, pady=5)
             self.refresh_serial_ports(port_dropdown)
 
             # Baudrate
-            ttk.Label(config_frame, text="Baudrate:", font=("Arial", 8)).grid(row=1, column=0, sticky="w", padx=10,
+            ttk.Label(config_frame, text="Baudrate:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10,
                                                                               pady=5)
             baudrates = ["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"]
             self.baudrate_var = tk.IntVar(value=115200)  # Default value
@@ -286,23 +305,24 @@ class GNSSTestTool:
                 textvariable=self.baudrate_var,
                 state="readonly",
                 values=baudrates,
-                width=20
+                width=30,
+                font=("Arial", 10)
             )
             baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
 
             # Timeout
-            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 8)).grid(row=2, column=0, sticky="w",
+            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
                                                                                  padx=10,
                                                                                  pady=5)
             self.timeout_var = tk.DoubleVar(value=1)
-            ttk.Entry(config_frame, textvariable=self.timeout_var, width=20).grid(row=2, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 10)).grid(row=2, column=1, padx=10, pady=5)
 
             # Duration
-            ttk.Label(config_frame, text="Test Duration (s):", font=("Arial", 8)).grid(row=3, column=0, sticky="w",
+            ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
                                                                                   padx=10,
                                                                                   pady=5)
             self.duration_var = tk.DoubleVar(value=30)
-            ttk.Entry(config_frame, textvariable=self.duration_var, width=20).grid(row=3, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 10)).grid(row=3, column=1, padx=10, pady=5)
 
             # Reference Device Checkbox
             self.ref_var = tk.BooleanVar(value=(self.reference_device_index == device_index))
@@ -315,12 +335,24 @@ class GNSSTestTool:
             ref_checkbox.grid(row=4, column=0, columnspan=2, sticky="w", padx=10, pady=5)
             # Save device configuration variables
             config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var, "timeout_var": self.timeout_var,
-                                 "duration_var": self.duration_var, "ref_var": self.ref_var}
+                                 "duration_var": self.duration_var, "ref_var": self.ref_var, "device_index": device_index, "ref_checkbox": ref_checkbox}
 
-        # Start Button
-        ttk.Button(self.serial_config_frame_holder, text="Start", command=self.start_live_mode).pack(pady=15)
+        # Frame to hold the buttons
+        button_frame = ttk.Frame(self.serial_config_frame_holder)
+        button_frame.pack(fill="x", padx=10, pady=15)
+
+        # Add Start Button
+        start_button = ttk.Button(button_frame, text="Start Test", command=self.start_live_mode)
+        start_button.grid(row=0, column=0, padx=5)
+
         # Add Stop Button
-        ttk.Button(self.root, text="Stop Tests", command=self.stop_all_tests).pack(pady=10)
+        stop_button = ttk.Button(button_frame, text="Stop Test", command=self.stop_all_tests)
+        stop_button.grid(row=0, column=1, padx=5)
+
+        # Add Clear Button
+        clear_button = ttk.Button(button_frame, text="Clear", command=self.clear_all_configs)
+        clear_button.grid(row=0, column=2, padx=5)
+
         # Bind window close to stop tests
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -338,9 +370,72 @@ class GNSSTestTool:
         if port_list:
             port_dropdown.set(port_list[0])
         else:
-            port_dropdown.set("No COM ports available")
+            port_dropdown.set("No ports available")
 
     def show_file_mode(self):
+        if self.test_type.get() == "Static (fixed reference point)":
+            self.show_static_file_mode()
+        else:
+            self.show_dynamic_file_mode()
+
+    def show_static_file_mode(self):
+
+        self.clear_result_content()
+        self.clear_setup_content()
+
+        """Show UI for log file processing."""
+
+        # Header
+        tk.Label(self.setup_frame, text="Load Static Test Data", font=("Arial", 14, "bold"), fg="#FE5F55").pack(pady=5, padx=5)
+        file_frame = ttk.LabelFrame(self.setup_frame, text="Log File Selection", padding=10)
+        file_frame.pack(fill="x", padx=10, pady=10)
+
+        # File Selection
+        ttk.Label(file_frame, text="Log File:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        self.file_var = tk.StringVar(value="Select Log File")
+        ttk.Entry(file_frame, textvariable=self.file_var, state="readonly", width=20).grid(row=0, column=1, padx=10, pady=5)
+        ttk.Button(file_frame, text="Browse", command=self.browse_file).grid(row=0, column=2, padx=10, pady=5)
+
+        # Reference Coordinates (Ground Truth)
+        self.use_reference = tk.BooleanVar(value=False)
+        use_reference_checkbox = ttk.Checkbutton(
+            file_frame,
+            text="Use Custom Reference Point",
+            variable=self.use_reference,
+            command=self.toggle_reference_entries,
+        )
+        use_reference_checkbox.grid(row=1, column=0, sticky="w", padx=10, pady=5)
+
+        # Info Icon with Tooltip
+        info_label = tk.Label(file_frame, text="?", font=("Arial", 10, "bold"), fg="blue", cursor="hand2")
+        info_label.grid(row=1, column=1, sticky="w", padx=5)
+
+        # Bind tooltip to info icon
+        info_label.bind("<Enter>", self.show_reference_tooltip)
+        info_label.bind("<Leave>", self.hide_reference_tooltip)
+
+        # Latitude Entry
+        ttk.Label(file_frame, text="Latitude:", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
+                                                                                    padx=10, pady=5)
+        self.lat_var = tk.DoubleVar(value=0.0000000)
+        self.lat_entry = ttk.Entry(file_frame, textvariable=self.lat_var, width=20, state="disabled")
+        self.lat_entry.grid(row=2, column=1, padx=10, pady=5)
+
+        # Longitude Entry
+        ttk.Label(file_frame, text="Longitude:", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
+                                                                                    padx=10, pady=5)
+        self.lon_var = tk.DoubleVar(value=0.0000000)
+        self.lon_entry = ttk.Entry(file_frame, textvariable=self.lon_var, width=20, state="disabled")
+        self.lon_entry.grid(row=3, column=1, padx=10, pady=5)
+
+        # Process Button
+        ttk.Button(file_frame, text="Process", command=self.process_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
+
+    def show_dynamic_file_mode(self):
+
+        self.clear_result_content()
+        self.clear_setup_content()
+
         """Show UI for log file processing."""
 
         tk.Label(self.setup_frame, text="Load Log File", font=("Arial", 18, "bold"), fg="#0078D7").pack(pady=10)
@@ -454,7 +549,6 @@ class GNSSTestTool:
         if file_path:
             self.file_var.set(file_path)
 
-
     def clear_setup_content(self):
         """Clear the content frame."""
         for widget in self.setup_frame.winfo_children():
@@ -498,7 +592,7 @@ class GNSSTestTool:
             self.tooltip,
             text="If no custom reference point is used, the CEP is calculated using the average of all test points as the reference.",
             justify="left",
-            background="#ffffe0",  # Light yellow background
+            background="#000000",  # black background
             relief="solid",
             borderwidth=1,
             font=("Arial", 10)
@@ -548,7 +642,7 @@ class GNSSTestTool:
 
     def on_close(self):
         """Handle window close."""
-        if messagebox.askyesno("Quit", "Are you sure you want to quit and stop all running tests?"):
+        if messagebox.askyesno("Quit", "Are you sure you want to quit?"):
             self.stop_all_tests()  # Stop all threads
             self.root.destroy()  # Close the application
         else:
@@ -594,6 +688,7 @@ class GNSSTestTool:
 
 
 if __name__ == "__main__":
+
     root = tk.Tk()
     app = GNSSTestTool(root)
     root.mainloop()
