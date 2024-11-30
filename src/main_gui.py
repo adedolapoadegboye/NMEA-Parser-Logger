@@ -329,7 +329,7 @@ class GNSSTestTool:
         """Refresh the available serial ports with detailed information."""
         # Get list of ports with descriptions
         ports = serial.tools.list_ports.comports()
-        port_list = [f"{port.device} - {port.description}" for port in ports]
+        port_list = [f"{port.device}" for port in ports]
 
         # Update the dropdown menu
         port_dropdown["values"] = port_list

@@ -194,7 +194,7 @@ class GNSSTestTool:
                                                                                  padx=10,
                                                                                  pady=5)
             self.port_var = tk.StringVar(value="Select Port")
-            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=20, font=("Arial", 8)
+            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30, font=("Arial", 8)
 )
             port_dropdown.grid(row=0, column=1, padx=10, pady=5)
             self.refresh_serial_ports(port_dropdown)
@@ -209,7 +209,7 @@ class GNSSTestTool:
                 textvariable=self.baudrate_var,
                 state="readonly",
                 values=baudrates,
-                width=20,
+                width=30,
                 font=("Arial", 8)
             )
             baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
@@ -219,14 +219,14 @@ class GNSSTestTool:
                                                                                  padx=10,
                                                                                  pady=5)
             self.timeout_var = tk.DoubleVar(value=1)
-            ttk.Entry(config_frame, textvariable=self.timeout_var, width=20, font=("Arial", 8)).grid(row=2, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 8)).grid(row=2, column=1, padx=10, pady=5)
 
             # Duration
             ttk.Label(config_frame, text="Duration (s):", font=("Arial", 8)).grid(row=3, column=0, sticky="w",
                                                                                   padx=10,
                                                                                   pady=5)
             self.duration_var = tk.DoubleVar(value=30)
-            ttk.Entry(config_frame, textvariable=self.duration_var, width=20, font=("Arial", 8)).grid(row=3, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 8)).grid(row=3, column=1, padx=10, pady=5)
 
             # Save device configuration variables
             config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var, "timeout_var": self.timeout_var,
