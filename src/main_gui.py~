@@ -30,12 +30,11 @@ class GNSSTestTool:
         self.num_devices_var = None
         self.number_of_test_devices = None
         self.number_of_test_devices_dropdown = None
-        self.mode_content = None
         self.test_type = None
         self.root = root
         self.root.title("GNSS Test Tool")
         # Set the window to fullscreen
-        self.root.geometry(f"{root.winfo_screenwidth()}x{root.winfo_screenheight()}")
+        self.root.geometry(f"{root.winfo_screenwidth() - 200}x{root.winfo_screenheight() - 200}")
         # Exit fullscreen with Escape key
         self.root.bind("<Escape>", lambda e: root.attributes('-fullscreen', False))
         self.root.configure(bg="#B8D8D8")  # Background color
@@ -46,36 +45,32 @@ class GNSSTestTool:
         title = tk.Label(
             self.root, text="GNSS Test Tool", font=("Arial", 18, "bold"), bg="#B8D8D8", fg="#FE5F55"
         )
-        title.pack(pady=10)
+        title.pack(pady=5)
 
         # Test Type Selection
-        test_type_frame = ttk.LabelFrame(self.root, text="Select Test Type", padding=10)
-        test_type_frame.pack(fill="x", padx=15, pady=10)
+        test_type_frame = ttk.LabelFrame(self.root, text="Select Type", padding=10)
+        test_type_frame.pack(fill="x", padx=10, pady=10)
 
-        ttk.Label(test_type_frame, text="Test Type:", font=("Arial", 10)).pack(side="left", padx=10)
+        ttk.Label(test_type_frame, text="Test Type:", font=("Arial", 10)).pack(side="left", padx=10, pady=10)
         self.test_type = tk.StringVar(value="Static (fixed reference point)")
         ttk.Combobox(
             test_type_frame, textvariable=self.test_type, values=["Static (fixed reference point)", "Dynamic (moving reference point)"], state="readonly", width=35
-        ).pack(side="left", padx=10)
+        ).pack(side="left", padx=10, pady=10)
 
         # Mode Selection Frame
-        mode_frame = ttk.LabelFrame(self.root, text="Select Processing Mode", padding=10)
+        mode_frame = ttk.LabelFrame(self.root, text="Select Mode", padding=10)
         mode_frame.pack(fill="x", padx=15, pady=10)
 
-        ttk.Button(mode_frame, text="Live Data", command=self.show_live_mode).pack(side="left", padx=10, pady=5)
-        ttk.Button(mode_frame, text="Load File", command=self.show_file_mode).pack(side="left", padx=10, pady=5)
-
-        # Static/Dynamic Mode Content
-        self.mode_content = ttk.Frame(self.root, padding=10)
-        # self.mode_content.pack(fill="both", expand=True, padx=15, pady=10)
+        ttk.Button(mode_frame, text="Process Live Data", command=self.show_live_mode).pack(side="left", padx=10, pady=5)
+        ttk.Button(mode_frame, text="Process Log File", command=self.show_file_mode).pack(side="left", padx=10, pady=5)
 
         # Left Frame for Setup
         self.setup_frame = ttk.Frame(self.root, padding=10)
         self.setup_frame.pack(side="left", fill="both", expand=False, padx=10, pady=10)
 
-        # Right Frame for Console/Result Viewer
+        # Right Frame for Results
         self.result_frame = ttk.Frame(self.root, padding=10)
-        self.result_frame.pack(side="right", fill="both", expand=True, padx=10, pady=10)
+        self.result_frame.pack(side="left", fill="both", expand=False, padx=10, pady=10)
 
     def show_live_mode(self):
         if self.test_type.get() == "Static (fixed reference point)":
@@ -84,23 +79,23 @@ class GNSSTestTool:
             self.clear_result_content()
 
             # Header
-            tk.Label(self.setup_frame, text="Live Static Test Setup", font=("Arial", 18, "bold"), fg="#FE5F55").pack(pady=10)
+            tk.Label(self.setup_frame, text="Live Static Test Setup", font=("Arial", 14, "bold"), fg="#FE5F55").pack(pady=5, padx=5)
 
             # General Configuration
             general_config_frame = ttk.LabelFrame(self.setup_frame, text="General Configuration", padding=10)
             general_config_frame.pack(fill="x", padx=10, pady=10)
 
             # Number of devices
-            ttk.Label(general_config_frame, text="Number of Test Devices:", font=("Arial", 8)).grid(row=0, column=0,
+            ttk.Label(general_config_frame, text="Number of Test Devices:", font=("Arial", 10)).grid(row=0, column=0,
                                                                                                     sticky="w",
-                                                                                                    padx=10, pady=5)
+                                                                                                    padx=5, pady=5)
             self.num_devices_var = tk.StringVar(value="1")
             self.num_devices_dropdown = ttk.Combobox(
                 general_config_frame,
                 textvariable=self.num_devices_var,
                 state="readonly",
                 values=[str(i) for i in range(1, 11)],
-                width=20,
+                width=10,
             )
             self.num_devices_dropdown.grid(row=0, column=1, padx=10, pady=5)
             self.num_devices_dropdown.bind("<<ComboboxSelected>>", self.update_serial_config_static_frames)
@@ -124,14 +119,14 @@ class GNSSTestTool:
             info_label.bind("<Leave>", self.hide_reference_tooltip)
 
             # Latitude Entry
-            ttk.Label(general_config_frame, text="Latitude:", font=("Arial", 8)).grid(row=2, column=0, sticky="w",
+            ttk.Label(general_config_frame, text="Latitude:", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
                                                                                       padx=10, pady=5)
             self.lat_var = tk.DoubleVar(value=0.0000000)
             self.lat_entry = ttk.Entry(general_config_frame, textvariable=self.lat_var, width=20, state="disabled")
             self.lat_entry.grid(row=2, column=1, padx=10, pady=5)
 
             # Longitude Entry
-            ttk.Label(general_config_frame, text="Longitude:", font=("Arial", 8)).grid(row=3, column=0, sticky="w",
+            ttk.Label(general_config_frame, text="Longitude:", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
                                                                                        padx=10, pady=5)
             self.lon_var = tk.DoubleVar(value=0.0000000)
             self.lon_entry = ttk.Entry(general_config_frame, textvariable=self.lon_var, width=20, state="disabled")
@@ -199,7 +194,8 @@ class GNSSTestTool:
                                                                                  padx=10,
                                                                                  pady=5)
             self.port_var = tk.StringVar(value="Select Port")
-            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=20)
+            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=20, font=("Arial", 8)
+)
             port_dropdown.grid(row=0, column=1, padx=10, pady=5)
             self.refresh_serial_ports(port_dropdown)
 
@@ -213,7 +209,8 @@ class GNSSTestTool:
                 textvariable=self.baudrate_var,
                 state="readonly",
                 values=baudrates,
-                width=20
+                width=20,
+                font=("Arial", 8)
             )
             baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
 
@@ -222,14 +219,14 @@ class GNSSTestTool:
                                                                                  padx=10,
                                                                                  pady=5)
             self.timeout_var = tk.DoubleVar(value=1)
-            ttk.Entry(config_frame, textvariable=self.timeout_var, width=20).grid(row=2, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.timeout_var, width=20, font=("Arial", 8)).grid(row=2, column=1, padx=10, pady=5)
 
             # Duration
             ttk.Label(config_frame, text="Duration (s):", font=("Arial", 8)).grid(row=3, column=0, sticky="w",
                                                                                   padx=10,
                                                                                   pady=5)
             self.duration_var = tk.DoubleVar(value=30)
-            ttk.Entry(config_frame, textvariable=self.duration_var, width=20).grid(row=3, column=1, padx=10, pady=5)
+            ttk.Entry(config_frame, textvariable=self.duration_var, width=20, font=("Arial", 8)).grid(row=3, column=1, padx=10, pady=5)
 
             # Save device configuration variables
             config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var, "timeout_var": self.timeout_var,
@@ -329,19 +326,26 @@ class GNSSTestTool:
 
     @staticmethod
     def refresh_serial_ports(port_dropdown):
-        """Refresh the available serial ports."""
-        ports = [port.device for port in serial.tools.list_ports.comports()]
-        port_dropdown["values"] = ports
-        if ports:
-            port_dropdown.set(ports[0])  # Default to the first port if available
+        """Refresh the available serial ports with detailed information."""
+        # Get list of ports with descriptions
+        ports = serial.tools.list_ports.comports()
+        port_list = [f"{port.device} - {port.description}" for port in ports]
+
+        # Update the dropdown menu
+        port_dropdown["values"] = port_list
+
+        # Set the first port as default if available
+        if port_list:
+            port_dropdown.set(port_list[0])
+        else:
+            port_dropdown.set("No COM ports available")
 
     def show_file_mode(self):
         """Show UI for log file processing."""
-        self.clear_mode_content()
 
-        tk.Label(self.mode_content, text="Load Log File", font=("Arial", 18, "bold"), fg="#0078D7").pack(pady=10)
+        tk.Label(self.setup_frame, text="Load Log File", font=("Arial", 18, "bold"), fg="#0078D7").pack(pady=10)
 
-        file_frame = ttk.LabelFrame(self.mode_content, text="Log File Selection", padding=10)
+        file_frame = ttk.LabelFrame(self.setup_frame, text="Log File Selection", padding=10)
         file_frame.pack(fill="x", padx=10, pady=10)
 
         # File Selection
@@ -450,10 +454,6 @@ class GNSSTestTool:
         if file_path:
             self.file_var.set(file_path)
 
-    def clear_mode_content(self):
-        """Clear the content frame."""
-        for widget in self.mode_content.winfo_children():
-            widget.destroy()
 
     def clear_setup_content(self):
         """Clear the content frame."""
@@ -554,6 +554,43 @@ class GNSSTestTool:
         else:
             messagebox.showinfo("Close action canceled","Window close action canceled by the user.")
             print("Window close action canceled.")
+
+    def clear_all_configs(self):
+        """Reset all configurations to their default values."""
+        try:
+            # Reset number of devices
+            if self.num_devices_var:
+                self.num_devices_var.set("1")  # Default to 1 device
+
+            # Reset reference point settings
+            if self.use_reference:
+                self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                self.toggle_reference_entries()  # Disable lat/lon entries
+
+            if self.lat_var:
+                self.lat_var.set(0.0)  # Reset latitude
+            if self.lon_var:
+                self.lon_var.set(0.0)  # Reset longitude
+
+            # Reset Serial Configuration fields
+            if self.port_var:
+                self.port_var.set("Select Port")  # Default port option
+            if self.baudrate_var:
+                self.baudrate_var.set(115200)  # Default baudrate
+            if self.timeout_var:
+                self.timeout_var.set(1.0)  # Default timeout
+            if self.duration_var:
+                self.duration_var.set(30.0)  # Default duration
+
+            # Clear the serial configuration frame holder
+            for widget in self.serial_config_frame_holder.winfo_children():
+                widget.destroy()
+
+            # Reinitialize serial configuration frames
+            self.update_serial_config_static_frames()
+            messagebox.showinfo("Clear", "All configurations have been reset.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while clearing configurations: {e}")
 
 
 if __name__ == "__main__":
