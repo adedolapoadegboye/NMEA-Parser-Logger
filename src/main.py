@@ -245,13 +245,16 @@ def parse_nmea_from_log(file_path):
     logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
     return parsed_sentences, nmea_data
 # noinspection PyCompatibility
-def process_nmea_log(file_path, reference_point=None):
+def process_nmea_log(file_path, timestamp, reference_point=None):
     """
     Process pre-collected NMEA log file and calculate CEP.
 
     Args:
         file_path (str): Path to the NMEA log file.
         reference_point (tuple, optional): Custom reference point (latitude, longitude). Defaults to None.
+        :param file_path:
+        :param reference_point:
+        :param timestamp:
     """
     logging.info(f"Starting log processing for file: {file_path}")
 
@@ -434,7 +437,7 @@ if __name__ == "__main__":
                         reference_point = None
 
                     # Process the log file and calculate CEP
-                    process_nmea_log(file_path, reference_point)
+                    process_nmea_log(file_path, timestamp, reference_point)
 
                 except Exception as e:
                     logging.error(f"An error occurred while processing the log file in mode 2: {e}")

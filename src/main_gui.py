@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+
 import serial.tools.list_ports
 from datetime import datetime
 import os
@@ -86,9 +87,46 @@ class GNSSTestTool:
         self.setup_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         ttk.Label(self.setup_frame, text="Select Test Type and mode to configure").pack(padx=10, pady=10)
 
-        # Results Frame (Col 2, Spans both rows in Col 2)
+        # Create the Results Frame
         self.result_frame = ttk.LabelFrame(self.root, text="Results", padding=10)
         self.result_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=10, pady=10)
+
+        # Create a Notebook (Tab container) within the Results Frame
+        results_notebook = ttk.Notebook(self.result_frame)
+        results_notebook.pack(fill="both", expand=True)
+
+        # Console Tab
+        console_tab = ttk.Frame(results_notebook)
+        results_notebook.add(console_tab, text="Console")
+        console_text = tk.Text(console_tab, wrap="word", state="disabled", height=15)
+        console_text.pack(fill="both", expand=True)
+
+        # Accuracy Tab
+        accuracy_tab = ttk.Frame(results_notebook)
+        results_notebook.add(accuracy_tab, text="Accuracy")
+
+        # Accuracy Content (Placeholder for CEP Results, Graphs, Summary)
+        accuracy_graph_frame = ttk.LabelFrame(accuracy_tab, text="Accuracy Graphs")
+        accuracy_graph_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        # Placeholder for graph widget or canvas
+        accuracy_graph_placeholder = ttk.Label(accuracy_graph_frame, text="Graphs will be displayed here.")
+        accuracy_graph_placeholder.pack(padx=20, pady=20)
+
+        accuracy_summary_frame = ttk.LabelFrame(accuracy_tab, text="Summary")
+        accuracy_summary_frame.pack(fill="x", padx=10, pady=10)
+        accuracy_summary_placeholder = ttk.Label(accuracy_summary_frame, text="CEP summary will be displayed here.")
+        accuracy_summary_placeholder.pack(padx=20, pady=20)
+
+        # Satellite Tab
+        satellite_tab = ttk.Frame(results_notebook)
+        results_notebook.add(satellite_tab, text="Satellite")
+
+        # Satellite Content (Placeholder for Satellite Analysis)
+        satellite_analysis_frame = ttk.LabelFrame(satellite_tab, text="Satellite Analysis")
+        satellite_analysis_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        satellite_analysis_placeholder = ttk.Label(satellite_analysis_frame,
+                                                   text="Satellite data and signal strength will be displayed here.")
+        satellite_analysis_placeholder.pack(padx=20, pady=20)
 
     def show_live_mode(self):
         if self.test_type.get() == "Static (fixed reference point)":
@@ -429,7 +467,7 @@ class GNSSTestTool:
         self.lon_entry.grid(row=3, column=1, padx=10, pady=5)
 
         # Process Button
-        ttk.Button(file_frame, text="Process", command=self.process_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
+        ttk.Button(file_frame, text="Process", command=self.start_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
 
     def show_dynamic_file_mode(self):
 
@@ -464,7 +502,7 @@ class GNSSTestTool:
         ttk.Entry(file_frame, textvariable=self.lon_var, width=20).grid(row=3, column=1, padx=10, pady=5)
 
         # Process Button
-        ttk.Button(file_frame, text="Process", command=self.process_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
+        ttk.Button(file_frame, text="Process", command=self.start_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
 
     def start_live_mode(self):
         """Start live data collection."""
@@ -524,28 +562,42 @@ class GNSSTestTool:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to start live test: {e}")
 
-    def process_file_mode(self):
+    def start_file_mode(self):
         """Process the selected log file."""
-        file_path = self.file_var.get()
-        if not os.path.exists(file_path):
-            messagebox.showerror("Error", "Invalid file path.")
-            return
+        # Setup logging
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
+        log_folder = f"logs/NMEA_{timestamp}"
+        os.makedirs(log_folder, exist_ok=True)
+        setup_logging(log_folder, timestamp)
+        try:
+            while True:
+                file_path = self.file_var.get()
+                if os.path.exists(file_path):
+                    break
+                else:
+                    messagebox.showerror("Error", "The file path provided does not exist. Please select a valid path.")
 
-        reference_point = None
-        if self.use_reference.get():
-            try:
-                ref_lat = float(self.lat_var.get())
-                ref_lon = float(self.lon_var.get())
-                reference_point = (ref_lat, ref_lon)
-            except ValueError:
-                messagebox.showerror("Error", "Invalid reference point.")
-                return
+            if self.use_reference.get():
+                while True:
+                    try:
+                        ref_lat = float(self.lat_var.get())
+                        ref_lon = float(self.lat_var.get())
+                        reference_point = (ref_lat, ref_lon)
+                        break
+                    except ValueError:
+                        messagebox.showerror("Error", "Invalid input. Please enter valid float values for latitude and longitude.")
+            else:
+                reference_point = None
 
-        process_nmea_log(file_path, reference_point)
+            # Process the log file and calculate CEP
+            process_nmea_log(file_path, timestamp, reference_point)
+
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while processing the log file: {e}")
 
     def browse_file(self):
         """Browse and select a log file."""
-        file_path = filedialog.askopenfilename(filetypes=[("Log Files", "*.txt *.log *.nmea *.csv *.xlsx")])
+        file_path = filedialog.askopenfilename(filetypes=[("Log Files", "*.txt *.log *.nmea")])
         if file_path:
             self.file_var.set(file_path)
 
@@ -685,7 +737,6 @@ class GNSSTestTool:
             messagebox.showinfo("Clear", "All configurations have been reset.")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred while clearing configurations: {e}")
-
 
 if __name__ == "__main__":
 
