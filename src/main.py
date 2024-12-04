@@ -12,7 +12,7 @@ import pynmea2
 import pandas as pd
 
 # Local Application Imports
-from nmea_data import NMEAData
+from headless_class import NMEAData
 
 # noinspection PyCompatibility
 def setup_logging(log_folder, timestamp):

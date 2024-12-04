@@ -1,7 +1,8 @@
-# nmea_data.py
+# headless_class.py
 import logging
 import pandas as pd
 import numpy as np
+import os
 
 # noinspection PyCompatibility
 class NMEAData:
@@ -1364,3 +1365,30 @@ class NMEAData:
 
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
+
+    @staticmethod
+    def setup_logging(log_folder, timestamp):
+        """
+        Sets up logging to output to both the console and a log file.
+
+        Args:
+            log_folder (str): Directory to save log files.
+            timestamp (str): Timestamp to append to the log file name.
+        """
+        # Ensure the log directory exists
+        os.makedirs(log_folder, exist_ok=True)
+
+        # Define the log file path
+        log_file = os.path.join(log_folder, f"console_output_{timestamp}.txt")
+
+        # Configure logging with both file and console handlers
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s [%(levelname)s] %(message)s',
+            handlers=[
+                logging.FileHandler(log_file, mode='a', encoding='utf-8'),
+                logging.StreamHandler(sys.stdout)
+            ]
+        )
+
+        logging.info(f"Console logging setup complete. Logs are being saved to {log_file}")

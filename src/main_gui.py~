@@ -723,20 +723,9 @@ class GNSSTestTool:
                 device_tab = ttk.Frame(self.device_notebook)  # Add to the nested notebook
                 self.device_notebook.add(device_tab, text=device_name)
 
-                # Create a frame to hold the text widget and scrollbar
-                frame_with_scrollbar = ttk.Frame(device_tab)
-                frame_with_scrollbar.pack(fill="both", expand=True)
-
-                # Create the text widget for logging
-                device_text = tk.Text(frame_with_scrollbar, wrap="word", state="disabled", height=15)
-
-                # Create a scrollbar and associate it with the text widget
-                device_scrollbar = ttk.Scrollbar(frame_with_scrollbar, orient="vertical", command=device_text.yview)
-                device_text.configure(yscrollcommand=device_scrollbar.set)
-
-                # Pack the text widget and scrollbar into the frame
-                device_text.pack(side="left", fill="both", expand=True)
-                device_scrollbar.pack(side="right", fill="y")
+                # Create a text widget for logging inside the tab
+                device_text = tk.Text(device_tab, wrap="word", state="disabled", height=15)
+                device_text.pack(fill="both", expand=True)
 
                 # Store the text widget in the dictionary
                 device_logs[device_name] = device_text

@@ -1,0 +1,1 @@
+2024-12-03 12:42:08,369 [INFO] Console logging setup complete. Logs are being saved to logs/NMEA_20241203_124208366437\console_output_20241203_124208366437.txt
