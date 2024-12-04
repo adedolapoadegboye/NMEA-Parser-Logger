@@ -932,7 +932,7 @@ class GNSSTestTool:
                 if stop_event and stop_event.is_set():  # Check if stop_event is set
                     logging.info(f"Stop signal received. Ending data collection on {port}.")
                     if console_widget:
-                        self.append_to_console_threadsafe(console_widget, f"Stop signal received for {port}.")
+                        self.append_to_console_specific(console_widget, f"Stop signal received for {port}.")
                     break
                 try:
                     nmea_sentence = ser.readline().decode('ascii', errors='replace').strip()
@@ -946,7 +946,7 @@ class GNSSTestTool:
                     if nmea_sentence.startswith('$PQTM'):
                         logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
                         if console_widget:
-                            self.append_to_console_threadsafe(console_widget, f"Proprietary NMEA Message: {nmea_sentence}")
+                            self.append_to_console_specific(console_widget, f"Proprietary NMEA Message: {nmea_sentence}")
                         try:
                             msg = pynmea2.parse(nmea_sentence)
                             if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
@@ -960,7 +960,7 @@ class GNSSTestTool:
                             logging.info(nmea_data)
                         except pynmea2.ParseError as e:
                             logging.warning(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
-                            self.append_to_console_threadsafe(console_widget, f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                         continue
 
                     # Handle standard NMEA sentences
@@ -978,37 +978,38 @@ class GNSSTestTool:
                             nmea_data.add_sentence_data()
                             nmea_data.add_coordinates()
                             logging.info(nmea_data)
+                            self.append_to_console_specific(console_widget, nmea_data)
                         except pynmea2.ParseError as e:
                             logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
-                            self.append_to_console_threadsafe(console_widget, f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
                     else:
                         logging.info(f"Unknown Message: {nmea_sentence}")
-                        self.append_to_console_threadsafe(console_widget, f"Unknown Message: {nmea_sentence}")
+                        self.append_to_console_specific(console_widget, f"Unknown Message: {nmea_sentence}")
 
                 except serial.SerialException as e:
                     logging.error(f"Error reading from serial port: {e}")
-                    self.append_to_console_threadsafe(console_widget, f"Error reading from serial port: {e}")
+                    self.append_to_console_specific(console_widget, f"Error reading from serial port: {e}")
                     break
 
         except Exception as e:
             logging.error(f"Unexpected error during serial read: {e}")
-            self.append_to_console_threadsafe(console_widget, f"Unexpected error during serial read: {e}")
+            self.append_to_console_specific(console_widget, f"Unexpected error during serial read: {e}")
 
         finally:
             # Ensure the log file is closed properly
             raw_nmea_log.close()
             logging.info(f"Log file {raw_nmea_log_path} closed.")
-            self.append_to_console_threadsafe(console_widget, f"Log file {raw_nmea_log_path} closed.")
+            self.append_to_console_specific(console_widget, f"Log file {raw_nmea_log_path} closed.")
 
         # Calculate CEP and log the results
         cep_value = nmea_data.calculate_cep(reference_point)
         if cep_value:
             logging.info(f"Mode 1: CEP statistics for port {port}:")
-            self.append_to_console_threadsafe(console_widget, f"Mode 1: CEP statistics for port {port}:")
+            self.append_to_console_specific(console_widget, f"Mode 1: CEP statistics for port {port}:")
             logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
             self.append_to_console_specific(console_widget, f"CEP50: {cep_value['CEP50']:.2f} meters")
             logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
-            self.append_to_console_threadsafe(console_widget, f"CEP68: {cep_value['CEP68']:.2f} meters")
+            self.append_to_console_specific(console_widget, f"CEP68: {cep_value['CEP68']:.2f} meters")
             logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
             self.append_to_console_specific(console_widget, f"CEP90: {cep_value['CEP90']:.2f} meters")
             logging.info(f"CEP95: {cep_value['CEP95']:.2f} meters")
@@ -1017,7 +1018,7 @@ class GNSSTestTool:
             self.append_to_console_specific(console_widget, f"CEP99: {cep_value['CEP99']:.2f} meters")
         else:
             logging.info(f"No coordinates available for CEP calculation for port {port}.")
-            self.append_to_console_threadsafe(console_widget, f"No coordinates available for CEP calculation for port {port}).")
+            self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for port {port}).")
 
         # Save parsed data to Excel
         nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
