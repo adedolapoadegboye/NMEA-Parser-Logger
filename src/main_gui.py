@@ -14,6 +14,10 @@ import pandas as pd
 
 class GNSSTestTool:
     def __init__(self, root):
+        self.duration_vars = None
+        self.timeout_vars = None
+        self.baudrate_vars = None
+        self.port_vars = None
         self.device_notebook = None
         self.results_notebook = None
         self.console_text = None
@@ -269,6 +273,12 @@ class GNSSTestTool:
         # Get the number of devices
         num_devices = int(self.num_devices_var.get())
 
+        # Initialize a list to store individual device port configurations
+        self.port_vars = [tk.StringVar(value="Select Port") for _ in range(num_devices)]
+        self.baudrate_vars = [tk.IntVar(value=115200) for _ in range(num_devices)]
+        self.timeout_vars = [tk.DoubleVar(value=1) for _ in range(num_devices)]
+        self.duration_vars = [tk.DoubleVar(value=30) for _ in range(num_devices)]
+
         # Generate serial config frames
         for device_index in range(1, num_devices + 1):
             config_frame = ttk.LabelFrame(
@@ -277,23 +287,25 @@ class GNSSTestTool:
             config_frame.pack(fill="x", padx=10, pady=5)
 
             # Serial Port
-            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w",
-                                                                                 padx=10,
-                                                                                 pady=5)
-            self.port_var = tk.StringVar(value="Select Port")
-            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30, font=("Arial", 10)
-)
+            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10,
+                                                                                  pady=5)
+            port_dropdown = ttk.Combobox(
+                config_frame,
+                textvariable=self.port_vars[device_index - 1],  # Use individual port variable
+                state="readonly",
+                width=30,
+                font=("Arial", 10)
+            )
             port_dropdown.grid(row=0, column=1, padx=10, pady=5)
-            self.refresh_serial_ports(port_dropdown)
+            self.refresh_serial_ports(port_dropdown)  # Populate port dropdown options
 
             # Baudrate
             ttk.Label(config_frame, text="Baudrate:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10,
-                                                                              pady=5)
+                                                                               pady=5)
             baudrates = ["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"]
-            self.baudrate_var = tk.IntVar(value=115200)  # Default value
             baudrate_dropdown = ttk.Combobox(
                 config_frame,
-                textvariable=self.baudrate_var,
+                textvariable=self.baudrate_vars[device_index - 1],  # Use individual baudrate variable
                 state="readonly",
                 values=baudrates,
                 width=30,
@@ -302,22 +314,33 @@ class GNSSTestTool:
             baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
 
             # Timeout
-            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
-                                                                                 padx=10,
-                                                                                 pady=5)
-            self.timeout_var = tk.DoubleVar(value=1)
-            ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 10)).grid(row=2, column=1, padx=10, pady=5)
+            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w", padx=10,
+                                                                                  pady=5)
+            ttk.Entry(
+                config_frame,
+                textvariable=self.timeout_vars[device_index - 1],  # Use individual timeout variable
+                width=30,
+                font=("Arial", 10)
+            ).grid(row=2, column=1, padx=10, pady=5)
 
             # Duration
-            ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
-                                                                                  padx=10,
-                                                                                  pady=5)
-            self.duration_var = tk.DoubleVar(value=30)
-            ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 10)).grid(row=3, column=1, padx=10, pady=5)
+            ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w", padx=10,
+                                                                                   pady=5)
+            ttk.Entry(
+                config_frame,
+                textvariable=self.duration_vars[device_index - 1],  # Use individual duration variable
+                width=30,
+                font=("Arial", 10)
+            ).grid(row=3, column=1, padx=10, pady=5)
 
             # Save device configuration variables
-            config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var, "timeout_var": self.timeout_var,
-                                 "duration_var": self.duration_var, "device_index": device_index}
+            config_frame.vars = {
+                "port_var": self.port_vars[device_index - 1],
+                "baudrate_var": self.baudrate_vars[device_index - 1],
+                "timeout_var": self.timeout_vars[device_index - 1],
+                "duration_var": self.duration_vars[device_index - 1],
+                "device_index": device_index
+            }
 
         # Frame to hold the buttons
         button_frame = ttk.Frame(self.serial_config_frame_holder)
@@ -556,26 +579,33 @@ class GNSSTestTool:
         try:
             # Reset stop event
             self.stop_event.clear()
-            # Clear result content
-            # self.clear_result_content()
-            # Validate port selection
-            port = self.port_var.get()
-            if port == "No ports available":
-                messagebox.showerror("Error", "Please select a valid port.")
-                return
 
-            # Validate and convert inputs
-            try:
-                baudrate = int(self.baudrate_var.get())
-                timeout = float(self.timeout_var.get())
-                duration = int(self.duration_var.get())
-                num_devices = int(self.num_devices_var.get())
-                if num_devices < 1 or num_devices > 10:
-                    messagebox.showerror("Error", "Number of devices must be between 1 and 10.")
-                    raise ValueError("Number of devices must be between 1 and 10.")
-            except ValueError as e:
-                messagebox.showerror("Error", f"Invalid input: {e}")
-                raise ValueError(f"Invalid input: {e}")
+            # Validate port selection for each device
+            num_devices = len(self.port_vars)  # Ensure the number of devices matches
+            devices = {}
+            for i in range(num_devices):
+                port = self.port_vars[i].get()
+                if port == "Select Port" or port == "No ports available":
+                    messagebox.showerror("Error", f"Please select a valid port for Device {i + 1}.")
+                    return
+
+                # Gather configuration for the device
+                try:
+                    baudrate = int(self.baudrate_vars[i].get())
+                    timeout = float(self.timeout_vars[i].get())
+                    duration = int(self.duration_vars[i].get())
+                except ValueError as e:
+                    messagebox.showerror("Error", f"Invalid input for Device {i + 1}: {e}")
+                    return
+
+                # Add device configuration to the dictionary
+                devices[f"device_{i + 1}"] = {
+                    "name": f"Device {i + 1}",
+                    "port": port,
+                    "baudrate": baudrate,
+                    "timeout": timeout,
+                    "duration": duration
+                }
 
             # Validate reference point if enabled
             if self.use_reference.get():
@@ -589,31 +619,21 @@ class GNSSTestTool:
             else:
                 reference_point = None
 
-            # Setup console logging for live mode
-
             # Setup logging
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
             log_folder = f"logs/NMEA_{timestamp}"
             os.makedirs(log_folder, exist_ok=True)
             self.setup_logging(log_folder, timestamp)
 
-            # Configure devices
-            devices = {}
-            for i in range(1, num_devices + 1):
-                devices[f"device_{i}"] = {
-                    "name": f"Device {i}",
-                    "port": port,
-                    "baudrate": baudrate,
-                    "timeout": timeout,
-                    "duration": duration
-                }
-
             # Run the test in a separate thread
-            test_thread = threading.Thread(target=self.run_live_test, args=(devices, log_folder, timestamp, reference_point))
+            test_thread = threading.Thread(
+                target=self.run_live_test, args=(devices, log_folder, timestamp, reference_point)
+            )
             test_thread.start()
 
         except Exception as e:
             messagebox.showerror("Error", f"Failed to start live test: {e}")
+            logging.error(f"Failed to start live test: {e}")
 
     def start_file_mode(self):
         """Process the selected log file."""
@@ -1169,19 +1189,6 @@ class GNSSTestTool:
             nmea_data.write_to_excel_mode_2(timestamp, cep_value)
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
-
-    def append_to_console_specific(self, console_widget, message):
-        """
-        Append a message to the given console widget in a thread-safe way.
-
-        Args:
-            console_widget (tk.Text): The Text widget where the message should be logged.
-            message (str): The message to append.
-        """
-        console_widget.config(state="normal")  # Enable editing temporarily
-        console_widget.insert("end", f"{message}\n")  # Append the message
-        console_widget.see("end")  # Scroll to the end
-        console_widget.config(state="disabled")  # Disable editing
 
     @staticmethod
     def append_to_console_threadsafe(console_widget, message):

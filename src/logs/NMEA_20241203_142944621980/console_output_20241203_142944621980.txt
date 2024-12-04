@@ -1,3 +1,0 @@
-2024-12-03 14:29:44,624 [INFO] Console logging setup complete. Logs are being saved to logs/NMEA_20241203_142944621980\console_output_20241203_142944621980.txt
-2024-12-03 14:29:44,646 [ERROR] Error opening serial port No ports available: could not open port 'No ports available': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
-2024-12-03 14:29:44,646 [INFO] Log file logs/NMEA_20241203_142944621980\nmea_raw_log_mode_1_No ports available_115200_20241203_142944621980.txt closed.
