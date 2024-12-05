@@ -1,0 +1,1887 @@
+2024-12-05 11:23:45,587 [INFO] Console logging setup complete. Logs are being saved to logs/NMEA_20241205_112345585524\console_output_20241205_112345585524.txt
+2024-12-05 11:23:45,681 [INFO] Connected to serial port COM9 with baudrate 115200.
+2024-12-05 11:23:46,089 [INFO] Standard NMEA Message: $GNGGA,192347.000,4910.426260,N,12304.399806,W,2,27,0.60,9.779,M,-16.816,M,,*4E
+2024-12-05 11:23:46,095 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:47+00:00
+  Latitude: 49.173771 N
+  Longitude: -123.0733301 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.779 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:46,106 [INFO] Standard NMEA Message: $GNGLL,4910.426260,N,12304.399806,W,192347.000,A,D*5B
+2024-12-05 11:23:46,116 [INFO] GLL - Geographic Position:
+  Latitude: 49.173771 N
+  Longitude: -123.0733301 W
+  Timestamp: 19:23:47+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:46,125 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:46,130 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:46,136 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:46,144 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:46,147 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:46,156 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:46,163 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:46,174 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:46,186 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,82,140,36,07,63,263,34,04,51,121,30,16,37,056,29,1*68
+2024-12-05 11:23:46,202 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 82° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 63° - Azimuth: 263° - SNR: 34 dB
+  Satellite 3 PRN: 04 - Elevation: 51° - Azimuth: 121° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 29 dB
+
+2024-12-05 11:23:46,207 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,29,20,24,311,25,27,18,097,31,1*64
+2024-12-05 11:23:46,218 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 29 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 25 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 31 dB
+
+2024-12-05 11:23:46,225 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,11,129,23,26,09,043,25,11,08,288,15,03,03,173,,1*64
+2024-12-05 11:23:46,236 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 11° - Azimuth: 129° - SNR: 23 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 25 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 15 dB
+  Satellite 4 PRN: 03 - Elevation: 03° - Azimuth: 173° - SNR:  dB
+
+2024-12-05 11:23:46,250 [INFO] Standard NMEA Message: $GPGSV,4,4,13,05,02,333,18,1*5B
+2024-12-05 11:23:46,262 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 05 - Elevation: 02° - Azimuth: 333° - SNR: 18 dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:46,275 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,26,78,61,043,,79,61,216,28,68,54,144,29,1*76
+2024-12-05 11:23:46,286 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 26 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:46,299 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:46,305 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:46,308 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,30,31,62,121,29,06,54,119,27,05,42,299,26,7*7E
+2024-12-05 11:23:46,316 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 30 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 29 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 27 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:46,318 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,24,04,28,119,25,34,11,282,09,15,10,331,21,7*70
+2024-12-05 11:23:46,333 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 24 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 09 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 21 dB
+
+2024-12-05 11:23:46,341 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,40,23,52,062,37,32,46,166,36,1*72
+2024-12-05 11:23:46,353 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 40 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:46,367 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,31,46,16,229,,38,14,333,28,08,08,342,21,1*7F
+2024-12-05 11:23:46,372 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 31 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 21 dB
+
+2024-12-05 11:23:46,386 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,23,12,03,016,19,25,02,055,,04,01,262,,1*78
+2024-12-05 11:23:46,396 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 23 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:46,410 [INFO] Standard NMEA Message: $GNRMC,192347.000,A,4910.426260,N,12304.399806,W,0.01,0.00,051224,,,D,V*17
+2024-12-05 11:23:46,420 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:47+00:00
+  Status: A
+  Latitude: 49.173771 N
+  Longitude: -123.0733301 W
+  Speed over Ground: 0.01 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:46,434 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.01,N,0.02,K,D*25
+2024-12-05 11:23:46,441 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.01 knots / 0.02 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:47,094 [INFO] Standard NMEA Message: $GNGGA,192348.000,4910.426254,N,12304.399842,W,2,27,0.60,9.681,M,-16.816,M,,*40
+2024-12-05 11:23:47,098 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:48+00:00
+  Latitude: 49.1737709 N
+  Longitude: -123.0733307 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.681 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:47,122 [INFO] Standard NMEA Message: $GNGLL,4910.426254,N,12304.399842,W,192348.000,A,D*53
+2024-12-05 11:23:47,134 [INFO] GLL - Geographic Position:
+  Latitude: 49.1737709 N
+  Longitude: -123.0733307 W
+  Timestamp: 19:23:48+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:47,149 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:47,160 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:47,173 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:47,183 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:47,200 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:47,213 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:47,226 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:47,236 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:47,239 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,82,140,36,07,63,263,34,04,51,121,30,16,37,056,28,1*69
+2024-12-05 11:23:47,248 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 82° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 63° - Azimuth: 263° - SNR: 34 dB
+  Satellite 3 PRN: 04 - Elevation: 51° - Azimuth: 121° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 28 dB
+
+2024-12-05 11:23:47,261 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,29,20,24,311,25,27,18,097,31,1*64
+2024-12-05 11:23:47,269 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 29 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 25 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 31 dB
+
+2024-12-05 11:23:47,281 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,11,129,23,26,09,043,25,11,08,288,14,03,02,173,,1*64
+2024-12-05 11:23:47,291 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 11° - Azimuth: 129° - SNR: 23 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 25 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 14 dB
+  Satellite 4 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+
+2024-12-05 11:23:47,303 [INFO] Standard NMEA Message: $GPGSV,4,4,13,05,02,333,18,1*5B
+2024-12-05 11:23:47,313 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 05 - Elevation: 02° - Azimuth: 333° - SNR: 18 dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:47,316 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,26,78,61,043,,79,61,216,28,68,54,144,29,1*76
+2024-12-05 11:23:47,323 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 26 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:47,336 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:47,343 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:47,355 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,30,31,62,121,29,06,54,119,27,05,42,299,26,7*7E
+2024-12-05 11:23:47,366 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 30 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 29 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 27 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:47,378 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,24,04,28,119,25,34,11,282,10,15,10,331,21,7*78
+2024-12-05 11:23:47,384 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 24 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 21 dB
+
+2024-12-05 11:23:47,391 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,40,23,52,062,37,32,46,166,36,1*72
+2024-12-05 11:23:47,402 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 40 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:47,409 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,31,46,16,229,,38,14,333,28,08,08,342,21,1*7F
+2024-12-05 11:23:47,422 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 31 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 21 dB
+
+2024-12-05 11:23:47,436 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,23,12,03,016,19,25,02,055,,04,01,262,,1*78
+2024-12-05 11:23:47,441 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 23 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:47,453 [INFO] Standard NMEA Message: $GNRMC,192348.000,A,4910.426254,N,12304.399842,W,0.01,0.00,051224,,,D,V*1F
+2024-12-05 11:23:47,465 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:48+00:00
+  Status: A
+  Latitude: 49.1737709 N
+  Longitude: -123.0733307 W
+  Speed over Ground: 0.01 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:47,477 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.01,N,0.03,K,D*24
+2024-12-05 11:23:47,488 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.01 knots / 0.03 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:48,098 [INFO] Standard NMEA Message: $GNGGA,192349.000,4910.426242,N,12304.399824,W,2,27,0.60,9.636,M,-16.816,M,,*4A
+2024-12-05 11:23:48,101 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:49+00:00
+  Latitude: 49.1737707 N
+  Longitude: -123.0733304 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.636 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:48,109 [INFO] Standard NMEA Message: $GNGLL,4910.426242,N,12304.399824,W,192349.000,A,D*55
+2024-12-05 11:23:48,119 [INFO] GLL - Geographic Position:
+  Latitude: 49.1737707 N
+  Longitude: -123.0733304 W
+  Timestamp: 19:23:49+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:48,131 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:48,133 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:48,134 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:48,135 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:48,138 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:48,147 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:48,149 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:48,154 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:48,166 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,82,140,36,07,63,263,34,04,49,122,30,16,37,056,28,1*63
+2024-12-05 11:23:48,175 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 82° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 63° - Azimuth: 263° - SNR: 34 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 28 dB
+
+2024-12-05 11:23:48,188 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,29,20,24,311,25,27,18,097,31,1*64
+2024-12-05 11:23:48,197 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 29 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 25 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 31 dB
+
+2024-12-05 11:23:48,208 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,11,129,23,26,09,043,24,11,08,288,16,03,02,173,,1*67
+2024-12-05 11:23:48,218 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 11° - Azimuth: 129° - SNR: 23 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 24 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 16 dB
+  Satellite 4 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+
+2024-12-05 11:23:48,232 [INFO] Standard NMEA Message: $GPGSV,4,4,13,05,02,333,18,1*5B
+2024-12-05 11:23:48,244 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 05 - Elevation: 02° - Azimuth: 333° - SNR: 18 dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:48,256 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,26,78,61,043,,79,61,216,28,68,54,144,29,1*76
+2024-12-05 11:23:48,269 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 26 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:48,276 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:48,277 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:48,280 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,30,31,62,121,29,06,54,119,26,05,42,299,26,7*7F
+2024-12-05 11:23:48,281 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 30 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 29 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:48,283 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,24,04,28,119,25,34,11,282,10,15,10,331,21,7*78
+2024-12-05 11:23:48,285 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 24 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 21 dB
+
+2024-12-05 11:23:48,288 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,40,23,52,062,37,32,46,166,36,1*72
+2024-12-05 11:23:48,289 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 40 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:48,291 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,21,1*7E
+2024-12-05 11:23:48,297 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 21 dB
+
+2024-12-05 11:23:48,299 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,23,12,03,016,19,25,02,055,,04,01,262,,1*78
+2024-12-05 11:23:48,315 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 23 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:48,327 [INFO] Standard NMEA Message: $GNRMC,192349.000,A,4910.426242,N,12304.399824,W,0.01,0.00,051224,,,D,V*19
+2024-12-05 11:23:48,340 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:49+00:00
+  Status: A
+  Latitude: 49.1737707 N
+  Longitude: -123.0733304 W
+  Speed over Ground: 0.01 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:48,355 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.01,N,0.02,K,D*25
+2024-12-05 11:23:48,367 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.01 knots / 0.02 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:49,092 [INFO] Standard NMEA Message: $GNGGA,192350.000,4910.426158,N,12304.400010,W,2,27,0.60,9.696,M,-16.816,M,,*48
+2024-12-05 11:23:49,104 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:50+00:00
+  Latitude: 49.1737693 N
+  Longitude: -123.0733335 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.696 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:49,124 [INFO] Standard NMEA Message: $GNGLL,4910.426158,N,12304.400010,W,192350.000,A,D*5D
+2024-12-05 11:23:49,138 [INFO] GLL - Geographic Position:
+  Latitude: 49.1737693 N
+  Longitude: -123.0733335 W
+  Timestamp: 19:23:50+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:49,149 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:49,161 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:49,168 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:49,178 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:49,191 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:49,201 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:49,214 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:49,224 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:49,239 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,82,140,36,07,63,263,34,04,49,122,30,16,37,056,28,1*63
+2024-12-05 11:23:49,245 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 82° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 63° - Azimuth: 263° - SNR: 34 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 28 dB
+
+2024-12-05 11:23:49,253 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,29,20,24,311,25,27,18,097,30,1*65
+2024-12-05 11:23:49,258 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 29 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 25 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 30 dB
+
+2024-12-05 11:23:49,270 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,11,129,23,26,09,043,24,11,08,288,15,05,03,333,18,1*6C
+2024-12-05 11:23:49,282 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 11° - Azimuth: 129° - SNR: 23 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 24 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 15 dB
+  Satellite 4 PRN: 05 - Elevation: 03° - Azimuth: 333° - SNR: 18 dB
+
+2024-12-05 11:23:49,294 [INFO] Standard NMEA Message: $GPGSV,4,4,13,03,02,173,,1*52
+2024-12-05 11:23:49,306 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:49,309 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,26,78,61,043,,79,61,216,28,68,54,144,29,1*76
+2024-12-05 11:23:49,314 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 26 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:49,321 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:49,331 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:49,343 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,29,31,62,121,29,06,54,119,26,05,42,299,26,7*77
+2024-12-05 11:23:49,348 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 29 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 29 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:49,361 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,24,04,28,119,25,34,11,282,10,15,10,331,21,7*78
+2024-12-05 11:23:49,374 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 24 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 21 dB
+
+2024-12-05 11:23:49,388 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,40,23,52,062,37,32,46,166,36,1*72
+2024-12-05 11:23:49,398 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 40 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:49,406 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,21,1*7E
+2024-12-05 11:23:49,415 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 21 dB
+
+2024-12-05 11:23:49,427 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,23,12,03,016,19,25,02,055,,04,01,262,,1*78
+2024-12-05 11:23:49,437 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 23 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:49,455 [INFO] Standard NMEA Message: $GNRMC,192350.000,A,4910.426158,N,12304.400010,W,0.02,0.00,051224,,,D,V*12
+2024-12-05 11:23:49,463 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:50+00:00
+  Status: A
+  Latitude: 49.1737693 N
+  Longitude: -123.0733335 W
+  Speed over Ground: 0.02 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:49,475 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.02,N,0.03,K,D*27
+2024-12-05 11:23:49,487 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.02 knots / 0.03 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:50,101 [INFO] Standard NMEA Message: $GNGGA,192351.000,4910.426134,N,12304.400076,W,2,27,0.60,9.713,M,-16.816,M,,*4F
+2024-12-05 11:23:50,113 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:51+00:00
+  Latitude: 49.1737689 N
+  Longitude: -123.0733346 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.713 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:50,134 [INFO] Standard NMEA Message: $GNGLL,4910.426134,N,12304.400076,W,192351.000,A,D*56
+2024-12-05 11:23:50,143 [INFO] GLL - Geographic Position:
+  Latitude: 49.1737689 N
+  Longitude: -123.0733346 W
+  Timestamp: 19:23:51+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:50,151 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:50,164 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:50,176 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:50,186 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:50,200 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:50,209 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:50,222 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:50,233 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:50,246 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,82,140,36,07,63,263,34,04,49,122,30,16,37,056,28,1*63
+2024-12-05 11:23:50,254 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 82° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 63° - Azimuth: 263° - SNR: 34 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 28 dB
+
+2024-12-05 11:23:50,266 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,29,20,24,311,25,27,18,097,30,1*65
+2024-12-05 11:23:50,276 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 29 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 25 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 30 dB
+
+2024-12-05 11:23:50,289 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,11,129,23,26,09,043,23,11,08,288,15,05,03,333,18,1*6B
+2024-12-05 11:23:50,298 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 11° - Azimuth: 129° - SNR: 23 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 23 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 15 dB
+  Satellite 4 PRN: 05 - Elevation: 03° - Azimuth: 333° - SNR: 18 dB
+
+2024-12-05 11:23:50,309 [INFO] Standard NMEA Message: $GPGSV,4,4,13,03,02,173,,1*52
+2024-12-05 11:23:50,322 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:50,328 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,26,78,61,043,,79,61,216,28,68,54,144,29,1*76
+2024-12-05 11:23:50,338 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 26 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:50,345 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:50,356 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:50,359 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,29,31,62,121,29,06,54,119,26,05,42,299,26,7*77
+2024-12-05 11:23:50,371 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 29 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 29 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:50,379 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,24,04,28,119,25,34,11,282,10,15,10,331,20,7*79
+2024-12-05 11:23:50,389 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 24 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 20 dB
+
+2024-12-05 11:23:50,396 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,40,23,52,062,37,32,46,166,36,1*72
+2024-12-05 11:23:50,402 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 40 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:50,409 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,22,1*7D
+2024-12-05 11:23:50,419 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 22 dB
+
+2024-12-05 11:23:50,431 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,23,12,03,016,19,25,02,055,,04,01,262,,1*78
+2024-12-05 11:23:50,440 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 23 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:50,451 [INFO] Standard NMEA Message: $GNRMC,192351.000,A,4910.426134,N,12304.400076,W,0.02,0.00,051224,,,D,V*19
+2024-12-05 11:23:50,461 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:51+00:00
+  Status: A
+  Latitude: 49.1737689 N
+  Longitude: -123.0733346 W
+  Speed over Ground: 0.02 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:50,471 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.02,N,0.03,K,D*27
+2024-12-05 11:23:50,483 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.02 knots / 0.03 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:51,090 [INFO] Standard NMEA Message: $GNGGA,192352.000,4910.426140,N,12304.400088,W,2,27,0.60,9.760,M,-16.816,M,,*4A
+2024-12-05 11:23:51,094 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:52+00:00
+  Latitude: 49.173769 N
+  Longitude: -123.0733348 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.76 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:51,109 [INFO] Standard NMEA Message: $GNGLL,4910.426140,N,12304.400088,W,192352.000,A,D*57
+2024-12-05 11:23:51,122 [INFO] GLL - Geographic Position:
+  Latitude: 49.173769 N
+  Longitude: -123.0733348 W
+  Timestamp: 19:23:52+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:51,133 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:51,142 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:51,156 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:51,163 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:51,175 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:51,189 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:51,199 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:51,208 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:51,219 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,82,140,36,07,64,264,34,04,49,122,30,16,37,056,28,1*63
+2024-12-05 11:23:51,227 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 82° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 64° - Azimuth: 264° - SNR: 34 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 28 dB
+
+2024-12-05 11:23:51,240 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,28,20,24,311,25,27,18,097,30,1*64
+2024-12-05 11:23:51,252 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 28 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 25 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 30 dB
+
+2024-12-05 11:23:51,264 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,11,129,24,26,09,043,24,11,08,288,16,05,03,333,18,1*68
+2024-12-05 11:23:51,276 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 11° - Azimuth: 129° - SNR: 24 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 24 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 16 dB
+  Satellite 4 PRN: 05 - Elevation: 03° - Azimuth: 333° - SNR: 18 dB
+
+2024-12-05 11:23:51,286 [INFO] Standard NMEA Message: $GPGSV,4,4,13,03,02,173,,1*52
+2024-12-05 11:23:51,300 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:51,304 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,26,78,61,043,,79,61,216,28,68,54,144,29,1*76
+2024-12-05 11:23:51,310 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 26 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:51,312 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:51,314 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:51,328 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,29,31,62,121,29,06,54,119,26,05,42,299,26,7*77
+2024-12-05 11:23:51,340 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 29 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 29 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:51,353 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,23,04,28,119,25,34,11,282,10,15,10,331,20,7*7E
+2024-12-05 11:23:51,359 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 23 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 20 dB
+
+2024-12-05 11:23:51,373 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,40,23,52,062,37,32,46,166,36,1*72
+2024-12-05 11:23:51,387 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 40 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:51,400 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,22,1*7D
+2024-12-05 11:23:51,413 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 22 dB
+
+2024-12-05 11:23:51,425 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,23,12,03,016,19,25,02,055,,04,01,262,,1*78
+2024-12-05 11:23:51,436 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 23 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:51,453 [INFO] Standard NMEA Message: $GNRMC,192352.000,A,4910.426140,N,12304.400088,W,0.01,0.00,051224,,,D,V*1B
+2024-12-05 11:23:51,464 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:52+00:00
+  Status: A
+  Latitude: 49.173769 N
+  Longitude: -123.0733348 W
+  Speed over Ground: 0.01 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:51,472 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.01,N,0.03,K,D*24
+2024-12-05 11:23:51,482 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.01 knots / 0.03 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:52,094 [INFO] Standard NMEA Message: $GNGGA,192353.000,4910.426146,N,12304.400154,W,2,27,0.60,9.765,M,-16.816,M,,*48
+2024-12-05 11:23:52,097 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:53+00:00
+  Latitude: 49.1737691 N
+  Longitude: -123.0733359 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.765 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:52,101 [INFO] Standard NMEA Message: $GNGLL,4910.426146,N,12304.400154,W,192353.000,A,D*50
+2024-12-05 11:23:52,104 [INFO] GLL - Geographic Position:
+  Latitude: 49.1737691 N
+  Longitude: -123.0733359 W
+  Timestamp: 19:23:53+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:52,119 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:52,131 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:52,143 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:52,154 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:52,166 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:52,177 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:52,189 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:52,198 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:52,211 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,82,140,36,07,64,264,34,04,49,122,30,16,37,056,28,1*63
+2024-12-05 11:23:52,223 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 82° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 64° - Azimuth: 264° - SNR: 34 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 28 dB
+
+2024-12-05 11:23:52,232 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,28,20,24,311,24,27,18,097,29,1*6D
+2024-12-05 11:23:52,243 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 28 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 24 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 29 dB
+
+2024-12-05 11:23:52,254 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,12,128,23,26,09,043,25,11,08,288,17,05,03,333,18,1*6D
+2024-12-05 11:23:52,264 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 12° - Azimuth: 128° - SNR: 23 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 25 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 17 dB
+  Satellite 4 PRN: 05 - Elevation: 03° - Azimuth: 333° - SNR: 18 dB
+
+2024-12-05 11:23:52,274 [INFO] Standard NMEA Message: $GPGSV,4,4,13,03,02,173,,1*52
+2024-12-05 11:23:52,284 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:52,296 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,26,78,61,043,,79,61,216,28,68,54,144,29,1*76
+2024-12-05 11:23:52,306 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 26 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:52,314 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:52,325 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:52,336 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,29,31,62,121,28,06,54,119,26,05,42,299,26,7*76
+2024-12-05 11:23:52,347 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 29 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 28 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:52,354 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,23,04,28,119,25,34,11,282,10,15,10,331,20,7*7E
+2024-12-05 11:23:52,361 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 23 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 20 dB
+
+2024-12-05 11:23:52,372 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,40,23,52,062,37,32,46,166,36,1*72
+2024-12-05 11:23:52,384 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 40 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:52,386 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,22,1*7D
+2024-12-05 11:23:52,392 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 22 dB
+
+2024-12-05 11:23:52,406 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,22,12,03,016,19,25,02,055,,04,01,262,,1*79
+2024-12-05 11:23:52,412 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 22 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:52,425 [INFO] Standard NMEA Message: $GNRMC,192353.000,A,4910.426146,N,12304.400154,W,0.01,0.00,051224,,,D,V*1C
+2024-12-05 11:23:52,435 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:53+00:00
+  Status: A
+  Latitude: 49.1737691 N
+  Longitude: -123.0733359 W
+  Speed over Ground: 0.01 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:52,448 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.01,N,0.02,K,D*25
+2024-12-05 11:23:52,459 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.01 knots / 0.02 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:53,094 [INFO] Standard NMEA Message: $GNGGA,192354.000,4910.426158,N,12304.400202,W,2,27,0.60,9.775,M,-16.816,M,,*41
+2024-12-05 11:23:53,101 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:54+00:00
+  Latitude: 49.1737693 N
+  Longitude: -123.0733367 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 9.775 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:53,117 [INFO] Standard NMEA Message: $GNGLL,4910.426158,N,12304.400202,W,192354.000,A,D*58
+2024-12-05 11:23:53,126 [INFO] GLL - Geographic Position:
+  Latitude: 49.1737693 N
+  Longitude: -123.0733367 W
+  Timestamp: 19:23:54+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:53,138 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:53,148 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:53,154 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:53,164 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:53,173 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:53,183 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:53,195 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:53,203 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:53,215 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,80,140,36,07,64,264,33,04,49,122,30,16,37,056,27,1*69
+2024-12-05 11:23:53,223 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 64° - Azimuth: 264° - SNR: 33 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 27 dB
+
+2024-12-05 11:23:53,233 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,28,20,24,311,24,27,18,097,29,1*6D
+2024-12-05 11:23:53,242 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 28 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 24 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 29 dB
+
+2024-12-05 11:23:53,253 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,12,128,24,26,09,043,23,11,08,288,16,05,03,333,18,1*6D
+2024-12-05 11:23:53,265 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 12° - Azimuth: 128° - SNR: 24 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 23 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 16 dB
+  Satellite 4 PRN: 05 - Elevation: 03° - Azimuth: 333° - SNR: 18 dB
+
+2024-12-05 11:23:53,282 [INFO] Standard NMEA Message: $GPGSV,4,4,13,03,02,173,,1*52
+2024-12-05 11:23:53,294 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:53,307 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,25,78,61,043,,79,61,216,28,68,54,144,29,1*75
+2024-12-05 11:23:53,317 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 25 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:53,324 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:53,331 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:53,337 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,29,31,62,121,27,06,54,119,26,05,42,299,26,7*79
+2024-12-05 11:23:53,343 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 29 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 27 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:53,352 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,23,04,28,119,25,34,11,282,10,15,10,331,20,7*7E
+2024-12-05 11:23:53,374 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 23 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 20 dB
+
+2024-12-05 11:23:53,382 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,39,23,52,062,37,32,46,166,36,1*7C
+2024-12-05 11:23:53,389 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 39 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:53,400 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,22,1*7D
+2024-12-05 11:23:53,406 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 22 dB
+
+2024-12-05 11:23:53,414 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,22,12,03,016,19,25,02,055,,04,01,262,,1*79
+2024-12-05 11:23:53,419 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 22 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:53,427 [INFO] Standard NMEA Message: $GNRMC,192354.000,A,4910.426158,N,12304.400202,W,0.01,0.00,051224,,,D,V*14
+2024-12-05 11:23:53,442 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:54+00:00
+  Status: A
+  Latitude: 49.1737693 N
+  Longitude: -123.0733367 W
+  Speed over Ground: 0.01 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:53,457 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.01,N,0.02,K,D*25
+2024-12-05 11:23:53,470 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.01 knots / 0.02 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:54,094 [INFO] Standard NMEA Message: $GNGGA,192355.000,4910.426248,N,12304.400022,W,2,27,0.60,10.168,M,-16.817,M,,*71
+2024-12-05 11:23:54,100 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:55+00:00
+  Latitude: 49.1737708 N
+  Longitude: -123.0733337 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 10.168 M
+  Geoidal Separation: -16.817 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:54,108 [INFO] Standard NMEA Message: $GNGLL,4910.426248,N,12304.400022,W,192355.000,A,D*5B
+2024-12-05 11:23:54,122 [INFO] GLL - Geographic Position:
+  Latitude: 49.1737708 N
+  Longitude: -123.0733337 W
+  Timestamp: 19:23:55+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:54,133 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:54,141 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:54,164 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:54,178 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:54,192 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:54,202 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:54,214 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:54,222 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:54,234 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,80,140,36,07,64,264,33,04,49,122,30,16,37,056,27,1*69
+2024-12-05 11:23:54,240 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 64° - Azimuth: 264° - SNR: 33 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 27 dB
+
+2024-12-05 11:23:54,247 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,28,20,24,311,24,27,18,097,29,1*6D
+2024-12-05 11:23:54,259 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 28 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 24 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 29 dB
+
+2024-12-05 11:23:54,267 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,12,128,22,26,09,043,24,11,08,288,15,05,03,333,18,1*6F
+2024-12-05 11:23:54,277 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 12° - Azimuth: 128° - SNR: 22 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 24 dB
+  Satellite 3 PRN: 11 - Elevation: 08° - Azimuth: 288° - SNR: 15 dB
+  Satellite 4 PRN: 05 - Elevation: 03° - Azimuth: 333° - SNR: 18 dB
+
+2024-12-05 11:23:54,285 [INFO] Standard NMEA Message: $GPGSV,4,4,13,03,02,173,,1*52
+2024-12-05 11:23:54,294 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:54,306 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,25,78,61,043,,79,61,216,28,68,54,144,29,1*75
+2024-12-05 11:23:54,313 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 25 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:54,323 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,16,70,06,322,,1*41
+2024-12-05 11:23:54,331 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 16 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:54,341 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,28,31,62,121,27,06,54,119,26,05,42,299,26,7*78
+2024-12-05 11:23:54,350 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 28 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 27 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:54,360 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,23,04,28,119,25,34,11,282,10,15,10,331,20,7*7E
+2024-12-05 11:23:54,372 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 23 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 20 dB
+
+2024-12-05 11:23:54,381 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,39,23,52,062,37,32,46,166,36,1*7C
+2024-12-05 11:23:54,392 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 39 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:54,404 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,22,1*7D
+2024-12-05 11:23:54,419 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 22 dB
+
+2024-12-05 11:23:54,430 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,22,12,03,016,19,25,02,055,,04,01,262,,1*79
+2024-12-05 11:23:54,439 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 22 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:54,450 [INFO] Standard NMEA Message: $GNRMC,192355.000,A,4910.426248,N,12304.400022,W,0.02,0.00,051224,,,D,V*14
+2024-12-05 11:23:54,459 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:55+00:00
+  Status: A
+  Latitude: 49.1737708 N
+  Longitude: -123.0733337 W
+  Speed over Ground: 0.02 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:54,474 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.02,N,0.03,K,D*27
+2024-12-05 11:23:54,483 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.02 knots / 0.03 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:55,095 [INFO] Standard NMEA Message: $GNGGA,192356.000,4910.426260,N,12304.400208,W,2,27,0.60,10.793,M,-16.817,M,,*70
+2024-12-05 11:23:55,101 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:56+00:00
+  Latitude: 49.173771 N
+  Longitude: -123.0733368 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 27
+  Horizontal Dilution of Precision (HDOP): 0.60
+  Antenna Altitude (Above Mean Sea Level): 10.793 M
+  Geoidal Separation: -16.817 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:55,109 [INFO] Standard NMEA Message: $GNGLL,4910.426260,N,12304.400208,W,192356.000,A,D*58
+2024-12-05 11:23:55,118 [INFO] GLL - Geographic Position:
+  Latitude: 49.173771 N
+  Longitude: -123.0733368 W
+  Timestamp: 19:23:56+00:00
+  Status: A
+  FAA Mode: D
+
+2024-12-05 11:23:55,126 [INFO] Standard NMEA Message: $GNGSA,A,3,09,07,04,16,30,20,27,08,26,11,,,0.94,0.60,0.72,1*0A
+2024-12-05 11:23:55,137 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 07, 04, 16, 30, 20, 27, 08, 26, 11
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:55,149 [INFO] Standard NMEA Message: $GNGSA,A,3,69,79,68,,,,,,,,,,0.94,0.60,0.72,2*03
+2024-12-05 11:23:55,155 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 69, 79, 68
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:55,166 [INFO] Standard NMEA Message: $GNGSA,A,3,09,31,06,05,24,04,34,15,,,,,0.94,0.60,0.72,3*04
+2024-12-05 11:23:55,178 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 09, 31, 06, 05, 24, 04, 34, 15
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:55,190 [INFO] Standard NMEA Message: $GNGSA,A,3,37,20,23,32,19,38,,,,,,,0.94,0.60,0.72,4*0F
+2024-12-05 11:23:55,200 [INFO] GSA - Satellite Info:
+  Mode: A
+  Mode Fix Type: 3
+  Satellites Used: 37, 20, 23, 32, 19, 38
+  PDOP: 0.94
+  HDOP: 0.60
+  VDOP: 0.72
+
+2024-12-05 11:23:55,206 [INFO] Standard NMEA Message: $GPGSV,4,1,13,09,80,140,36,07,64,264,33,04,49,122,30,16,37,056,27,1*69
+2024-12-05 11:23:55,218 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 1
+  Total Satellites in View: 13
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 140° - SNR: 36 dB
+  Satellite 2 PRN: 07 - Elevation: 64° - Azimuth: 264° - SNR: 33 dB
+  Satellite 3 PRN: 04 - Elevation: 49° - Azimuth: 122° - SNR: 30 dB
+  Satellite 4 PRN: 16 - Elevation: 37° - Azimuth: 056° - SNR: 27 dB
+
+2024-12-05 11:23:55,229 [INFO] Standard NMEA Message: $GPGSV,4,2,13,46,33,188,28,30,26,256,28,20,24,311,24,27,18,097,29,1*6D
+2024-12-05 11:23:55,238 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 2
+  Total Satellites in View: 13
+  Satellite 1 PRN: 46 - Elevation: 33° - Azimuth: 188° - SNR: 28 dB
+  Satellite 2 PRN: 30 - Elevation: 26° - Azimuth: 256° - SNR: 28 dB
+  Satellite 3 PRN: 20 - Elevation: 24° - Azimuth: 311° - SNR: 24 dB
+  Satellite 4 PRN: 27 - Elevation: 18° - Azimuth: 097° - SNR: 29 dB
+
+2024-12-05 11:23:55,249 [INFO] Standard NMEA Message: $GPGSV,4,3,13,08,12,128,21,26,09,043,23,11,07,287,15,05,03,333,18,1*6B
+2024-12-05 11:23:55,258 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 3
+  Total Satellites in View: 13
+  Satellite 1 PRN: 08 - Elevation: 12° - Azimuth: 128° - SNR: 21 dB
+  Satellite 2 PRN: 26 - Elevation: 09° - Azimuth: 043° - SNR: 23 dB
+  Satellite 3 PRN: 11 - Elevation: 07° - Azimuth: 287° - SNR: 15 dB
+  Satellite 4 PRN: 05 - Elevation: 03° - Azimuth: 333° - SNR: 18 dB
+
+2024-12-05 11:23:55,269 [INFO] Standard NMEA Message: $GPGSV,4,4,13,03,02,173,,1*52
+2024-12-05 11:23:55,279 [INFO] GSV - Satellites in View:
+  Number of Messages: 4
+  Message Number: 4
+  Total Satellites in View: 13
+  Satellite 1 PRN: 03 - Elevation: 02° - Azimuth: 173° - SNR:  dB
+  Satellite 2 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 3 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+  Satellite 4 PRN:  - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:55,289 [INFO] Standard NMEA Message: $GLGSV,2,1,07,69,70,318,25,78,61,043,,79,61,216,28,68,54,144,29,1*75
+2024-12-05 11:23:55,298 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 07
+  Satellite 1 PRN: 69 - Elevation: 70° - Azimuth: 318° - SNR: 25 dB
+  Satellite 2 PRN: 78 - Elevation: 61° - Azimuth: 043° - SNR:  dB
+  Satellite 3 PRN: 79 - Elevation: 61° - Azimuth: 216° - SNR: 28 dB
+  Satellite 4 PRN: 68 - Elevation: 54° - Azimuth: 144° - SNR: 29 dB
+
+2024-12-05 11:23:55,309 [INFO] Standard NMEA Message: $GLGSV,2,2,07,86,10,358,,80,08,219,17,70,06,322,,1*40
+2024-12-05 11:23:55,320 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 07
+  Satellite 1 PRN: 86 - Elevation: 10° - Azimuth: 358° - SNR:  dB
+  Satellite 2 PRN: 80 - Elevation: 08° - Azimuth: 219° - SNR: 17 dB
+  Satellite 3 PRN: 70 - Elevation: 06° - Azimuth: 322° - SNR:  dB
+  Satellite 4 PRN: 1 - Elevation: ° - Azimuth: ° - SNR:  dB
+
+2024-12-05 11:23:55,334 [INFO] Standard NMEA Message: $GAGSV,2,1,08,09,80,115,28,31,62,121,27,06,54,119,26,05,42,299,26,7*78
+2024-12-05 11:23:55,345 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 1
+  Total Satellites in View: 08
+  Satellite 1 PRN: 09 - Elevation: 80° - Azimuth: 115° - SNR: 28 dB
+  Satellite 2 PRN: 31 - Elevation: 62° - Azimuth: 121° - SNR: 27 dB
+  Satellite 3 PRN: 06 - Elevation: 54° - Azimuth: 119° - SNR: 26 dB
+  Satellite 4 PRN: 05 - Elevation: 42° - Azimuth: 299° - SNR: 26 dB
+
+2024-12-05 11:23:55,359 [INFO] Standard NMEA Message: $GAGSV,2,2,08,24,29,188,23,04,28,119,25,34,11,282,10,15,10,331,19,7*74
+2024-12-05 11:23:55,372 [INFO] GSV - Satellites in View:
+  Number of Messages: 2
+  Message Number: 2
+  Total Satellites in View: 08
+  Satellite 1 PRN: 24 - Elevation: 29° - Azimuth: 188° - SNR: 23 dB
+  Satellite 2 PRN: 04 - Elevation: 28° - Azimuth: 119° - SNR: 25 dB
+  Satellite 3 PRN: 34 - Elevation: 11° - Azimuth: 282° - SNR: 10 dB
+  Satellite 4 PRN: 15 - Elevation: 10° - Azimuth: 331° - SNR: 19 dB
+
+2024-12-05 11:23:55,384 [INFO] Standard NMEA Message: $GBGSV,3,1,12,37,70,213,39,20,63,284,39,23,52,062,37,32,46,166,36,1*7C
+2024-12-05 11:23:55,396 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 1
+  Total Satellites in View: 12
+  Satellite 1 PRN: 37 - Elevation: 70° - Azimuth: 213° - SNR: 39 dB
+  Satellite 2 PRN: 20 - Elevation: 63° - Azimuth: 284° - SNR: 39 dB
+  Satellite 3 PRN: 23 - Elevation: 52° - Azimuth: 062° - SNR: 37 dB
+  Satellite 4 PRN: 32 - Elevation: 46° - Azimuth: 166° - SNR: 36 dB
+
+2024-12-05 11:23:55,410 [INFO] Standard NMEA Message: $GBGSV,3,2,12,19,19,316,30,46,16,229,,38,14,333,28,08,08,342,22,1*7D
+2024-12-05 11:23:55,421 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 2
+  Total Satellites in View: 12
+  Satellite 1 PRN: 19 - Elevation: 19° - Azimuth: 316° - SNR: 30 dB
+  Satellite 2 PRN: 46 - Elevation: 16° - Azimuth: 229° - SNR:  dB
+  Satellite 3 PRN: 38 - Elevation: 14° - Azimuth: 333° - SNR: 28 dB
+  Satellite 4 PRN: 08 - Elevation: 08° - Azimuth: 342° - SNR: 22 dB
+
+2024-12-05 11:23:55,432 [INFO] Standard NMEA Message: $GBGSV,3,3,12,34,04,042,22,12,03,016,19,25,02,055,,04,01,262,,1*79
+2024-12-05 11:23:55,442 [INFO] GSV - Satellites in View:
+  Number of Messages: 3
+  Message Number: 3
+  Total Satellites in View: 12
+  Satellite 1 PRN: 34 - Elevation: 04° - Azimuth: 042° - SNR: 22 dB
+  Satellite 2 PRN: 12 - Elevation: 03° - Azimuth: 016° - SNR: 19 dB
+  Satellite 3 PRN: 25 - Elevation: 02° - Azimuth: 055° - SNR:  dB
+  Satellite 4 PRN: 04 - Elevation: 01° - Azimuth: 262° - SNR:  dB
+
+2024-12-05 11:23:55,455 [INFO] Standard NMEA Message: $GNRMC,192356.000,A,4910.426260,N,12304.400208,W,0.02,0.00,051224,,,D,V*17
+2024-12-05 11:23:55,465 [INFO] RMC - Recommended Minimum:
+  Timestamp: 19:23:56+00:00
+  Status: A
+  Latitude: 49.173771 N
+  Longitude: -123.0733368 W
+  Speed over Ground: 0.02 knots
+  Course over Ground: 0.0
+  Date: 2024-12-05
+  Magnetic Variation:  
+  Mode Indicator: D
+  Navigational Status: V
+
+2024-12-05 11:23:55,479 [INFO] Standard NMEA Message: $GNVTG,0.00,T,,M,0.02,N,0.04,K,D*20
+2024-12-05 11:23:55,490 [INFO] VTG - Course over Ground and Ground Speed:
+  True Track: 0.0° T
+  Magnetic Track: None° M
+  Speed over Ground: 0.02 knots / 0.04 km/h
+  FAA Mode: D
+
+2024-12-05 11:23:56,104 [INFO] Standard NMEA Message: $GNGGA,192357.000,4910.426260,N,12304.400430,W,2,26,0.61,11.188,M,-16.816,M,,*70
+2024-12-05 11:23:56,118 [INFO] GGA - Fix Data:
+  Timestamp: 19:23:57+00:00
+  Latitude: 49.173771 N
+  Longitude: -123.0733405 W
+  GPS Quality Indicator: 2
+  Number of Satellites in Use: 26
+  Horizontal Dilution of Precision (HDOP): 0.61
+  Antenna Altitude (Above Mean Sea Level): 11.188 M
+  Geoidal Separation: -16.816 M
+  Age of Differential GPS Data: 
+  Differential Reference Station ID: 
+
+2024-12-05 11:23:56,153 [INFO] Log file logs/NMEA_20241205_112345585524\nmea_raw_log_mode_1_COM9_115200_20241205_112345585524.txt closed.
+2024-12-05 11:23:56,155 [WARNING] Warning: Only 11 data points available for CEP calculation. At least 50 points are recommended for a reliable calculation.

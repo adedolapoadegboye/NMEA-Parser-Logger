@@ -16,6 +16,10 @@ import datetime
 
 class GNSSTestTool:
     def __init__(self, root):
+        self.device_plot_data = {}  # To store fix_times, distances, and device_name for all devices
+        self.canvas_widget = None
+        self.canvas = None
+        self.accuracy_graph_placeholder = None
         self.summary_table = None
         self.accuracy_summary_frame = None
         self.accuracy_graph_frame = None
@@ -151,11 +155,11 @@ class GNSSTestTool:
         self.results_notebook.add(accuracy_tab, text="Accuracy")
 
         # Accuracy Content (Graphs)
-        accuracy_graph_frame = ttk.LabelFrame(accuracy_tab, text="Precision/Accuracy Summary")
-        accuracy_graph_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        accuracy_graph_placeholder = ttk.Label(accuracy_graph_frame,
+        self.accuracy_graph_frame = ttk.LabelFrame(accuracy_tab, text="Precision/Accuracy Summary")
+        self.accuracy_graph_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        self.accuracy_graph_placeholder = ttk.Label(self.accuracy_graph_frame,
                                                text="Accuracy/Precision graphs will be displayed here after completion of all active tests.")
-        accuracy_graph_placeholder.pack(padx=20, pady=20)
+        self.accuracy_graph_placeholder.pack(padx=20, pady=20)
 
 
         # Accuracy Summary (CEP Table)
@@ -642,6 +646,8 @@ class GNSSTestTool:
             else:
                 reference_point = None
 
+            self.fresh_start()
+
             # Setup logging
             timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S%f')
             log_folder = f"logs/NMEA_{timestamp}"
@@ -741,7 +747,7 @@ class GNSSTestTool:
             self.tooltip,
             text="If no custom reference point is used, the CEP is calculated using the average of all test points as the reference.",
             justify="left",
-            background="#000000",  # black background
+            background="#B8D8D8",  # black background
             relief="solid",
             borderwidth=1,
             font=("Arial", 10)
@@ -781,6 +787,9 @@ class GNSSTestTool:
             # Wait for threads to finish
             for thread in threads:
                 thread.join()
+
+            # Call the final plot function with aggregated data
+            self.finalize_accuracy_plot()
 
             # Notify the user if not stopped
             if not self.stop_event.is_set():
@@ -843,6 +852,10 @@ class GNSSTestTool:
             # Clear the device notebook
             for tab in self.device_notebook.tabs():
                 self.device_notebook.forget(tab)
+
+
+            # Clear plots
+            self.fresh_start()
 
             # Reinitialize serial configuration frames
             self.update_serial_config_static_frames()
@@ -1243,13 +1256,17 @@ class GNSSTestTool:
 
     def update_accuracy_plot(self, distances, valid_coords, device_name):
         """
-        Updates the accuracy plot for a specific device.
+        Updates the accuracy plot data for a specific device.
 
         Args:
             distances (list[float]): List of distances from the reference point.
             valid_coords (list[tuple]): List of tuples containing latitude, longitude, and fix_time.
             device_name (str): Name of the device (used in the legend).
         """
+        # Ensure device_plot_data is initialized and is a dictionary
+        if not hasattr(self, "device_plot_data") or not isinstance(self.device_plot_data, dict):
+            self.device_plot_data = {}
+
         # Extract fix_times and ensure they are datetime objects
         fix_times = [fix_time for _, _, fix_time in valid_coords]
         if isinstance(fix_times[0], datetime.time):  # If fix_time is a datetime.time object
@@ -1257,23 +1274,46 @@ class GNSSTestTool:
             reference_date = datetime.datetime.now().date()
             fix_times = [datetime.datetime.combine(reference_date, t) for t in fix_times]
 
-        # Clear previous plot
+        # Append the data to the shared structure, keyed by device name
+        if device_name not in self.device_plot_data:
+            self.device_plot_data[device_name] = {'fix_times': [], 'distances': []}
+
+        # Update the device's data
+        self.device_plot_data[device_name]['fix_times'].extend(fix_times)
+        self.device_plot_data[device_name]['distances'].extend(distances)
+
+    def finalize_accuracy_plot(self):
+        """
+        Finalizes and displays the accuracy plot after all threads have completed.
+        """
+        # Initialize the plot if not already done
+        if not hasattr(self, "fig"):
+            self.fig, self.ax = plt.subplots(figsize=(6, 4))
+
+        # Clear the existing plot
         self.ax.clear()
 
-        # Plot the distances over time
-        self.ax.plot(fix_times, distances, label=device_name, marker='o', linestyle='-')
+        # Plot the data for each device
+        for device_name, device_data in self.device_plot_data.items():
+            self.ax.plot(
+                device_data['fix_times'],
+                device_data['distances'],
+                label=device_name,  # Correct label for each device
+                marker='o',
+                linestyle='-'
+            )
+
+        # Set plot titles and labels
         self.ax.set_title("Accuracy Plot")
         self.ax.set_xlabel("Fix Time")
         self.ax.set_ylabel("Distance (meters)")
         self.ax.legend()
 
-        # Draw the updated figure in the Tkinter canvas
-        canvas = FigureCanvasTkAgg(self.fig, self.accuracy_graph_frame)
-        canvas_widget = canvas.get_tk_widget()
-
-        # Use pack() to align with the layout of accuracy_graph_frame
-        canvas_widget.grid(row=1, column=1)
-        canvas.draw()
+        # Redraw the canvas
+        self.canvas = FigureCanvasTkAgg(self.fig, self.accuracy_graph_frame)
+        self.canvas_widget = self.canvas.get_tk_widget()
+        self.canvas_widget.pack(fill="both", expand=True)
+        self.canvas.draw()
 
     def update_summary_table(self, device_name, cep_stats):
         """
@@ -1300,8 +1340,7 @@ class GNSSTestTool:
             f"{cep_stats['CEP68']:.2f}",
             f"{cep_stats['CEP95']:.2f}",
             f"{cep_stats['CEP99']:.2f}",
-            f"{cep_stats['reference_point']}"
-        )
+            f"({cep_stats['reference_point'][0]:.6f}, {cep_stats['reference_point'][1]:.6f})"        )
 
         # Check if the device already has a row
         if device_name in self.table_data:
@@ -1319,6 +1358,47 @@ class GNSSTestTool:
         """Clears the summary table."""
         if hasattr(self, "summary_table"):
             self.summary_table.delete(*self.summary_table.get_children())
+
+    def clear_accuracy_plot(self):
+        """
+        Clears the accuracy plot by removing the current canvas and resetting the figure.
+        """
+        # Destroy all widgets in the accuracy graph frame
+        for widget in self.accuracy_graph_frame.winfo_children():
+            widget.destroy()
+
+        # Clear the Matplotlib figure (self.fig) to ensure it is reset
+        self.fig.clear()
+        self.ax = self.fig.add_subplot(111)  # Recreate the subplot for new plots
+
+    def clear_console_tabs(self):
+        """
+        Clears all console tabs and their associated text widgets.
+        """
+        try:
+            # Destroy all widgets in the console frame
+            for widget in self.device_notebook.winfo_children():
+                widget.destroy()
+
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while clearing tabs: {e}")
+
+    def clear_device_plot_data(self):
+        """
+        Clears the device_plot_data dictionary, removing all stored data for plotting.
+        """
+        if hasattr(self, "device_plot_data"):
+            del self.device_plot_data  # Remove the attribute
+            logging.info("Device plot data cleared.")
+        else:
+            logging.info("Device plot data is already cleared or not initialized.")
+
+    def fresh_start(self):
+        self.clear_console_tabs()
+        self.clear_accuracy_plot()
+        self.clear_summary_table()
+        self.clear_device_plot_data()
+
 
 if __name__ == "__main__":
 
