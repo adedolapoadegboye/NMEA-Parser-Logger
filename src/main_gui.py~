@@ -1272,7 +1272,7 @@ class GNSSTestTool:
         canvas_widget = canvas.get_tk_widget()
 
         # Use pack() to align with the layout of accuracy_graph_frame
-        canvas_widget.grid(row=1, column=1)
+        canvas_widget.grid(row=1, column=1, sticky="nsew")
         canvas.draw()
 
     def update_summary_table(self, device_name, cep_stats):

@@ -1043,7 +1043,7 @@ class NMEAData:
             return np.sqrt(lat_dist ** 2 + lon_dist ** 2)
 
         # Calculate distances to the reference point
-        distances = [deg_to_meters(ref_lat, ref_lon, lat, lon) for lat, lon, *_ in valid_coords]
+        distances = [deg_to_meters(ref_lat, ref_lon, lat, lon) for lat, lon in valid_coords]
 
         # CEP calculations using percentiles
         cep50 = np.percentile(distances, 50)
