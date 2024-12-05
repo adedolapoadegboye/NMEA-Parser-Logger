@@ -13,6 +13,8 @@ import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import datetime
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
+
 
 class GNSSTestTool:
     def __init__(self, root):
@@ -1300,7 +1302,8 @@ class GNSSTestTool:
                 device_data['distances'],
                 label=device_name,  # Correct label for each device
                 marker='o',
-                linestyle='-'
+                linestyle='-',
+                picker=5  # Enable picking for click events
             )
 
         # Set plot titles and labels
@@ -1309,10 +1312,16 @@ class GNSSTestTool:
         self.ax.set_ylabel("Distance (meters)")
         self.ax.legend()
 
-        # Redraw the canvas
+        # Connect hover and click events
         self.canvas = FigureCanvasTkAgg(self.fig, self.accuracy_graph_frame)
+
         self.canvas_widget = self.canvas.get_tk_widget()
         self.canvas_widget.pack(fill="both", expand=True)
+
+        # Add zoom/pan and reset button
+        self.enable_zoom_pan()
+
+        # Draw the canvas
         self.canvas.draw()
 
     def update_summary_table(self, device_name, cep_stats):
@@ -1398,6 +1407,22 @@ class GNSSTestTool:
         self.clear_accuracy_plot()
         self.clear_summary_table()
         self.clear_device_plot_data()
+
+    def enable_zoom_pan(self):
+        """
+        Enable zoom and pan functionality using Matplotlib toolbar.
+        """
+        toolbar = NavigationToolbar2Tk(self.canvas, self.accuracy_graph_frame)
+        toolbar.update()
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+
+    def reset_view(self):
+        """
+        Reset the plot view to the original limits.
+        """
+        self.ax.relim()
+        self.ax.autoscale_view()
+        self.canvas.draw()
 
 
 if __name__ == "__main__":
