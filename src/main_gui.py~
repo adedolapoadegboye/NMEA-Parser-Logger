@@ -142,7 +142,7 @@ class GNSSTestTool:
 
         # Style configuration for Notebook Tabs
         style = ttk.Style()
-        style.configure("TNotebook.Frame", width=tab_width, borderwidth=1, relief="flat")
+        style.configure("TNotebook.Tab", width=tab_width, borderwidth=1, relief="flat")
 
         # General Console Tab
         console_tab = ttk.Frame(self.results_notebook)
