@@ -1343,6 +1343,10 @@ class GNSSTestTool:
         """
         Finalizes and displays the accuracy plot after all threads have completed.
         """
+
+        if self.accuracy_graph_placeholder:
+            self.accuracy_graph_placeholder.destroy()
+
         # Initialize the plot if not already done
         if not hasattr(self, "fig"):
             self.fig, self.ax = plt.subplots(figsize=(8, 6))

@@ -1426,7 +1426,7 @@ class GNSSTestTool:
     def clear_accuracy_plot(self):
         """
         Resets the accuracy plot to its default state without destroying widgets.
-        Clears the figure and reinitializes the axes.
+        Clears the figure and reinitialize the axes.
         """
         # Reset the Matplotlib figure if it exists and is initialized
         if hasattr(self, "fig") and self.fig is not None:
