@@ -18,6 +18,8 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 class GNSSTestTool:
     def __init__(self, root):
+        self.toolbar = None
+        self.accuracy_tab = None
         self.device_plot_data = {}  # To store fix_times, distances, and device_name for all devices
         self.canvas_widget = None
         self.canvas = None
@@ -137,12 +139,20 @@ class GNSSTestTool:
         self.results_notebook = ttk.Notebook(self.result_frame)
         self.results_notebook.pack(fill="both", expand=True)
 
-        # Calculate the width for each tab to be 1/3 of the Results Frame width
-        tab_width = int(self.result_frame.winfo_width()) / 8
-
         # Style configuration for Notebook Tabs
         style = ttk.Style()
-        style.configure("TNotebook.Tab", width=tab_width, borderwidth=1, relief="flat")
+        style.configure(
+            "TNotebook.Tab",
+            background="#8FA3A3",  # Darker background for better contrast
+            foreground="black",  # White text
+        )
+
+        # Configure the appearance of the selected tab
+        style.map(
+            "TNotebook.Tab",
+            background=[("selected", "#2A6EBB")],  # Soft blue for active tab
+            foreground=[("selected", "blue")],
+        )
 
         # General Console Tab
         console_tab = ttk.Frame(self.results_notebook)
@@ -153,11 +163,11 @@ class GNSSTestTool:
         self.device_notebook.pack(fill="both", expand=True)
 
         # Accuracy Tab
-        accuracy_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(accuracy_tab, text="Accuracy")
+        self.accuracy_tab = ttk.Frame(self.results_notebook)
+        self.results_notebook.add(self.accuracy_tab, text="Accuracy")
 
         # Accuracy Content (Graphs)
-        self.accuracy_graph_frame = ttk.LabelFrame(accuracy_tab, text="Precision/Accuracy Summary")
+        self.accuracy_graph_frame = ttk.LabelFrame(self.accuracy_tab, text="Precision/Accuracy Summary")
         self.accuracy_graph_frame.pack(fill="both", expand=True, padx=10, pady=10)
         self.accuracy_graph_placeholder = ttk.Label(self.accuracy_graph_frame,
                                                text="Accuracy/Precision graphs will be displayed here after completion of all active tests.")
@@ -165,7 +175,7 @@ class GNSSTestTool:
 
 
         # Accuracy Summary (CEP Table)
-        accuracy_summary_frame = ttk.LabelFrame(accuracy_tab, text="Summary")
+        accuracy_summary_frame = ttk.LabelFrame(self.accuracy_tab, text="Summary")
         accuracy_summary_frame.pack(fill="x", padx=10, pady=10)
 
         # Initialize the summary table inside the accuracy_summary_frame
@@ -1335,7 +1345,7 @@ class GNSSTestTool:
         """
         # Initialize the plot if not already done
         if not hasattr(self, "fig"):
-            self.fig, self.ax = plt.subplots(figsize=(6, 4))
+            self.fig, self.ax = plt.subplots(figsize=(8, 6))
 
         # Clear the existing plot
         self.ax.clear()
@@ -1415,15 +1425,26 @@ class GNSSTestTool:
 
     def clear_accuracy_plot(self):
         """
-        Clears the accuracy plot by removing the current canvas and resetting the figure.
+        Resets the accuracy plot to its default state without destroying widgets.
+        Clears the figure and reinitializes the axes.
         """
-        # Destroy all widgets in the accuracy graph frame
-        for widget in self.accuracy_graph_frame.winfo_children():
-            widget.destroy()
+        # Reset the Matplotlib figure if it exists and is initialized
+        if hasattr(self, "fig") and self.fig is not None:
+            self.fig.clear()  # Clear the figure
+            self.ax = self.fig.add_subplot(111)  # Recreate the subplot with default settings
 
-        # Clear the Matplotlib figure (self.fig) to ensure it is reset
-        self.fig.clear()
-        self.ax = self.fig.add_subplot(111)  # Recreate the subplot for new plots
+            # Reset plot appearance
+            self.ax.set_title("Accuracy Plot")
+            self.ax.set_xlabel("Fix Time (UTC)")
+            self.ax.set_ylabel("Error (meters)")
+
+            # Redraw the canvas if it exists and is initialized
+            if hasattr(self, "canvas") and self.canvas is not None:
+                self.canvas.draw()
+
+        # Clear internal data structures related to plotting if initialized
+        if hasattr(self, "device_plot_data") and self.device_plot_data is not None:
+            self.device_plot_data = {}  # Reset device plot data dictionary
 
     def clear_console_tabs(self):
         """
@@ -1441,7 +1462,7 @@ class GNSSTestTool:
         """
         Clears the device_plot_data dictionary, removing all stored data for plotting.
         """
-        if hasattr(self, "device_plot_data"):
+        if hasattr(self, "device_plot_data") and self.device_plot_data is not {}:
             del self.device_plot_data  # Remove the attribute
             logging.info("Device plot data cleared.")
         else:
@@ -1449,17 +1470,17 @@ class GNSSTestTool:
 
     def fresh_start(self):
         self.clear_console_tabs()
-        self.clear_accuracy_plot()
         self.clear_summary_table()
         self.clear_device_plot_data()
+        self.clear_accuracy_plot()
 
     def enable_zoom_pan(self):
         """
         Enable zoom and pan functionality using Matplotlib toolbar.
         """
-        toolbar = NavigationToolbar2Tk(self.canvas, self.accuracy_graph_frame)
-        toolbar.update()
-        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.accuracy_graph_frame)
+        self.toolbar.update()
+        self.toolbar.pack(side=tk.BOTTOM, fill=tk.X)
 
     def reset_view(self):
         """
