@@ -16,6 +16,7 @@ class NMEAData:
         self.coordinates = []  # To store latitude and longitude tuples
         self.MIN_POINTS_FOR_CEP = 50  # Minimum number of points for CEP calculation
         self.gsv_satellite_info = []  # To store satellite CNR and related info from GSV sentences
+        self.gsa_satellite_info = []  # To store satellite CNR and related info from GSA sentences
 
     def __str__(self):
         # Pretty print the data based on sentence type
@@ -572,6 +573,29 @@ class NMEAData:
                 "SNR 4": f"{self.data.snr_4} dB"
             })
         elif self.sentence_type == "GSA":
+            if self.sentence_type == "GSA":
+                # Use system time to timestamp each GSV message
+                sentence_timestamp = pd.Timestamp.now().replace(microsecond=3)
+
+                # Extract satellite CNR and relevant data from GSV sentence
+                for i in range(1, 5):  # GSV sentences may contain up to 4 satellite entries
+                    satellite_prn = getattr(self.data, f'sv_prn_num_{i}', None)
+                    elevation = getattr(self.data, f'elevation_deg_{i}', None)
+                    azimuth = getattr(self.data, f'azimuth_{i}', None)
+                    snr = getattr(self.data, f'snr_{i}', None)
+
+                    # Ensure we have valid numeric values
+                    try:
+                        if satellite_prn and snr and snr != '':  # Ensure snr is not an empty string
+                            self.gsv_satellite_info.append({
+                                "Timestamp": sentence_timestamp,
+                                "Satellite PRN": satellite_prn,
+                                "Elevation (°)": float(elevation) if elevation else None,
+                                "Azimuth (°)": float(azimuth) if azimuth else None,
+                                "CNR (SNR) (dB)": float(snr) if snr else None
+                            })
+                    except ValueError:
+                        logging.error(f"Invalid data for satellite PRN {satellite_prn} in GSV sentence.")
             self.parsed_sentences.append({
                 "Type": "GSA",
                 "Mode": self.data.mode,
@@ -1398,9 +1422,11 @@ class NMEAData:
     def calculate_satellite_statistics(self):
         # Create a dataframe for the satellite CNR summary
         df_gsv_sat_summary = pd.DataFrame(self.gsv_satellite_info)
+        df_gsa_sat_summary = pd.DataFrame(self.gsa_satellite_info)
 
         # Default statistics for satellites
         df_gsv_satellite_summary_stats = pd.DataFrame()  # Initialize to avoid 'referenced before assignment'
+        df_gsa_satellite_summary_stats = pd.DataFrame()  # Initialize to avoid 'referenced before assignment'
 
         # Calculate satellite statistics for the "Satellites summary" sheet
         if not df_gsv_sat_summary.empty:
@@ -1420,5 +1446,22 @@ class NMEAData:
 
             df_gsv_satellite_summary_stats = pd.DataFrame([gsv_satellite_summary_stats])
 
-        return df_gsv_satellite_summary_stats
+        if not df_gsa_sat_summary.empty:
+            avg_cnr = df_gsa_sat_summary["CNR (SNR) (dB)"].mean()
+            min_cnr = df_gsa_sat_summary["CNR (SNR) (dB)"].min()
+            max_cnr = df_gsa_sat_summary["CNR (SNR) (dB)"].max()
+
+            # Calculate the number of unique satellites (unique PRNs)
+            unique_prns = df_gsa_sat_summary["Satellite PRN"].nunique()
+
+            gsa_satellite_summary_stats = {
+                "Average CNR (SNR) (dB)": avg_cnr,
+                "Min CNR (SNR) (dB)": min_cnr,
+                "Max CNR (SNR) (dB)": max_cnr,
+                "Total Satellites Tracked": unique_prns
+            }
+
+            df_gsa_satellite_summary_stats = pd.DataFrame([gsa_satellite_summary_stats])
+
+        return df_gsv_satellite_summary_stats, df_gsa_satellite_summary_stats
 

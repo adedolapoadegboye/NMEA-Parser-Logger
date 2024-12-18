@@ -18,17 +18,23 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 class GNSSTestTool:
     def __init__(self, root):
+        self.results_frame_content = None
+        self.satellite_table_data = None
+        self.satellite_summary_table = None
+        self.satellite_analysis_placeholder = None
+        self.satellite_analysis_frame = None
+        self.satellite_tab = None
         self.toolbar = None
         self.accuracy_tab = None
         self.device_plot_data = {}  # To store fix_times, distances, and device_name for all devices
         self.canvas_widget = None
         self.canvas = None
         self.accuracy_graph_placeholder = None
-        self.summary_table = None
+        self.accuracy_summary_table = None
         self.accuracy_summary_frame = None
         self.accuracy_graph_frame = None
         self.fig, self.ax = plt.subplots(figsize=(6, 4))  # Create a Matplotlib figure
-        self.table_data = {}  # To store summary table rows for all devices
+        self.accuracy_table_data = {}  # To store summary table rows for all devices
         self.duration_vars = None
         self.timeout_vars = None
         self.baudrate_vars = None
@@ -62,7 +68,7 @@ class GNSSTestTool:
         self.root = root
         self.root.title("GNSS Test Tool")
         # Set the window to almost fullscreen
-        self.root.geometry(f"{root.winfo_screenwidth() - 200}x{root.winfo_screenheight() - 200}")
+        self.root.geometry(f"{root.winfo_screenwidth() - 50}x{root.winfo_screenheight() - 50}")
         # Exit fullscreen with Escape key
         self.root.bind("<Escape>", lambda e: root.attributes('-fullscreen', False))
         self.root.configure(bg="#B8D8D8")  # Background color
@@ -135,8 +141,25 @@ class GNSSTestTool:
         self.result_frame = ttk.LabelFrame(self.root, text="Results", padding=10)
         self.result_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=10, pady=10)
 
-        # Create a Notebook (Tab container) within the Results Frame
-        self.results_notebook = ttk.Notebook(self.result_frame)
+        # Add Canvas and Scrollbar to Results Frame
+        result_canvas = tk.Canvas(self.result_frame)
+        result_scrollbar = ttk.Scrollbar(self.result_frame, orient="vertical", command=result_canvas.yview)
+        self.results_frame_content = ttk.Frame(result_canvas)  # Frame for Results content
+
+        # Configure the canvas and scrollbar
+        self.results_frame_content.bind(
+            "<Configure>",
+            lambda e: result_canvas.configure(scrollregion=result_canvas.bbox("all"))
+        )
+        result_canvas.create_window((0, 0), window=self.results_frame_content, anchor="nw")
+        result_canvas.configure(yscrollcommand=result_scrollbar.set)
+
+        # Pack the canvas and scrollbar
+        result_canvas.pack(side="left", fill="both", expand=True)
+        result_scrollbar.pack(side="right", fill="y")
+
+        # Create a Notebook (Tab container) within the Results Frame content
+        self.results_notebook = ttk.Notebook(self.results_frame_content)
         self.results_notebook.pack(fill="both", expand=True)
 
         # Style configuration for Notebook Tabs
@@ -144,14 +167,14 @@ class GNSSTestTool:
         style.configure(
             "TNotebook.Tab",
             background="#8FA3A3",  # Darker background for better contrast
-            foreground="black",  # White text
+            foreground="black",  # Black text
         )
 
         # Configure the appearance of the selected tab
         style.map(
             "TNotebook.Tab",
-            background=[("selected", "#2A6EBB")],  # Soft blue for active tab
-            foreground=[("selected", "blue")],
+            background=[("selected", "#2A6EBB")],
+            foreground=[("selected", "#FE5F55")],
         )
 
         # General Console Tab
@@ -164,90 +187,58 @@ class GNSSTestTool:
 
         # Accuracy Tab
         self.accuracy_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(self.accuracy_tab, text="Accuracy")
+        self.results_notebook.add(self.accuracy_tab, text="Test Stats")
 
         # Accuracy Content (Graphs)
         self.accuracy_graph_frame = ttk.LabelFrame(self.accuracy_tab, text="Precision/Accuracy Summary")
         self.accuracy_graph_frame.pack(fill="both", expand=True, padx=10, pady=10)
         self.accuracy_graph_placeholder = ttk.Label(self.accuracy_graph_frame,
-                                               text="Accuracy/Precision graphs will be displayed here after completion of all active tests.")
+                                                    text="Accuracy graph will be displayed here after completion of all active tests.")
         self.accuracy_graph_placeholder.pack(padx=20, pady=20)
 
+        # Initialize the canvas
+        self.canvas = FigureCanvasTkAgg(self.fig, self.accuracy_graph_frame)
+        self.canvas_widget = self.canvas.get_tk_widget()
+        self.canvas_widget.pack(fill="both", expand=True)
 
         # Accuracy Summary (CEP Table)
-        accuracy_summary_frame = ttk.LabelFrame(self.accuracy_tab, text="Summary")
+        accuracy_summary_frame = ttk.LabelFrame(self.accuracy_tab, text="CEP Summary")
         accuracy_summary_frame.pack(fill="x", padx=10, pady=10)
 
         # Initialize the summary table inside the accuracy_summary_frame
         columns = ["Device", "Fixes", "CEP50 (m)", "CEP68 (m)", "CEP95 (m)", "CEP99 (m)", "Reference Point"]
-        self.summary_table = ttk.Treeview(accuracy_summary_frame, columns=columns, show="headings")
+        self.accuracy_summary_table = ttk.Treeview(accuracy_summary_frame, columns=columns, show="headings")
 
         # Configure columns and headings
         for col in columns:
-            self.summary_table.heading(col, text=col)
-            self.summary_table.column(col, anchor="center", width=120)
+            self.accuracy_summary_table.heading(col, text=col)
+            self.accuracy_summary_table.column(col, anchor="center", width=120)
 
         # Pack the Treeview widget
-        self.summary_table.pack(fill="x", expand=True)
+        self.accuracy_summary_table.pack(fill="x", expand=True)
 
         # Initialize the dictionary to track device rows in the summary table
-        self.table_data = {}
+        self.accuracy_table_data = {}
 
-        # Satellite Tab
-        satellite_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(satellite_tab, text="Satellite")
+        # Satellite Summary (CEP Table)
+        satellite_summary_frame = ttk.LabelFrame(self.accuracy_tab, text="Satellite Signal Strength Summary")
+        satellite_summary_frame.pack(fill="x", padx=10, pady=10)
 
-        # Satellite Content (Placeholder for Satellite Analysis)
-        satellite_analysis_frame = ttk.LabelFrame(satellite_tab, text="Satellite Analysis")
-        satellite_analysis_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        satellite_analysis_placeholder = ttk.Label(satellite_analysis_frame,
-                                                   text="Satellite data and signal strength will be displayed here.")
-        satellite_analysis_placeholder.pack(padx=20, pady=20)
+        # Initialize the summary table inside the satellite_summary_frame
+        columns = ["Device", "Average Satellites CNR (dB)", "Minimum Satellites CNR (dB)",
+                   "Maximum Satellites CNR (dB)", "Total Satellites in View"]
+        self.satellite_summary_table = ttk.Treeview(satellite_summary_frame, columns=columns, show="headings")
 
-        # Map Tab
-        map_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(map_tab, text="Map")
+        # Configure columns and headings
+        for col in columns:
+            self.satellite_summary_table.heading(col, text=col)
+            self.satellite_summary_table.column(col, anchor="center", width=120)
 
-        map_frame = ttk.LabelFrame(map_tab, text="Map View")
-        map_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        map_placeholder = ttk.Label(map_frame, text="Map with device location and path will be displayed here.")
-        map_placeholder.pack(padx=20, pady=20)
+        # Pack the Treeview widget
+        self.satellite_summary_table.pack(fill="x", expand=True)
 
-        # Altitude Tab
-        altitude_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(altitude_tab, text="Altitude")
-
-        altitude_frame = ttk.LabelFrame(altitude_tab, text="Altitude Information")
-        altitude_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        altitude_placeholder = ttk.Label(altitude_frame, text="Altitude data over time will be displayed here.")
-        altitude_placeholder.pack(padx=20, pady=20)
-
-        # Speed Over Ground Tab
-        speed_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(speed_tab, text="Speed Over Ground")
-
-        speed_frame = ttk.LabelFrame(speed_tab, text="Speed Over Ground")
-        speed_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        speed_placeholder = ttk.Label(speed_frame, text="Speed data over ground will be displayed here.")
-        speed_placeholder.pack(padx=20, pady=20)
-
-        # Course Over Ground Tab
-        course_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(course_tab, text="Course Over Ground")
-
-        course_frame = ttk.LabelFrame(course_tab, text="Course Over Ground")
-        course_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        course_placeholder = ttk.Label(course_frame, text="Course data over ground will be displayed here.")
-        course_placeholder.pack(padx=20, pady=20)
-
-        # Dilution of Precision Tab
-        dop_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(dop_tab, text="Dilution of Precision")
-
-        dop_frame = ttk.LabelFrame(dop_tab, text="Dilution of Precision")
-        dop_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        dop_placeholder = ttk.Label(dop_frame, text="Dilution of precision (DOP) data will be displayed here.")
-        dop_placeholder.pack(padx=20, pady=20)
+        # Initialize the dictionary to track device rows in the summary table
+        self.satellite_table_data = {}
 
     def show_live_mode(self):
         if self.test_type.get() == "Static (fixed reference point)":
@@ -287,7 +278,7 @@ class GNSSTestTool:
             use_reference_checkbox.grid(row=1, column=0, sticky="w", padx=10, pady=5)
 
             # Info Icon with Tooltip
-            info_label = tk.Label(general_config_frame, text="?", font=("Arial", 10, "bold"), fg="blue", cursor="hand2")
+            info_label = tk.Label(general_config_frame, text="?", font=("Arial", 10, "bold"), fg="#FE5F55", cursor="hand2")
             info_label.grid(row=1, column=1, sticky="w", padx=5)
 
             # Bind tooltip to info icon
@@ -526,7 +517,7 @@ class GNSSTestTool:
         stop_button.grid(row=0, column=1, padx=5)
 
         # Add Clear Button
-        clear_button = ttk.Button(button_frame, text="Clear", command=self.clear_all_configs)
+        clear_button = ttk.Button(button_frame, text="Clear Settings", command=self.clear_all_configs)
         clear_button.grid(row=0, column=2, padx=5)
 
         # Bind window close to stop tests
@@ -582,7 +573,7 @@ class GNSSTestTool:
         use_reference_checkbox.grid(row=1, column=0, sticky="w", padx=10, pady=5)
 
         # Info Icon with Tooltip
-        info_label = tk.Label(file_frame, text="?", font=("Arial", 10, "bold"), fg="blue", cursor="hand2")
+        info_label = tk.Label(file_frame, text="?", font=("Arial", 10, "bold"), fg="#FE5F55", cursor="hand2")
         info_label.grid(row=1, column=1, sticky="w", padx=5)
 
         # Bind tooltip to info icon
@@ -605,6 +596,9 @@ class GNSSTestTool:
 
         # Process Button
         ttk.Button(file_frame, text="Process", command=self.start_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
+
+        # Clear Button
+        ttk.Button(file_frame, text="Clear", command=self.start_file_mode).grid(row=4, column=3, columnspan=3, pady=15)
 
     def show_dynamic_file_mode(self):
 
@@ -634,7 +628,7 @@ class GNSSTestTool:
         use_reference_checkbox.grid(row=1, column=0, sticky="w", padx=10, pady=5)
 
         # Info Icon with Tooltip
-        info_label = tk.Label(file_frame, text="?", font=("Arial", 10, "bold"), fg="blue", cursor="hand2")
+        info_label = tk.Label(file_frame, text="?", font=("Arial", 10, "bold"), fg="#FE5F55", cursor="hand2")
         info_label.grid(row=1, column=1, sticky="w", padx=5)
 
         # Bind tooltip to info icon
@@ -660,6 +654,7 @@ class GNSSTestTool:
 
     def start_live_mode(self):
         """Start live data collection."""
+        # self.fresh_start()
         try:
             # Reset stop event
             self.stop_event.clear()
@@ -852,7 +847,8 @@ class GNSSTestTool:
             if not self.stop_event.is_set():
                 messagebox.showinfo("Success", "Data Analysis completed successfully.")
             else:
-                messagebox.showinfo("Stop action completed", "Test stopped by the user.")
+                pass
+                # messagebox.showinfo("Stop action completed", "Test stopped by the user.")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred during the test: {e}")
 
@@ -861,10 +857,8 @@ class GNSSTestTool:
         if messagebox.askyesno("Confirm Stop", "Are you sure you want to stop all running tests?"):
             self.stop_event.set()  # Signal threads to stop
             messagebox.showinfo("Stop action completed","All tests have been stopped.")
-            print("All tests stopped.")
         else:
             messagebox.showinfo("Stop action canceled","Stop action canceled by the user.")
-            print("Stop action canceled.")
 
     def on_close(self):
         """Handle window close."""
@@ -1098,7 +1092,7 @@ class GNSSTestTool:
         cep_value = nmea_data.calculate_cep(reference_point)
         if cep_value:
             self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
-            self.update_summary_table(f"Device-{port}", cep_value)
+            self.update_accuracy_summary_table(f"Device-{port}", cep_value)
             logging.info(f"Mode 1: CEP statistics for port {port}:")
             self.append_to_console_specific(console_widget, f"Mode 1: CEP statistics for port {port}:")
             logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
@@ -1115,7 +1109,37 @@ class GNSSTestTool:
             logging.info(f"No coordinates available for CEP calculation for port {port}.")
             self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for port {port}).")
 
-        # Save parsed data to Excel
+        # Calculate sats summary and log the results
+        gsv_sats_summary_stats= nmea_data.calculate_satellite_statistics()
+
+        # GSV Satellite Statistics
+        if not gsv_sats_summary_stats.empty:
+            self.update_satellites_summary_table(f"Device-{port}", gsv_sats_summary_stats)
+
+            # Extract statistics for logging
+            gsv_avg_cnr = gsv_sats_summary_stats["Average CNR (SNR) (dB)"].iloc[0]
+            gsv_min_cnr = gsv_sats_summary_stats["Min CNR (SNR) (dB)"].iloc[0]
+            gsv_max_cnr = gsv_sats_summary_stats["Max CNR (SNR) (dB)"].iloc[0]
+            gsv_total_tracked = gsv_sats_summary_stats["Total Satellites Tracked"].iloc[0]
+
+            # Log and append to console
+            logging.info(f"GSV Satellite Statistics for port {port}:")
+            self.append_to_console_specific(console_widget, f"GSV Satellite Statistics for port {port}:")
+            logging.info(f"Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+            self.append_to_console_specific(console_widget, f"GSV Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+            logging.info(f"Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+            self.append_to_console_specific(console_widget, f"GSV Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+            logging.info(f"Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+            self.append_to_console_specific(console_widget, f"GSV Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+            logging.info(f"Total Satellites Tracked: {gsv_total_tracked}")
+            self.append_to_console_specific(console_widget, f"Total Satellites Tracked: {gsv_total_tracked}")
+        else:
+            logging.info(f"No GSV satellite information available for statistics calculation for port {port}.")
+            self.append_to_console_specific(console_widget,
+                                            f"No GSV satellite information available for statistics calculation for port {port}.")
+
+
+            # Save parsed data to Excel
         nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
 
     # noinspection PyCompatibility
@@ -1324,16 +1348,19 @@ class GNSSTestTool:
         if not hasattr(self, "device_plot_data") or not isinstance(self.device_plot_data, dict):
             self.device_plot_data = {}
 
+        # Reset data if device_name already exists to avoid duplication
+        if device_name not in self.device_plot_data:
+            self.device_plot_data[device_name] = {'fix_times': [], 'distances': []}
+        else:
+            self.device_plot_data[device_name]['fix_times'].clear()
+            self.device_plot_data[device_name]['distances'].clear()
+
         # Extract fix_times and ensure they are datetime objects
         fix_times = [fix_time for _, _, fix_time in valid_coords]
         if isinstance(fix_times[0], datetime.time):  # If fix_time is a datetime.time object
             # Use the current date as a reference
             reference_date = datetime.datetime.now().date()
             fix_times = [datetime.datetime.combine(reference_date, t) for t in fix_times]
-
-        # Append the data to the shared structure, keyed by device name
-        if device_name not in self.device_plot_data:
-            self.device_plot_data[device_name] = {'fix_times': [], 'distances': []}
 
         # Update the device's data
         self.device_plot_data[device_name]['fix_times'].extend(fix_times)
@@ -1342,20 +1369,29 @@ class GNSSTestTool:
     def finalize_accuracy_plot(self):
         """
         Finalizes and displays the accuracy plot after all threads have completed.
+        Ensures no duplicate toolbar buttons are created.
         """
+
+        # Clear existing canvas if it exists
+        if hasattr(self, "canvas_widget") and self.canvas_widget.winfo_exists():
+            self.canvas_widget.destroy()
+
+        # Clear existing toolbar if it exists
+        if hasattr(self, "toolbar") and self.toolbar:
+            self.toolbar.destroy()
+
         # Initialize the plot if not already done
         if not hasattr(self, "fig"):
             self.fig, self.ax = plt.subplots(figsize=(8, 6))
-
-        # Clear the existing plot
-        self.ax.clear()
+        else:
+            self.ax.clear()  # Clear existing axes
 
         # Plot the data for each device
         for device_name, device_data in self.device_plot_data.items():
             self.ax.plot(
                 device_data['fix_times'],
                 device_data['distances'],
-                label=device_name,  # Correct label for each device
+                label=device_name,
                 marker='o',
                 linestyle='-',
                 picker=5  # Enable picking for click events
@@ -1367,19 +1403,22 @@ class GNSSTestTool:
         self.ax.set_ylabel("Error (meters)")
         self.ax.legend()
 
-        # Connect hover and click events
+        # Reinitialize the canvas
         self.canvas = FigureCanvasTkAgg(self.fig, self.accuracy_graph_frame)
-
         self.canvas_widget = self.canvas.get_tk_widget()
         self.canvas_widget.pack(fill="both", expand=True)
 
-        # Add zoom/pan and reset button
-        self.enable_zoom_pan()
+        # Add a new toolbar
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.accuracy_graph_frame)
+        self.toolbar.update()
+
+        # Pack the toolbar below the plot
+        self.toolbar.pack(side="bottom", fill="x")
 
         # Draw the canvas
         self.canvas.draw()
 
-    def update_summary_table(self, device_name, cep_stats):
+    def update_accuracy_summary_table(self, device_name, cep_stats):
         """
         Updates the summary table with CEP statistics for a specific device.
 
@@ -1388,13 +1427,13 @@ class GNSSTestTool:
             cep_stats (dict): CEP statistics for the device.
         """
         # Initialize the Treeview widget if not already done
-        if not hasattr(self, "summary_table"):
+        if not hasattr(self, "accuracy_summary_table"):
             columns = ["Device", "Fixes", "CEP50 (m)", "CEP68 (m)", "CEP95 (m)", "CEP99 (m)", "Reference Point"]
-            self.summary_table = ttk.Treeview(self.accuracy_summary_frame, columns=columns, show="headings")
+            self.accuracy_summary_table = ttk.Treeview(self.accuracy_summary_frame, columns=columns, show="headings")
             for col in columns:
-                self.summary_table.heading(col, text=col)
-                self.summary_table.column(col, anchor="center", width=120)
-            self.summary_table.pack(fill="x", expand=True)
+                self.accuracy_summary_table.heading(col, text=col)
+                self.accuracy_summary_table.column(col, anchor="center", width=120)
+            self.accuracy_summary_table.pack(fill="x", expand=True)
 
         # Add or update the row for the device
         row = (
@@ -1407,44 +1446,43 @@ class GNSSTestTool:
             f"({cep_stats['reference_point'][0]:.6f}, {cep_stats['reference_point'][1]:.6f})"        )
 
         # Check if the device already has a row
-        if device_name in self.table_data:
+        if device_name in self.accuracy_table_data:
             # Update existing row (remove and re-insert with updated values)
-            for item in self.summary_table.get_children():
-                if self.summary_table.item(item, "values")[0] == device_name:
-                    self.summary_table.delete(item)
+            for item in self.accuracy_summary_table.get_children():
+                if self.accuracy_summary_table.item(item, "values")[0] == device_name:
+                    self.accuracy_summary_table.delete(item)
                     break
 
         # Insert the updated or new row
-        self.summary_table.insert("", "end", values=row)
-        self.table_data[device_name] = row  # Save the row in the dictionary
+        self.accuracy_summary_table.insert("", "end", values=row)
+        self.accuracy_table_data[device_name] = row  # Save the row in the dictionary
 
-    def clear_summary_table(self):
+    def clear_accuracy_summary_table(self):
         """Clears the summary table."""
-        if hasattr(self, "summary_table"):
-            self.summary_table.delete(*self.summary_table.get_children())
+        if hasattr(self, "accuracy_summary_table"):
+            self.accuracy_summary_table.delete(*self.accuracy_summary_table.get_children())
+            self.accuracy_table_data.clear()
 
     def clear_accuracy_plot(self):
         """
         Resets the accuracy plot to its default state without destroying widgets.
-        Clears the figure and reinitialize the axes.
+        Clears the figure, reinitializes the axes, and resets device plot data.
         """
         # Reset the Matplotlib figure if it exists and is initialized
         if hasattr(self, "fig") and self.fig is not None:
-            self.fig.clear()  # Clear the figure
-            self.ax = self.fig.add_subplot(111)  # Recreate the subplot with default settings
-
-            # Reset plot appearance
+            self.fig.clf()  # Clear the entire figure and its axes
+            self.ax = self.fig.add_subplot(111)  # Reinitialize the subplot
             self.ax.set_title("Accuracy Plot")
             self.ax.set_xlabel("Fix Time (UTC)")
             self.ax.set_ylabel("Error (meters)")
 
-            # Redraw the canvas if it exists and is initialized
-            if hasattr(self, "canvas") and self.canvas is not None:
-                self.canvas.draw()
-
-        # Clear internal data structures related to plotting if initialized
+        # Clear internal data structures related to plotting
         if hasattr(self, "device_plot_data") and self.device_plot_data is not None:
-            self.device_plot_data = {}  # Reset device plot data dictionary
+            self.device_plot_data.clear()  # Reset device plot data
+
+        # Redraw the canvas to reflect changes
+        if hasattr(self, "canvas") and self.canvas is not None:
+            self.canvas.draw()
 
     def clear_console_tabs(self):
         """
@@ -1470,7 +1508,8 @@ class GNSSTestTool:
 
     def fresh_start(self):
         self.clear_console_tabs()
-        self.clear_summary_table()
+        self.clear_accuracy_summary_table()
+        self.clear_satellite_summary_table()
         self.clear_device_plot_data()
         self.clear_accuracy_plot()
 
@@ -1489,6 +1528,57 @@ class GNSSTestTool:
         self.ax.relim()
         self.ax.autoscale_view()
         self.canvas.draw()
+
+    def update_satellites_summary_table(self, device_name, gsv_sats_summary_stats):
+        """
+        Updates the satellites summary table with signal strength statistics for a specific device.
+
+        Args:
+            device_name (str): Name of the device.
+            gsv_sats_summary_stats (dict): signal strength statistics for the device.
+        """
+        # Initialize the Treeview widget if not already done
+        if not hasattr(self, "satellite_summary_table"):
+            columns = ["Device", "Average Satellites CNR (dB)", "Minimum Satellites CNR (dB)",
+                       "Maximum Satellites CNR (dB)", "Total Satellites in View"]
+            self.satellite_summary_table = ttk.Treeview(self.satellite_analysis_frame, columns=columns, show="headings")
+            for col in columns:
+                self.satellite_summary_table.heading(col, text=col)
+                self.satellite_summary_table.column(col, anchor="center", width=120)
+            self.satellite_summary_table.pack(fill="x", expand=True)
+
+        # Extract statistics for logging
+        gsv_avg_cnr = gsv_sats_summary_stats["Average CNR (SNR) (dB)"].iloc[0]
+        gsv_min_cnr = gsv_sats_summary_stats["Min CNR (SNR) (dB)"].iloc[0]
+        gsv_max_cnr = gsv_sats_summary_stats["Max CNR (SNR) (dB)"].iloc[0]
+        gsv_total_tracked = gsv_sats_summary_stats["Total Satellites Tracked"].iloc[0]
+
+        # Add or update the row for the device
+        row = (
+            device_name,
+            f"{gsv_avg_cnr:.2f}",
+            f"{gsv_min_cnr:.2f}",
+            f"{gsv_max_cnr:.2f}",
+            f"{gsv_total_tracked:.0f}"
+        )
+
+        # Check if the device already has a row
+        if device_name in self.satellite_table_data:
+            # Update existing row (remove and re-insert with updated values)
+            for item in self.satellite_summary_table.get_children():
+                if self.satellite_summary_table.item(item, "values")[0] == device_name:
+                    self.satellite_summary_table.delete(item)
+                    break
+
+        # Insert the updated or new row
+        self.satellite_summary_table.insert("", "end", values=row)
+        self.satellite_table_data[device_name] = row  # Save the row in the dictionary
+
+    def clear_satellite_summary_table(self):
+        """Clears the satellite summary table."""
+        if hasattr(self, "satellite_summary_table"):
+            self.satellite_summary_table.delete(*self.satellite_summary_table.get_children())
+            self.satellite_table_data = {}
 
 
 if __name__ == "__main__":
