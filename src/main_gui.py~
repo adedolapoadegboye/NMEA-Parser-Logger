@@ -18,6 +18,7 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 class GNSSTestTool:
     def __init__(self, root):
+        self.file_config_frame_holder = None
         self.results_frame_content = None
         self.satellite_table_data = None
         self.satellite_summary_table = None
@@ -151,7 +152,14 @@ class GNSSTestTool:
             "<Configure>",
             lambda e: result_canvas.configure(scrollregion=result_canvas.bbox("all"))
         )
-        result_canvas.create_window((0, 0), window=self.results_frame_content, anchor="nw")
+
+        # Dynamically update the width of the content frame to match the canvas
+        result_canvas.bind(
+            "<Configure>",
+            lambda e: result_canvas.itemconfig("content", width=e.width)
+        )
+
+        result_canvas.create_window((0, 0), window=self.results_frame_content, anchor="nw", tags="content")
         result_canvas.configure(yscrollcommand=result_scrollbar.set)
 
         # Pack the canvas and scrollbar
@@ -187,7 +195,7 @@ class GNSSTestTool:
 
         # Accuracy Tab
         self.accuracy_tab = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(self.accuracy_tab, text="Test Stats")
+        self.results_notebook.add(self.accuracy_tab, text="Statistics")
 
         # Accuracy Content (Graphs)
         self.accuracy_graph_frame = ttk.LabelFrame(self.accuracy_tab, text="Precision/Accuracy Summary")
@@ -547,25 +555,37 @@ class GNSSTestTool:
 
     def show_static_file_mode(self):
 
+        """Show UI for static file serial data setup"""
+
         self.clear_setup_content()
 
-        """Show UI for log file processing."""
-
         # Header
-        tk.Label(self.setup_frame, text="Load Static Test Data", font=("Arial", 14, "bold"), fg="#FE5F55").pack(pady=5, padx=5)
-        file_frame = ttk.LabelFrame(self.setup_frame, text="Log File Selection", padding=10)
-        file_frame.pack(fill="x", padx=10, pady=10)
+        tk.Label(self.setup_frame, text="Load Static Test Files", font=("Arial", 14, "bold"), fg="#FE5F55").pack(pady=5,
+                                                                                                                 padx=5)
 
-        # File Selection
-        ttk.Label(file_frame, text="Log File:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10, pady=5)
-        self.file_var = tk.StringVar(value="Select Log File")
-        ttk.Entry(file_frame, textvariable=self.file_var, state="readonly", width=20).grid(row=0, column=1, padx=10, pady=5)
-        ttk.Button(file_frame, text="Browse", command=self.browse_file).grid(row=0, column=2, padx=10, pady=5)
+        # General Configuration
+        general_config_frame = ttk.LabelFrame(self.setup_frame, text="General Configuration", padding=10)
+        general_config_frame.pack(fill="x", padx=10, pady=10)
+
+        # Number of devices
+        ttk.Label(general_config_frame, text="Number of Test logs:", font=("Arial", 10)).grid(row=0, column=0,
+                                                                                                 sticky="w",
+                                                                                                 padx=5, pady=5)
+        self.num_devices_var = tk.StringVar(value="1")
+        self.num_devices_dropdown = ttk.Combobox(
+            general_config_frame,
+            textvariable=self.num_devices_var,
+            state="readonly",
+            values=[str(i) for i in range(1, 11)],
+            width=10,
+        )
+        self.num_devices_dropdown.grid(row=0, column=1, padx=10, pady=5)
+        self.num_devices_dropdown.bind("<<ComboboxSelected>>", self.update_file_config_static_frames)
 
         # Reference Coordinates (Ground Truth)
         self.use_reference = tk.BooleanVar(value=False)
         use_reference_checkbox = ttk.Checkbutton(
-            file_frame,
+            general_config_frame,
             text="Use Custom Reference Point",
             variable=self.use_reference,
             command=self.toggle_reference_entries,
@@ -573,7 +593,7 @@ class GNSSTestTool:
         use_reference_checkbox.grid(row=1, column=0, sticky="w", padx=10, pady=5)
 
         # Info Icon with Tooltip
-        info_label = tk.Label(file_frame, text="?", font=("Arial", 10, "bold"), fg="#FE5F55", cursor="hand2")
+        info_label = tk.Label(general_config_frame, text="?", font=("Arial", 10, "bold"), fg="#FE5F55", cursor="hand2")
         info_label.grid(row=1, column=1, sticky="w", padx=5)
 
         # Bind tooltip to info icon
@@ -581,24 +601,177 @@ class GNSSTestTool:
         info_label.bind("<Leave>", self.hide_reference_tooltip)
 
         # Latitude Entry
-        ttk.Label(file_frame, text="Latitude:", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
-                                                                                    padx=10, pady=5)
+        ttk.Label(general_config_frame, text="Latitude:", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
+                                                                                   padx=10, pady=5)
         self.lat_var = tk.DoubleVar(value=0.0000000)
-        self.lat_entry = ttk.Entry(file_frame, textvariable=self.lat_var, width=20, state="disabled")
+        self.lat_entry = ttk.Entry(general_config_frame, textvariable=self.lat_var, width=20, state="disabled")
         self.lat_entry.grid(row=2, column=1, padx=10, pady=5)
 
         # Longitude Entry
-        ttk.Label(file_frame, text="Longitude:", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
+        ttk.Label(general_config_frame, text="Longitude:", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
                                                                                     padx=10, pady=5)
         self.lon_var = tk.DoubleVar(value=0.0000000)
-        self.lon_entry = ttk.Entry(file_frame, textvariable=self.lon_var, width=20, state="disabled")
+        self.lon_entry = ttk.Entry(general_config_frame, textvariable=self.lon_var, width=20, state="disabled")
         self.lon_entry.grid(row=3, column=1, padx=10, pady=5)
 
-        # Process Button
-        ttk.Button(file_frame, text="Process", command=self.start_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
+        # File Configuration Frame Holder
+        self.file_config_frame_holder = ttk.LabelFrame(self.setup_frame, text="Logfile Configuration", padding=10)
+        self.file_config_frame_holder.pack(fill="both", padx=10, pady=10)
 
-        # Clear Button
-        ttk.Button(file_frame, text="Clear", command=self.start_file_mode).grid(row=4, column=3, columnspan=3, pady=15)
+        # Initialize Serial Configuration Frames
+        self.update_file_config_static_frames()
+
+    def update_file_config_static_frames(self, event=None):
+        """Update the file configuration frames based on the selected number of devices."""
+
+        # Clear existing frames
+        for widget in self.file_config_frame_holder.winfo_children():
+            widget.destroy()
+
+        # Get the number of devices
+        num_devices = int(self.num_devices_var.get())
+
+        # Initialize a list to store individual file configurations
+        self.file_var = [tk.StringVar(value="Select Log File") for _ in range(num_devices)]
+
+        # Generate file config frames
+        for device_index in range(1, num_devices + 1):
+            config_frame = ttk.LabelFrame(
+                self.file_config_frame_holder, text=f"Device {device_index} File Configuration", padding=10
+            )
+            config_frame.pack(fill="x", padx=10, pady=5)
+
+            # File Path Selection
+            ttk.Label(config_frame, text="Log File:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10,
+                                                                               pady=5)
+            ttk.Entry(
+                config_frame,
+                textvariable=self.file_var[device_index - 1],  # Use individual file variable
+                state="readonly",
+                width=30,
+                font=("Arial", 10)
+            ).grid(row=0, column=1, padx=10, pady=5)
+
+            ttk.Button(
+                config_frame,
+                text="Browse",
+                command=lambda idx=device_index - 1: self.browse_file(idx)
+            ).grid(row=0, column=2, padx=10, pady=5)
+
+        # Frame to hold the buttons
+        button_frame = ttk.Frame(self.file_config_frame_holder)
+        button_frame.pack(fill="x", padx=10, pady=15)
+
+        # Add Start Button
+        start_button = ttk.Button(button_frame, text="Start Test", command=self.start_file_mode)
+        start_button.grid(row=0, column=0, padx=5)
+
+        # Add Stop Button
+        stop_button = ttk.Button(button_frame, text="Stop Test", command=self.stop_all_tests)
+        stop_button.grid(row=0, column=1, padx=5)
+
+        # Add Clear Button
+        clear_button = ttk.Button(button_frame, text="Clear", command=self.clear_all_configs)
+        clear_button.grid(row=0, column=2, padx=5)
+
+        # Bind window close to stop tests
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def update_file_config_dynamic_frames(self, event=None):
+            """Update the serial configuration frames based on the selected number of devices."""
+            # Clear existing frames
+            for widget in self.serial_config_frame_holder.winfo_children():
+                widget.destroy()
+
+            # Get the number of devices
+            num_devices = int(self.num_devices_var.get())
+
+            # Generate serial config frames
+            for device_index in range(1, num_devices + 1):
+                config_frame = ttk.LabelFrame(
+                    self.serial_config_frame_holder, text=f"Device {device_index} Configuration", padding=10
+                )
+                config_frame.pack(fill="x", padx=10, pady=5)
+
+                # Serial Port
+                ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w",
+                                                                                      padx=10,
+                                                                                      pady=5)
+                self.port_var = tk.StringVar(value="Select Port")
+                port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30,
+                                             font=("Arial", 10)
+                                             )
+                port_dropdown.grid(row=0, column=1, padx=10, pady=5)
+                self.refresh_serial_ports(port_dropdown)
+
+                # Baudrate
+                ttk.Label(config_frame, text="Baudrate:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10,
+                                                                                   pady=5)
+                baudrates = ["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"]
+                self.baudrate_var = tk.IntVar(value=115200)  # Default value
+                baudrate_dropdown = ttk.Combobox(
+                    config_frame,
+                    textvariable=self.baudrate_var,
+                    state="readonly",
+                    values=baudrates,
+                    width=30,
+                    font=("Arial", 10)
+                )
+                baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
+
+                # Timeout
+                ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
+                                                                                      padx=10,
+                                                                                      pady=5)
+                self.timeout_var = tk.DoubleVar(value=1)
+                ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 10)).grid(row=2,
+                                                                                                          column=1,
+                                                                                                          padx=10,
+                                                                                                          pady=5)
+
+                # Duration
+                ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
+                                                                                       padx=10,
+                                                                                       pady=5)
+                self.duration_var = tk.DoubleVar(value=30)
+                ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 10)).grid(row=3,
+                                                                                                           column=1,
+                                                                                                           padx=10,
+                                                                                                           pady=5)
+
+                # Reference Device Checkbox
+                self.ref_var = tk.BooleanVar(value=(self.reference_device_index == device_index))
+                ref_checkbox = ttk.Checkbutton(
+                    config_frame,
+                    text="Reference Device",
+                    variable=self.ref_var,  # Bind the checkbox to this variable
+                    command=lambda idx=device_index: self.toggle_reference(idx)
+                )
+                ref_checkbox.grid(row=4, column=0, columnspan=2, sticky="w", padx=10, pady=5)
+                # Save device configuration variables
+                config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var,
+                                     "timeout_var": self.timeout_var,
+                                     "duration_var": self.duration_var, "ref_var": self.ref_var,
+                                     "device_index": device_index, "ref_checkbox": ref_checkbox}
+
+            # Frame to hold the buttons
+            button_frame = ttk.Frame(self.serial_config_frame_holder)
+            button_frame.pack(fill="x", padx=10, pady=15)
+
+            # Add Start Button
+            start_button = ttk.Button(button_frame, text="Start Test", command=self.start_file_mode)
+            start_button.grid(row=0, column=0, padx=5)
+
+            # Add Stop Button
+            stop_button = ttk.Button(button_frame, text="Stop Test", command=self.stop_all_tests)
+            stop_button.grid(row=0, column=1, padx=5)
+
+            # Add Clear Button
+            clear_button = ttk.Button(button_frame, text="Clear Settings", command=self.clear_all_configs)
+            clear_button.grid(row=0, column=2, padx=5)
+
+            # Bind window close to stop tests
+            self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def show_dynamic_file_mode(self):
 
@@ -654,7 +827,6 @@ class GNSSTestTool:
 
     def start_live_mode(self):
         """Start live data collection."""
-        # self.fresh_start()
         try:
             # Reset stop event
             self.stop_event.clear()
@@ -717,44 +889,104 @@ class GNSSTestTool:
             logging.error(f"Failed to start live test: {e}")
 
     def start_file_mode(self):
-        """Process the selected log file."""
-        # Setup logging
-        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S%f')
-        log_folder = f"logs/NMEA_{timestamp}"
-        os.makedirs(log_folder, exist_ok=True)
-        self.setup_logging(log_folder, timestamp)
+        """Process the selected log files."""
         try:
-            while True:
-                file_path = self.file_var.get()
-                if os.path.exists(file_path):
-                    break
+            # Reset stop event
+            self.stop_event.clear()
+            self.fresh_start()
+            # Validate file path selection
+            if int(self.num_devices_var.get()) != len(self.file_var):
+                messagebox.showerror("Error", "Please provide the same number of log files indicated in the general config section.")# Ensure the number of selected logfiles matches the selected number
+            else:
+                pass
+            devices = {}
+            for i in range(int(self.num_devices_var.get())):
+                file_var = self.file_var[i].get()
+                if file_var == "Select Log File" or file_var == "":
+                    messagebox.showerror("Error", f"Please select a valid file for Logfile {i + 1}.")
+                    return
                 else:
-                    messagebox.showerror("Error", "The file path provided does not exist. Please select a valid path.")
-            # Clear result content
-            self.clear_result_content()
+                    pass
+
+                #Add logfile to the dictionary
+                devices[f"device_{i + 1}"] = {
+                    "name": f"Device {i + 1}",
+                    "file": file_var,
+                }
+
+            # Validate reference point if enabled
             if self.use_reference.get():
-                while True:
-                    try:
-                        ref_lat = float(self.lat_var.get())
-                        ref_lon = float(self.lat_var.get())
-                        reference_point = (ref_lat, ref_lon)
-                        break
-                    except ValueError:
-                        messagebox.showerror("Error", "Invalid input. Please enter valid float values for latitude and longitude.")
+                try:
+                    ref_lat = self.lat_var.get()
+                    ref_lon = self.lon_var.get()
+                    reference_point = (float(ref_lat), float(ref_lon))
+                except ValueError as e:
+                    messagebox.showerror("Error", f"Invalid reference point: {e}")
+                    return
             else:
                 reference_point = None
 
-            # Process the log file and calculate CEP
-            self.process_nmea_log(file_path, timestamp, reference_point)
+            self.fresh_start()
+
+            # Setup logging
+            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S%f')
+            log_folder = f"logs/NMEA_{timestamp}"
+            os.makedirs(log_folder, exist_ok=True)
+            self.setup_logging(log_folder, timestamp)
+
+            # Run the test in a separate thread
+            test_thread = threading.Thread(
+                target=self.run_file_test, args=(devices, log_folder, timestamp, reference_point)
+            )
+            test_thread.start()
 
         except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while processing the log file: {e}")
+            messagebox.showerror("Error", f"Failed to start file mode: {e}")
+            logging.error(f"Failed to start file mode: {e}")
 
-    def browse_file(self):
-        """Browse and select a log file."""
-        file_path = filedialog.askopenfilename(filetypes=[("Log Files", "*.txt *.log *.nmea")])
+
+        # # Setup logging
+        # timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S%f')
+        # log_folder = f"logs/NMEA_{timestamp}"
+        # os.makedirs(log_folder, exist_ok=True)
+        # self.setup_logging(log_folder, timestamp)
+        # try:
+        #     while True:
+        #         file_path = self.file_var.get()
+        #         if os.path.exists(file_path):
+        #             break
+        #         else:
+        #             messagebox.showerror("Error", "The file path provided does not exist. Please select a valid path.")
+        #     # Clear result content
+        #     self.clear_result_content()
+        #     if self.use_reference.get():
+        #         while True:
+        #             try:
+        #                 ref_lat = float(self.lat_var.get())
+        #                 ref_lon = float(self.lat_var.get())
+        #                 reference_point = (ref_lat, ref_lon)
+        #                 break
+        #             except ValueError:
+        #                 messagebox.showerror("Error", "Invalid input. Please enter valid float values for latitude and longitude.")
+        #     else:
+        #         reference_point = None
+        #
+        #     # Process the log file and calculate CEP
+        #     self.process_nmea_log(file_path, timestamp, reference_point)
+        #
+        # except Exception as e:
+        #     messagebox.showerror("Error", f"An error occurred while processing the log file: {e}")
+
+    def browse_file(self, idx):
+        """Browse and select a log file. Update the corresponding file entry.
+
+        Args:
+            idx (int): Index of the file input to update.
+        """
+        file_path = filedialog.askopenfilename(title="Select Log File",
+                                               filetypes=[("Log Files", "*.log"), ("All Files", "*.*")])
         if file_path:
-            self.file_var.set(file_path)
+            self.file_var[idx].set(file_path)
 
     def clear_setup_content(self):
         """Clear the content frame."""
@@ -831,6 +1063,45 @@ class GNSSTestTool:
                     args=(
                         config["port"], config["baudrate"], config["timeout"], config["duration"],
                         log_folder, timestamp, reference_point, self.stop_event, device_logs[device_name]
+                    )
+                )
+                threads.append(thread)
+                thread.start()
+
+            # Wait for threads to finish
+            for thread in threads:
+                thread.join()
+
+            # Call the final plot function with aggregated data
+            self.finalize_accuracy_plot()
+
+            # Notify the user if not stopped
+            if not self.stop_event.is_set():
+                messagebox.showinfo("Success", "Data Analysis completed successfully.")
+            else:
+                pass
+                # messagebox.showinfo("Stop action completed", "Test stopped by the user.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred during the test: {e}")
+
+    def run_file_test(self, devices, log_folder, timestamp, reference_point):
+        """Run the test on a separate thread."""
+        try:
+            # Dictionary to map device names to their corresponding text widgets
+            device_logs = {}
+
+            # Create dynamic tabs for each device in the nested device_notebook
+            for device_name, config in devices.items():
+                self.create_device_tab(device_name, config, device_logs)
+
+            threads = []
+
+            for device_name, config in devices.items():
+                # Create and start a thread for each device
+                thread = threading.Thread(
+                    target=self.process_nmea_log,
+                    args=(
+                        config["file"], log_folder, timestamp, reference_point, self.stop_event, device_logs[device_name]
                     )
                 )
                 threads.append(thread)
@@ -1143,8 +1414,7 @@ class GNSSTestTool:
         nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
 
     # noinspection PyCompatibility
-    @staticmethod
-    def parse_nmea_from_log(file_path):
+    def parse_nmea_from_log(self,file_path, console_widget):
         """
         Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences.
 
@@ -1153,10 +1423,14 @@ class GNSSTestTool:
 
         Returns:
             tuple: A list of parsed sentences and an NMEAData object.
+            :param file_path:
+            :param console_widget:
         """
         parsed_sentences = []
         nmea_data = NMEAData(None, None, parsed_sentences)
         logging.info(f"Processing log file: {file_path}")
+        if console_widget:
+            self.append_to_console_specific(console_widget, f"Processing log file: {file_path}")
 
         try:
             # Handle different file types based on the file extension
@@ -1164,72 +1438,105 @@ class GNSSTestTool:
                 with open(file_path, 'r', encoding='utf-8') as f:
                     lines = f.readlines()
                 logging.info(f"Total lines read from file: {len(lines)}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Total lines read from file: {len(lines)}")
 
             elif file_path.endswith('.csv'):
                 df = pd.read_csv(file_path, header=None)
                 lines = df[0].astype(str).tolist()
                 logging.info(f"Total lines read from CSV: {len(df)}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Total lines read from file: {len(df)}")
 
             elif file_path.endswith('.xlsx'):
                 df = pd.read_excel(file_path, header=None)
                 lines = df[0].astype(str).tolist()
                 logging.info(f"Total lines read from Excel: {len(df)}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Total lines read from file: {len(df)}")
 
             else:
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Unsupported file type: {file_path}")
                 logging.error(f"Unsupported file type: {file_path}")
                 raise ValueError("Unsupported file type. Supported formats: .txt, .log, .nmea, .csv, .xlsx")
 
             # Process each line in the file
             for nmea_sentence in lines:
                 nmea_sentence = nmea_sentence.strip()
-                logging.debug(f"Processing sentence: {nmea_sentence}")
+                logging.info(f"Processing sentence: {nmea_sentence}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Processing sentence: {nmea_sentence}")
+
 
                 try:
                     if nmea_sentence.startswith('$PQTM'):
                         logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
-                        msg = pynmea2.parse(nmea_sentence)
+                        if console_widget:
+                            self.append_to_console_specific(console_widget, f"Proprietary NMEA Message: {nmea_sentence}")
+                        try:
+                            msg = pynmea2.parse(nmea_sentence)
+                            if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                                raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence",
+                                                         msg)
 
-                        if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
-                            raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
-
-                        nmea_data.sentence_type = msg.sentence_type
-                        nmea_data.data = msg
-                        nmea_data.add_sentence_data()
-                        nmea_data.add_coordinates()
-                        logging.info(nmea_data)
+                            nmea_data.sentence_type = msg.sentence_type
+                            nmea_data.data = msg
+                            nmea_data.add_sentence_data()
+                            nmea_data.add_coordinates()
+                            logging.info(nmea_data)
+                        except pynmea2.ParseError as e:
+                            logging.warning(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                        continue
 
                     elif nmea_sentence.startswith('$G'):
                         logging.info(f"Standard NMEA Message: {nmea_sentence}")
-                        msg = pynmea2.parse(nmea_sentence)
-
-                        if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
-                            raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence", msg)
-
-                        nmea_data.sentence_type = msg.sentence_type
-                        nmea_data.data = msg
-                        nmea_data.add_sentence_data()
-                        nmea_data.add_coordinates()
-                        logging.info(nmea_data)
+                        self.append_to_console_specific(console_widget, f"Standard NMEA Message: {nmea_sentence}")
+                        try:
+                            msg = pynmea2.parse(nmea_sentence)
+                            if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                                raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence",
+                                                         msg)
+                            nmea_data.sentence_type = msg.sentence_type
+                            nmea_data.data = msg
+                            nmea_data.add_sentence_data()
+                            nmea_data.add_coordinates()
+                            logging.info(nmea_data)
+                            self.append_to_console_specific(console_widget, nmea_data)
+                        except pynmea2.ParseError as e:
+                            logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
 
                     else:
                         logging.info(f"Received Unknown Message: {nmea_sentence}")
+                        self.append_to_console_specific(console_widget,
+                                                        f"Received Unknown Message: {nmea_sentence}")
 
                 except pynmea2.ParseError as e:
                     logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
-
+                    self.append_to_console_specific(console_widget,
+                                                    f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
         except Exception as e:
             logging.error(f"Failed to read or process file: {file_path}. Error: {e}")
+            self.append_to_console_specific(console_widget,
+                                            f"Failed to read or process file: {file_path}. Error: {e}")
 
         logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
+        self.append_to_console_specific(console_widget,
+                                        f"Total parsed sentences: {len(parsed_sentences)}")
         return parsed_sentences, nmea_data
 
-    def process_nmea_log(self, file_path, timestamp, reference_point=None):
+    def process_nmea_log(self, file_path, log_folder, timestamp, reference_point=None, stop_event=None, console_widget=None):
         """
         Process pre-collected NMEA log file and calculate CEP.
 
         Args:
             file_path (str): Path to the NMEA log file.
             reference_point (tuple, optional): Custom reference point (latitude, longitude). Defaults to None.
+            :param console_widget:
+            :param stop_event:
+            :param log_folder:
             :param file_path:
             :param reference_point:
             :param timestamp:
@@ -1241,53 +1548,121 @@ class GNSSTestTool:
             logging.error(f"File does not exist: {file_path}")
             return
 
+        # Ensure log folder exists
+        os.makedirs(log_folder, exist_ok=True)
+
+        if stop_event and stop_event.is_set():  # Check if stop_event is set
+            logging.info(f"Stop signal received. Ending file processing for {file_path}.")
+            if console_widget:
+                self.append_to_console_specific(console_widget, f"Stop signal received for {file_path}.")
+                return
+
         # Process the file to get parsed sentences
         try:
-            parsed_sentences, nmea_data = self.parse_nmea_from_log(file_path)
+            parsed_sentences, nmea_data = self.parse_nmea_from_log(file_path, console_widget)
         except Exception as e:
             logging.error(f"Error during parsing NMEA log file: {file_path}. Exception: {e}")
+            if console_widget:
+                self.append_to_console_specific(console_widget, f"Error during parsing NMEA log file: {file_path}. Exception: {e}")
             return
 
         if not parsed_sentences:
             logging.error(f"No valid NMEA sentences found in log file: {file_path}")
+            if console_widget:
+                self.append_to_console_specific(console_widget, f"No valid NMEA sentences found in log file: {file_path}")
             return
 
         logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
+        if console_widget:
+            self.append_to_console_specific(console_widget, f"Total parsed sentences: {len(parsed_sentences)}")
 
         # Determine or calculate the reference point
         if reference_point is None:
             try:
                 logging.info("Calculating the mean point from log data for CEP Analysis.")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, "Calculating the mean point from log data for CEP Analysis.")
                 reference_point = nmea_data.calculate_mean_point()
             except Exception as e:
                 logging.error(f"Error calculating mean point: {e}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Error calculating mean point: {e}")
                 return
         else:
             logging.info(f"Using provided reference point: {reference_point}")
+            if console_widget:
+                self.append_to_console_specific(console_widget, f"Using provided reference point: {reference_point}")
 
         # Calculate CEP values
         try:
             cep_value = nmea_data.calculate_cep(reference_point)
             if cep_value is not None:
+                self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{file_path}")
                 logging.info(f"Mode 2: CEP statistics for logfile {file_path}:")
+                self.append_to_console_specific(console_widget, f"Mode 2: CEP statistics for logfile {file_path}:")
                 logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP50: {cep_value['CEP50']:.2f} meters")
                 logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP68: {cep_value['CEP68']:.2f} meters")
                 logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP90: {cep_value['CEP90']:.2f} meters")
                 logging.info(f"CEP95: {cep_value['CEP95']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP95: {cep_value['CEP95']:.2f} meters")
                 logging.info(f"CEP99: {cep_value['CEP99']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP99: {cep_value['CEP99']:.2f} meters")
             else:
                 logging.info(f"No coordinates available for CEP calculation for log {file_path}.")
+                self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for log {file_path}.")
         except Exception as e:
             logging.error(f"Error calculating CEP values: {e}")
+            self.append_to_console_specific(console_widget, f"Error calculating CEP values: {e}")
             return
 
+        # Calculate Satellite Summary
+        try:
+            # Calculate sats summary and log the results
+            gsv_sats_summary_stats = nmea_data.calculate_satellite_statistics()
+
+            # GSV Satellite Statistics
+            if not gsv_sats_summary_stats.empty:
+                self.update_satellites_summary_table(f"Device-{file_path}", gsv_sats_summary_stats)
+
+                # Extract statistics for logging
+                gsv_avg_cnr = gsv_sats_summary_stats["Average CNR (SNR) (dB)"].iloc[0]
+                gsv_min_cnr = gsv_sats_summary_stats["Min CNR (SNR) (dB)"].iloc[0]
+                gsv_max_cnr = gsv_sats_summary_stats["Max CNR (SNR) (dB)"].iloc[0]
+                gsv_total_tracked = gsv_sats_summary_stats["Total Satellites Tracked"].iloc[0]
+
+                # Log and append to console
+                logging.info(f"GSV Satellite Statistics for port {file_path}:")
+                self.append_to_console_specific(console_widget, f"GSV Satellite Statistics for port {file_path}:")
+                logging.info(f"Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+                self.append_to_console_specific(console_widget, f"GSV Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+                logging.info(f"Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+                self.append_to_console_specific(console_widget, f"GSV Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+                logging.info(f"Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+                self.append_to_console_specific(console_widget, f"GSV Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+                logging.info(f"Total Satellites Tracked: {gsv_total_tracked}")
+                self.append_to_console_specific(console_widget, f"Total Satellites Tracked: {gsv_total_tracked}")
+            else:
+                logging.info(f"No GSV satellite information available for statistics calculation for port {file_path}.")
+                self.append_to_console_specific(console_widget,
+                                                f"No GSV satellite information available for statistics calculation for port {file_path}.")
+
+        except Exception as e:
+            logging.error(f"Error calculating GSV Satellite Statistics: {e}")
+            self.append_to_console_specific(console_widget, f"Error calculating GSV Satellite Statistics: {e}")
+
         logging.info(f"Finished log processing for file: {file_path}")
+        if console_widget:
+            self.append_to_console_specific(console_widget, f"Finished log processing for file: {file_path}")
 
         # Write results to an Excel file
         try:
             nmea_data.write_to_excel_mode_2(timestamp, cep_value)
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
+            self.append_to_console_specific(console_widget, f"Error writing to Excel file: {e}")
 
     @staticmethod
     def append_to_console_threadsafe(console_widget, message):
@@ -1466,7 +1841,7 @@ class GNSSTestTool:
     def clear_accuracy_plot(self):
         """
         Resets the accuracy plot to its default state without destroying widgets.
-        Clears the figure, reinitializes the axes, and resets device plot data.
+        Clears the figure, re-initializes the axes, and resets device plot data.
         """
         # Reset the Matplotlib figure if it exists and is initialized
         if hasattr(self, "fig") and self.fig is not None:
@@ -1579,6 +1954,7 @@ class GNSSTestTool:
         if hasattr(self, "satellite_summary_table"):
             self.satellite_summary_table.delete(*self.satellite_summary_table.get_children())
             self.satellite_table_data = {}
+
 
 
 if __name__ == "__main__":
