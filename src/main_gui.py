@@ -905,8 +905,6 @@ class GNSSTestTool:
                 if file_var == "Select Log File" or file_var == "":
                     messagebox.showerror("Error", f"Please select a valid file for Logfile {i + 1}.")
                     return
-                else:
-                    pass
 
                 #Add logfile to the dictionary
                 devices[f"device_{i + 1}"] = {
@@ -1052,7 +1050,7 @@ class GNSSTestTool:
 
             # Create dynamic tabs for each device in the nested device_notebook
             for device_name, config in devices.items():
-                self.create_device_tab(device_name, config, device_logs)
+                self.create_device_tab(device_name, device_logs)
 
             threads = []
 
@@ -1092,7 +1090,7 @@ class GNSSTestTool:
 
             # Create dynamic tabs for each device in the nested device_notebook
             for device_name, config in devices.items():
-                self.create_device_tab(device_name, config, device_logs)
+                self.create_device_tab(device_name, device_logs)
 
             threads = []
 
@@ -1111,8 +1109,8 @@ class GNSSTestTool:
             for thread in threads:
                 thread.join()
 
-            # Call the final plot function with aggregated data
-            self.finalize_accuracy_plot()
+            # # Call the final plot function with aggregated data
+            # self.finalize_accuracy_plot()
 
             # Notify the user if not stopped
             if not self.stop_event.is_set():
@@ -1121,7 +1119,8 @@ class GNSSTestTool:
                 pass
                 # messagebox.showinfo("Stop action completed", "Test stopped by the user.")
         except Exception as e:
-            messagebox.showerror("Error", f"An error occurred during the test: {e}")
+            messagebox.showerror("Error", f"An error occurred during the log analysis: {e}")
+            logging.error(f"An error occurred during the log analysis: {e}")
 
     def stop_all_tests(self):
         """Stop all running tests."""
@@ -1675,13 +1674,12 @@ class GNSSTestTool:
         """
         console_widget.after(0, GNSSTestTool.append_to_console_specific, console_widget, message)
 
-    def create_device_tab(self, device_name, config, device_logs):
+    def create_device_tab(self, device_name, device_logs):
         """
         Creates a tab for a specific device with a text widget and scrollbar.
 
         Args:
             device_name (str): The name of the device.
-            config (dict): Configuration details of the device (e.g., port, baudrate).
             device_logs (dict): Dictionary to store the device's text widget for logging.
         """
         # Add a tab for this device in the nested notebook
@@ -1708,7 +1706,7 @@ class GNSSTestTool:
 
         # Log initialization
         self.append_to_console_specific(device_logs[device_name],
-                                        f"Initializing device {device_name} on port {config['port']}...")
+                                        f"Initializing {device_name}...")
 
     def update_accuracy_plot(self, distances, valid_coords, device_name):
         """

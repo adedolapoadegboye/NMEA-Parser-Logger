@@ -1,3 +1,0 @@
-2024-12-18 17:00:49,120 [INFO] Console logging setup complete. Logs are being saved to logs/NMEA_20241218_170049117551\console_output_20241218_170049117551.txt
-2024-12-18 17:01:00,263 [INFO] Console logging setup complete. Logs are being saved to logs/NMEA_20241218_170100259935\console_output_20241218_170100259935.txt
-2024-12-18 17:01:17,152 [INFO] Console logging setup complete. Logs are being saved to logs/NMEA_20241218_170117149829\console_output_20241218_170117149829.txt
