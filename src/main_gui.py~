@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 import datetime
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
-
 class GNSSTestTool:
     def __init__(self, root):
+        self.mode = None
         self.file_config_frame_holder = None
         self.results_frame_content = None
         self.satellite_table_data = None
@@ -250,6 +250,7 @@ class GNSSTestTool:
 
     def show_live_mode(self):
         if self.test_type.get() == "Static (fixed reference point)":
+            self.mode = "live static"
             """Show UI for static live serial data setup"""
             self.clear_setup_content()
 
@@ -315,6 +316,7 @@ class GNSSTestTool:
             self.update_serial_config_static_frames()
 
         else:
+            self.mode = "live dynamic"
             """Show UI for load file data."""
             self.clear_setup_content()
 
@@ -517,7 +519,7 @@ class GNSSTestTool:
         button_frame.pack(fill="x", padx=10, pady=15)
 
         # Add Start Button
-        start_button = ttk.Button(button_frame, text="Start Test", command=self.start_live_mode)
+        start_button = ttk.Button(button_frame, text="Start Test", command=self.start_live_mode_2)
         start_button.grid(row=0, column=0, padx=5)
 
         # Add Stop Button
@@ -549,8 +551,10 @@ class GNSSTestTool:
 
     def show_file_mode(self):
         if self.test_type.get() == "Static (fixed reference point)":
+            self.mode = "file static"
             self.show_static_file_mode()
         else:
+            self.mode = "file dynamic"
             self.show_dynamic_file_mode()
 
     def show_static_file_mode(self):
@@ -827,6 +831,71 @@ class GNSSTestTool:
 
     def start_live_mode(self):
         """Start live data collection."""
+        self.mode = "live static"
+        try:
+            # Reset stop event
+            self.stop_event.clear()
+
+            # Validate port selection for each device
+            num_devices = len(self.port_vars)  # Ensure the number of devices matches
+            devices = {}
+            for i in range(num_devices):
+                port = self.port_vars[i].get()
+                if port == "Select Port" or port == "No ports available":
+                    messagebox.showerror("Error", f"Please select a valid port for Device {i + 1}.")
+                    return
+
+                # Gather configuration for the device
+                try:
+                    baudrate = int(self.baudrate_vars[i].get())
+                    timeout = float(self.timeout_vars[i].get())
+                    duration = int(self.duration_vars[i].get())
+                except ValueError as e:
+                    messagebox.showerror("Error", f"Invalid input for Device {i + 1}: {e}")
+                    return
+
+                # Add device configuration to the dictionary
+                devices[f"device_{i + 1}"] = {
+                    "name": f"Device {i + 1}",
+                    "port": port,
+                    "baudrate": baudrate,
+                    "timeout": timeout,
+                    "duration": duration
+                }
+
+            # Validate reference point if enabled
+            if self.use_reference.get():
+                try:
+                    ref_lat = self.lat_var.get()
+                    ref_lon = self.lon_var.get()
+                    reference_point = (float(ref_lat), float(ref_lon))
+                except ValueError as e:
+                    messagebox.showerror("Error", f"Invalid reference point: {e}")
+                    return
+            else:
+                reference_point = None
+
+            self.fresh_start()
+
+            # Setup logging
+            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S%f')
+            log_folder = f"logs/NMEA_{timestamp}"
+            os.makedirs(log_folder, exist_ok=True)
+            self.setup_logging(log_folder, timestamp)
+
+            # Run the test in a separate thread
+            test_thread = threading.Thread(
+                target=self.run_live_test, args=(devices, log_folder, timestamp, reference_point)
+            )
+            test_thread.start()
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to start live test: {e}")
+            logging.error(f"Failed to start live test: {e}")
+
+    def start_live_mode_2(self):
+        """Start live data collection."""
+        self.mode = "live static"
         try:
             # Reset stop event
             self.stop_event.clear()
@@ -890,6 +959,7 @@ class GNSSTestTool:
 
     def start_file_mode(self):
         """Process the selected log files."""
+        self.mode = "file static"
         try:
             # Reset stop event
             self.stop_event.clear()
@@ -941,39 +1011,6 @@ class GNSSTestTool:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to start file mode: {e}")
             logging.error(f"Failed to start file mode: {e}")
-
-
-        # # Setup logging
-        # timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S%f')
-        # log_folder = f"logs/NMEA_{timestamp}"
-        # os.makedirs(log_folder, exist_ok=True)
-        # self.setup_logging(log_folder, timestamp)
-        # try:
-        #     while True:
-        #         file_path = self.file_var.get()
-        #         if os.path.exists(file_path):
-        #             break
-        #         else:
-        #             messagebox.showerror("Error", "The file path provided does not exist. Please select a valid path.")
-        #     # Clear result content
-        #     self.clear_result_content()
-        #     if self.use_reference.get():
-        #         while True:
-        #             try:
-        #                 ref_lat = float(self.lat_var.get())
-        #                 ref_lon = float(self.lat_var.get())
-        #                 reference_point = (ref_lat, ref_lon)
-        #                 break
-        #             except ValueError:
-        #                 messagebox.showerror("Error", "Invalid input. Please enter valid float values for latitude and longitude.")
-        #     else:
-        #         reference_point = None
-        #
-        #     # Process the log file and calculate CEP
-        #     self.process_nmea_log(file_path, timestamp, reference_point)
-        #
-        # except Exception as e:
-        #     messagebox.showerror("Error", f"An error occurred while processing the log file: {e}")
 
     def browse_file(self, idx):
         """Browse and select a log file. Update the corresponding file entry.
@@ -1109,8 +1146,11 @@ class GNSSTestTool:
             for thread in threads:
                 thread.join()
 
-            # # Call the final plot function with aggregated data
-            # self.finalize_accuracy_plot()
+            if self.stop_event and self.stop_event.is_set() and self.mode == "file static":  # Check if stop_event is set
+                return
+
+            # Call the final plot function with aggregated data
+            self.finalize_accuracy_plot()
 
             # Notify the user if not stopped
             if not self.stop_event.is_set():
@@ -1142,44 +1182,105 @@ class GNSSTestTool:
     def clear_all_configs(self):
         """Reset all configurations to their default values."""
         try:
-            # Reset number of devices
-            if self.num_devices_var:
-                self.num_devices_var.set("1")  # Default to 1 device
+            if self.mode == "file static" or self.mode == "file dynamic":
+                if self.file_var:
+                    self.file_var = tk.StringVar(value="Select Log Path")  # Reset file path
 
-            # Reset reference point settings
-            if self.use_reference:
-                self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
-                self.toggle_reference_entries()  # Disable lat/lon entries
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
 
-            if self.lat_var:
-                self.lat_var.set(0.0)  # Reset latitude
-            if self.lon_var:
-                self.lon_var.set(0.0)  # Reset longitude
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
 
-            # Reset Serial Configuration fields
-            if self.port_var:
-                self.port_var.set("Select Port")  # Default port option
-            if self.baudrate_var:
-                self.baudrate_var.set(115200)  # Default baudrate
-            if self.timeout_var:
-                self.timeout_var.set(1.0)  # Default timeout
-            if self.duration_var:
-                self.duration_var.set(30.0)  # Default duration
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
 
-            # Clear the serial configuration frame holder
-            for widget in self.serial_config_frame_holder.winfo_children():
-                widget.destroy()
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
 
-            # Clear the device notebook
-            for tab in self.device_notebook.tabs():
-                self.device_notebook.forget(tab)
+                # Clear plots
+                self.fresh_start()
 
+            elif self.mode == "live static":
+                # Reset serial configuration settings
+                if self.port_var:
+                    self.port_var.set("Select Port")  # Default port option
+                if self.baudrate_var:
+                    self.baudrate_var.set(115200)  # Default baudrate
+                if self.timeout_var:
+                    self.timeout_var.set(1.0)  # Default timeout
+                if self.duration_var:
+                    self.duration_var.set(30.0)  # Default duration
+                # Clear the serial configuration frame holder
+                for widget in self.serial_config_frame_holder.winfo_children():
+                    widget.destroy()
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
 
-            # Clear plots
-            self.fresh_start()
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
 
-            # Reinitialize serial configuration frames
-            self.update_serial_config_static_frames()
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
+
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
+
+                # Clear plots
+                self.fresh_start()
+
+                # Reinitialize serial configuration frames
+                self.update_serial_config_static_frames()
+
+            elif self.mode == "live dynamic":
+                # Reset serial configuration settings
+                if self.port_var:
+                    self.port_var.set("Select Port")  # Default port option
+                if self.baudrate_var:
+                    self.baudrate_var.set(115200)  # Default baudrate
+                if self.timeout_var:
+                    self.timeout_var.set(1.0)  # Default timeout
+                if self.duration_var:
+                    self.duration_var.set(30.0)  # Default duration
+                # Clear the serial configuration frame holder
+                for widget in self.serial_config_frame_holder.winfo_children():
+                    widget.destroy()
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
+
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
+
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
+
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
+
+                # Clear plots
+                self.fresh_start()
+
+                # Reinitialize serial configuration frames
+                self.update_serial_config_dynamic_frames()
+
             messagebox.showinfo("Clear", "All configurations have been reset.")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred while clearing configurations: {e}")
@@ -1380,7 +1481,7 @@ class GNSSTestTool:
             self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for port {port}).")
 
         # Calculate sats summary and log the results
-        gsv_sats_summary_stats= nmea_data.calculate_satellite_statistics()
+        gsv_sats_summary_stats = nmea_data.calculate_satellite_statistics()
 
         # GSV Satellite Statistics
         if not gsv_sats_summary_stats.empty:
@@ -1413,7 +1514,7 @@ class GNSSTestTool:
         nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
 
     # noinspection PyCompatibility
-    def parse_nmea_from_log(self,file_path, console_widget):
+    def parse_nmea_from_log(self,file_path, console_widget, stop_event):
         """
         Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences.
 
@@ -1422,6 +1523,7 @@ class GNSSTestTool:
 
         Returns:
             tuple: A list of parsed sentences and an NMEAData object.
+            :param stop_event:
             :param file_path:
             :param console_widget:
         """
@@ -1460,6 +1562,12 @@ class GNSSTestTool:
                 logging.error(f"Unsupported file type: {file_path}")
                 raise ValueError("Unsupported file type. Supported formats: .txt, .log, .nmea, .csv, .xlsx")
 
+            if stop_event and stop_event.is_set():  # Check if stop_event is set
+                logging.info(f"Stop signal received. Ending file processing for {file_path}.")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Stop signal received for {file_path}.")
+                    return
+
             # Process each line in the file
             for nmea_sentence in lines:
                 nmea_sentence = nmea_sentence.strip()
@@ -1467,7 +1575,11 @@ class GNSSTestTool:
                 if console_widget:
                     self.append_to_console_specific(console_widget, f"Processing sentence: {nmea_sentence}")
 
-
+                if stop_event and stop_event.is_set():  # Check if stop_event is set
+                    logging.info(f"Stop signal received. Ending file processing for {file_path}.")
+                    if console_widget:
+                        self.append_to_console_specific(console_widget, f"Stop signal received for {file_path}.")
+                        return
                 try:
                     if nmea_sentence.startswith('$PQTM'):
                         logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
@@ -1558,11 +1670,11 @@ class GNSSTestTool:
 
         # Process the file to get parsed sentences
         try:
-            parsed_sentences, nmea_data = self.parse_nmea_from_log(file_path, console_widget)
+            parsed_sentences, nmea_data = self.parse_nmea_from_log(file_path, console_widget, stop_event)
         except Exception as e:
-            logging.error(f"Error during parsing NMEA log file: {file_path}. Exception: {e}")
+            logging.error(f"Error during parsing NMEA log file or test stopped: {file_path}. Exception: {e}")
             if console_widget:
-                self.append_to_console_specific(console_widget, f"Error during parsing NMEA log file: {file_path}. Exception: {e}")
+                self.append_to_console_specific(console_widget, f"Error during parsing NMEA log file or test stopped: {file_path}. Exception: {e}")
             return
 
         if not parsed_sentences:
@@ -1597,6 +1709,7 @@ class GNSSTestTool:
             cep_value = nmea_data.calculate_cep(reference_point)
             if cep_value is not None:
                 self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{file_path}")
+                self.update_accuracy_summary_table(f"Device-{file_path}", cep_value)
                 logging.info(f"Mode 2: CEP statistics for logfile {file_path}:")
                 self.append_to_console_specific(console_widget, f"Mode 2: CEP statistics for logfile {file_path}:")
                 logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
@@ -1680,7 +1793,6 @@ class GNSSTestTool:
 
         Args:
             device_name (str): The name of the device.
-            config (dict): Configuration details of the device (e.g., port, baudrate).
             device_logs (dict): Dictionary to store the device's text widget for logging.
         """
         # Add a tab for this device in the nested notebook
@@ -1953,8 +2065,6 @@ class GNSSTestTool:
         if hasattr(self, "satellite_summary_table"):
             self.satellite_summary_table.delete(*self.satellite_summary_table.get_children())
             self.satellite_table_data = {}
-
-
 
 if __name__ == "__main__":
 
