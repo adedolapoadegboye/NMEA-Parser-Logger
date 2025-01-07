@@ -5,6 +5,7 @@ import serial.tools.list_ports
 from datetime import datetime
 import os
 import threading
+from time import sleep
 import sys
 from time import time
 from gui_class import NMEAData
@@ -1214,8 +1215,8 @@ class GNSSTestTool:
             for thread in threads:
                 thread.join()
 
-            # # Call the final plot function with aggregated data
-            # self.finalize_accuracy_plot()
+            # Call the final plot function with aggregated data
+            self.finalize_dynamic_accuracy_plot()
 
             # Notify the user if not stopped
             if not self.stop_event.is_set():
@@ -1762,10 +1763,17 @@ class GNSSTestTool:
         if dynamic_reference:
             self.dynamic_reference_points = dynamic_fix_points
 
+        print(name, self.dynamic_reference_points, dynamic_fix_points)
+
         # Calculate CEP and log the results
+        for _ in range(5):
+            if self.dynamic_reference_points:
+                break
+            sleep(1)
+            logging.info("Waiting for dynamic_reference_points to be populated...")
         cep_value = nmea_data.calculate_dynamic_cep(self.dynamic_reference_points, dynamic_fix_points)
         if cep_value:
-            # self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
+            self.update_dynamic_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
             self.update_dynamic_accuracy_summary_table(f"Device-{port}", cep_value)
             logging.info(f"Mode 1: CEP statistics for port {port}:")
             self.append_to_console_specific(console_widget, f"Mode 1: CEP statistics for port {port}:")
@@ -2208,6 +2216,89 @@ class GNSSTestTool:
         # Draw the canvas
         self.canvas.draw()
 
+    def update_dynamic_accuracy_plot(self, distances, valid_coords, device_name):
+        """
+        Updates the accuracy plot data for a specific device.
+
+        Args:
+            distances (list[float]): List of distances from the reference point.
+            valid_coords (list[tuple]): List of tuples containing latitude, longitude, and fix_time.
+            device_name (str): Name of the device (used in the legend).
+        """
+        # Ensure device_plot_data is initialized and is a dictionary
+        if not hasattr(self, "device_plot_data") or not isinstance(self.device_plot_data, dict):
+            self.device_plot_data = {}
+
+        # Reset data if device_name already exists to avoid duplication
+        if device_name not in self.device_plot_data:
+            self.device_plot_data[device_name] = {'fix_times': [], 'distances': []}
+        else:
+            self.device_plot_data[device_name]['fix_times'].clear()
+            self.device_plot_data[device_name]['distances'].clear()
+
+        # Extract fix_times and ensure they are datetime objects
+        fix_times = [fix_time for _, _, fix_time in valid_coords]
+        if isinstance(fix_times[0], datetime.time):  # If fix_time is a datetime.time object
+            # Use the current date as a reference
+            reference_date = datetime.datetime.now().date()
+            fix_times = [datetime.datetime.combine(reference_date, t) for t in fix_times]
+
+        # Update the device's data
+        self.device_plot_data[device_name]['fix_times'].extend(fix_times)
+        self.device_plot_data[device_name]['distances'].extend(distances)
+
+    def finalize_dynamic_accuracy_plot(self):
+        """
+        Finalizes and displays the accuracy plot after all threads have completed.
+        Ensures no duplicate toolbar buttons are created.
+        """
+
+        # Clear existing canvas if it exists
+        if hasattr(self, "canvas_widget") and self.canvas_widget.winfo_exists():
+            self.canvas_widget.destroy()
+
+        # Clear existing toolbar if it exists
+        if hasattr(self, "toolbar") and self.toolbar:
+            self.toolbar.destroy()
+
+        # Initialize the plot if not already done
+        if not hasattr(self, "fig"):
+            self.fig, self.ax = plt.subplots(figsize=(8, 6))
+        else:
+            self.ax.clear()  # Clear existing axes
+
+        # Plot the data for each device
+        for device_name, device_data in self.device_plot_data.items():
+            self.ax.plot(
+                device_data['fix_times'],
+                device_data['distances'],
+                label=device_name,
+                marker='o',
+                linestyle='-',
+                picker=5  # Enable picking for click events
+            )
+
+        # Set plot titles and labels
+        self.ax.set_title("Accuracy Plot")
+        self.ax.set_xlabel("Fix Time (UTC)")
+        self.ax.set_ylabel("Error (meters)")
+        self.ax.legend()
+
+        # Reinitialize the canvas
+        self.canvas = FigureCanvasTkAgg(self.fig, self.accuracy_graph_frame)
+        self.canvas_widget = self.canvas.get_tk_widget()
+        self.canvas_widget.pack(fill="both", expand=True)
+
+        # Add a new toolbar
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.accuracy_graph_frame)
+        self.toolbar.update()
+
+        # Pack the toolbar below the plot
+        self.toolbar.pack(side="bottom", fill="x")
+
+        # Draw the canvas
+        self.canvas.draw()
+
     def update_accuracy_summary_table(self, device_name, cep_stats):
         """
         Updates the summary table with CEP statistics for a specific device.
@@ -2341,6 +2432,7 @@ class GNSSTestTool:
         self.clear_satellite_summary_table()
         self.clear_device_plot_data()
         self.clear_accuracy_plot()
+        self.clear_dynamic_reference_points()
 
     def enable_zoom_pan(self):
         """
@@ -2408,6 +2500,13 @@ class GNSSTestTool:
         if hasattr(self, "satellite_summary_table"):
             self.satellite_summary_table.delete(*self.satellite_summary_table.get_children())
             self.satellite_table_data = {}
+
+    def clear_dynamic_reference_points(self):
+        """
+        Clears the content of self.dynamic_reference_points if it is a list.
+        """
+        if hasattr(self, 'dynamic_reference_points'):
+            self.dynamic_reference_points.clear()
 
 if __name__ == "__main__":
 

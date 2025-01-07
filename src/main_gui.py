@@ -5,6 +5,7 @@ import serial.tools.list_ports
 from datetime import datetime
 import os
 import threading
+from time import sleep
 import sys
 from time import time
 from gui_class import NMEAData
@@ -1104,7 +1105,7 @@ class GNSSTestTool:
         """Ensure only one reference device checkbox can be selected."""
         # Update the reference device index
         if self.reference_device_index == selected_index:
-            self.reference_device_index = None  # Deselect if the same device is clicked again
+            self.reference_device_index = 0  # Deselect if the same device is clicked again
         else:
             self.reference_device_index = selected_index  # Set the new reference device
 
@@ -1214,8 +1215,8 @@ class GNSSTestTool:
             for thread in threads:
                 thread.join()
 
-            # # Call the final plot function with aggregated data
-            # self.finalize_accuracy_plot()
+            # Call the final plot function with aggregated data
+            self.finalize_dynamic_accuracy_plot()
 
             # Notify the user if not stopped
             if not self.stop_event.is_set():
@@ -1762,10 +1763,17 @@ class GNSSTestTool:
         if dynamic_reference:
             self.dynamic_reference_points = dynamic_fix_points
 
+        print(name, self.dynamic_reference_points, dynamic_fix_points)
+
         # Calculate CEP and log the results
+        for _ in range(5):
+            if self.dynamic_reference_points:
+                break
+            sleep(1)
+            logging.info("Waiting for dynamic_reference_points to be populated...")
         cep_value = nmea_data.calculate_dynamic_cep(self.dynamic_reference_points, dynamic_fix_points)
         if cep_value:
-            # self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
+            self.update_dynamic_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
             self.update_dynamic_accuracy_summary_table(f"Device-{port}", cep_value)
             logging.info(f"Mode 1: CEP statistics for port {port}:")
             self.append_to_console_specific(console_widget, f"Mode 1: CEP statistics for port {port}:")
@@ -2424,6 +2432,7 @@ class GNSSTestTool:
         self.clear_satellite_summary_table()
         self.clear_device_plot_data()
         self.clear_accuracy_plot()
+        self.clear_dynamic_reference_points()
 
     def enable_zoom_pan(self):
         """
@@ -2491,6 +2500,13 @@ class GNSSTestTool:
         if hasattr(self, "satellite_summary_table"):
             self.satellite_summary_table.delete(*self.satellite_summary_table.get_children())
             self.satellite_table_data = {}
+
+    def clear_dynamic_reference_points(self):
+        """
+        Clears the content of self.dynamic_reference_points if it is a list.
+        """
+        if hasattr(self, 'dynamic_reference_points'):
+            self.dynamic_reference_points.clear()
 
 if __name__ == "__main__":
 

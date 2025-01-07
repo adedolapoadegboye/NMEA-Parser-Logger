@@ -1561,7 +1561,7 @@ class NMEAData:
             logging.info(f"Data written to {filepath}")
 
         except Exception as e:
-            logging.error(f"Error writing to Excel file sss: {e}")
+            logging.error(f"Error writing to Excel file: {e}")
 
     @staticmethod
     def setup_logging(log_folder, timestamp):
