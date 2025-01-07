@@ -17,6 +17,7 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 class GNSSTestTool:
     def __init__(self, root):
+        self.dynamic_reference_points = []
         self.mode = None
         self.file_config_frame_holder = None
         self.results_frame_content = None
@@ -49,7 +50,7 @@ class GNSSTestTool:
         self.tooltip = None
         self.ref_var = None
         self.reference_device_vars = []
-        self.reference_device_index = None
+        self.reference_device_index = 0
         self.result_frame = None
         self.setup_frame = None
         self.file_var = None
@@ -943,23 +944,12 @@ class GNSSTestTool:
 
                 # Add device configuration to the dictionary
                 devices[f"device_{i + 1}"] = {
-                    "name": f"Device {i + 1}",
+                    "name": i + 1,
                     "port": port,
                     "baudrate": baudrate,
                     "timeout": timeout,
                     "duration": duration
                 }
-
-            if self.use_reference is not None:
-                try:
-                    ref_lat = self.lat_var.get()
-                    ref_lon = self.lon_var.get()
-                    reference_point = (float(ref_lat), float(ref_lon))
-                except ValueError as e:
-                    messagebox.showerror("Error", f"Invalid reference point: {e}")
-                    return
-            else:
-                reference_point = None
 
             self.fresh_start()
 
@@ -971,7 +961,7 @@ class GNSSTestTool:
 
             # Run the test in a separate thread
             test_thread = threading.Thread(
-                target=self.run_live_test_2, args=(devices, log_folder, timestamp, reference_point)
+                target=self.run_live_test_2, args=(devices, log_folder, timestamp)
             )
             test_thread.start()
 
@@ -1196,7 +1186,7 @@ class GNSSTestTool:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred during the test: {e}")
 
-    def run_live_test_2(self, devices, log_folder, timestamp, reference_point):
+    def run_live_test_2(self, devices, log_folder, timestamp):
         """Run the test on a separate thread."""
         try:
             # Dictionary to map device names to their corresponding text widgets
@@ -1214,7 +1204,7 @@ class GNSSTestTool:
                     target=self.read_nmea_data_2,
                     args=(
                         config["port"], config["baudrate"], config["timeout"], config["duration"],
-                        log_folder, timestamp, reference_point, self.stop_event, device_logs[device_name]
+                        log_folder, timestamp, self.stop_event, device_logs[device_name], config["name"],
                     )
                 )
                 threads.append(thread)
@@ -1224,8 +1214,8 @@ class GNSSTestTool:
             for thread in threads:
                 thread.join()
 
-            # Call the final plot function with aggregated data
-            self.finalize_accuracy_plot()
+            # # Call the final plot function with aggregated data
+            # self.finalize_accuracy_plot()
 
             # Notify the user if not stopped
             if not self.stop_event.is_set():
@@ -1631,7 +1621,7 @@ class GNSSTestTool:
             # Save parsed data to Excel
         nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
 
-    def read_nmea_data_2(self, port, baudrate, timeout, duration, log_folder, timestamp, reference_point=None, stop_event=None, console_widget=None):
+    def read_nmea_data_2(self, port, baudrate, timeout, duration, log_folder, timestamp, stop_event=None, console_widget=None, name=None):
         """
         Reads live NMEA data from a serial port and processes it.
 
@@ -1644,8 +1634,8 @@ class GNSSTestTool:
             timestamp (str): Timestamp to append to file names.
             reference_point (tuple, optional): Custom reference point for CEP calculation.
             stop_event (threading.Event, optional): Event to signal the function to stop.
+            :param name:
             :param stop_event:
-            :param reference_point:
             :param timestamp:
             :param log_folder:
             :param duration:
@@ -1655,6 +1645,7 @@ class GNSSTestTool:
             :param console_widget:
         """
         parsed_sentences = []
+        dynamic_fix_points = []
         start_time = time()
         nmea_data = NMEAData(None, None, parsed_sentences)
 
@@ -1670,6 +1661,12 @@ class GNSSTestTool:
         except Exception as e:
             logging.error(f"Error opening log file {raw_nmea_log_path}: {e}")
             return
+
+
+        if int(name) == int(self.reference_device_index):
+            dynamic_reference = True
+        else:
+            dynamic_reference = False
 
         try:
             # Attempt to configure and open the serial port
@@ -1723,9 +1720,8 @@ class GNSSTestTool:
                             logging.warning(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                             self.append_to_console_specific(console_widget, f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
                         continue
-
                     # Handle standard NMEA sentences
-                    if nmea_sentence.startswith('$G'):
+                    elif nmea_sentence.startswith('$G'):
                         logging.info(f"Standard NMEA Message: {nmea_sentence}")
                         self.append_to_console_specific(console_widget, f"Standard NMEA Message: {nmea_sentence}")
                         try:
@@ -1738,6 +1734,7 @@ class GNSSTestTool:
                             nmea_data.data = msg
                             nmea_data.add_sentence_data()
                             nmea_data.add_coordinates()
+                            dynamic_fix_points = nmea_data.coordinates
                             logging.info(nmea_data)
                             self.append_to_console_specific(console_widget, nmea_data)
                         except pynmea2.ParseError as e:
@@ -1762,11 +1759,14 @@ class GNSSTestTool:
             logging.info(f"Log file {raw_nmea_log_path} closed.")
             self.append_to_console_specific(console_widget, f"Log file {raw_nmea_log_path} closed.")
 
+        if dynamic_reference:
+            self.dynamic_reference_points = dynamic_fix_points
+
         # Calculate CEP and log the results
-        cep_value = nmea_data.calculate_cep(reference_point)
+        cep_value = nmea_data.calculate_dynamic_cep(self.dynamic_reference_points, dynamic_fix_points)
         if cep_value:
-            self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
-            self.update_accuracy_summary_table(f"Device-{port}", cep_value)
+            # self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
+            self.update_dynamic_accuracy_summary_table(f"Device-{port}", cep_value)
             logging.info(f"Mode 1: CEP statistics for port {port}:")
             self.append_to_console_specific(console_widget, f"Mode 1: CEP statistics for port {port}:")
             logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
@@ -1781,7 +1781,7 @@ class GNSSTestTool:
             self.append_to_console_specific(console_widget, f"CEP99: {cep_value['CEP99']:.2f} meters")
         else:
             logging.info(f"No coordinates available for CEP calculation for port {port}.")
-            self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for port {port}).")
+            self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for port {port}.")
 
         # Calculate sats summary and log the results
         gsv_sats_summary_stats = nmea_data.calculate_satellite_statistics()
@@ -1815,7 +1815,7 @@ class GNSSTestTool:
 
             # Save parsed data to Excel
 
-        nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
+        nmea_data.write_to_excel_mode_1_dynamic(port, baudrate, timestamp, cep_value)
 
     # noinspection PyCompatibility
     def parse_nmea_from_log(self,file_path, console_widget, stop_event):
@@ -2208,6 +2208,89 @@ class GNSSTestTool:
         # Draw the canvas
         self.canvas.draw()
 
+    def update_dynamic_accuracy_plot(self, distances, valid_coords, device_name):
+        """
+        Updates the accuracy plot data for a specific device.
+
+        Args:
+            distances (list[float]): List of distances from the reference point.
+            valid_coords (list[tuple]): List of tuples containing latitude, longitude, and fix_time.
+            device_name (str): Name of the device (used in the legend).
+        """
+        # Ensure device_plot_data is initialized and is a dictionary
+        if not hasattr(self, "device_plot_data") or not isinstance(self.device_plot_data, dict):
+            self.device_plot_data = {}
+
+        # Reset data if device_name already exists to avoid duplication
+        if device_name not in self.device_plot_data:
+            self.device_plot_data[device_name] = {'fix_times': [], 'distances': []}
+        else:
+            self.device_plot_data[device_name]['fix_times'].clear()
+            self.device_plot_data[device_name]['distances'].clear()
+
+        # Extract fix_times and ensure they are datetime objects
+        fix_times = [fix_time for _, _, fix_time in valid_coords]
+        if isinstance(fix_times[0], datetime.time):  # If fix_time is a datetime.time object
+            # Use the current date as a reference
+            reference_date = datetime.datetime.now().date()
+            fix_times = [datetime.datetime.combine(reference_date, t) for t in fix_times]
+
+        # Update the device's data
+        self.device_plot_data[device_name]['fix_times'].extend(fix_times)
+        self.device_plot_data[device_name]['distances'].extend(distances)
+
+    def finalize_dynamic_accuracy_plot(self):
+        """
+        Finalizes and displays the accuracy plot after all threads have completed.
+        Ensures no duplicate toolbar buttons are created.
+        """
+
+        # Clear existing canvas if it exists
+        if hasattr(self, "canvas_widget") and self.canvas_widget.winfo_exists():
+            self.canvas_widget.destroy()
+
+        # Clear existing toolbar if it exists
+        if hasattr(self, "toolbar") and self.toolbar:
+            self.toolbar.destroy()
+
+        # Initialize the plot if not already done
+        if not hasattr(self, "fig"):
+            self.fig, self.ax = plt.subplots(figsize=(8, 6))
+        else:
+            self.ax.clear()  # Clear existing axes
+
+        # Plot the data for each device
+        for device_name, device_data in self.device_plot_data.items():
+            self.ax.plot(
+                device_data['fix_times'],
+                device_data['distances'],
+                label=device_name,
+                marker='o',
+                linestyle='-',
+                picker=5  # Enable picking for click events
+            )
+
+        # Set plot titles and labels
+        self.ax.set_title("Accuracy Plot")
+        self.ax.set_xlabel("Fix Time (UTC)")
+        self.ax.set_ylabel("Error (meters)")
+        self.ax.legend()
+
+        # Reinitialize the canvas
+        self.canvas = FigureCanvasTkAgg(self.fig, self.accuracy_graph_frame)
+        self.canvas_widget = self.canvas.get_tk_widget()
+        self.canvas_widget.pack(fill="both", expand=True)
+
+        # Add a new toolbar
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.accuracy_graph_frame)
+        self.toolbar.update()
+
+        # Pack the toolbar below the plot
+        self.toolbar.pack(side="bottom", fill="x")
+
+        # Draw the canvas
+        self.canvas.draw()
+
     def update_accuracy_summary_table(self, device_name, cep_stats):
         """
         Updates the summary table with CEP statistics for a specific device.
@@ -2234,6 +2317,45 @@ class GNSSTestTool:
             f"{cep_stats['CEP95']:.2f}",
             f"{cep_stats['CEP99']:.2f}",
             f"({cep_stats['reference_point'][0]:.6f}, {cep_stats['reference_point'][1]:.6f})"        )
+
+        # Check if the device already has a row
+        if device_name in self.accuracy_table_data:
+            # Update existing row (remove and re-insert with updated values)
+            for item in self.accuracy_summary_table.get_children():
+                if self.accuracy_summary_table.item(item, "values")[0] == device_name:
+                    self.accuracy_summary_table.delete(item)
+                    break
+
+        # Insert the updated or new row
+        self.accuracy_summary_table.insert("", "end", values=row)
+        self.accuracy_table_data[device_name] = row  # Save the row in the dictionary
+
+    def update_dynamic_accuracy_summary_table(self, device_name, cep_stats):
+        """
+        Updates the summary table with CEP statistics for a specific device.
+
+        Args:
+            device_name (str): Name of the device.
+            cep_stats (dict): CEP statistics for the device.
+        """
+        # Initialize the Treeview widget if not already done
+        if not hasattr(self, "accuracy_summary_table"):
+            columns = ["Device", "Fixes", "CEP50 (m)", "CEP68 (m)", "CEP95 (m)", "CEP99 (m)", "Reference Point"]
+            self.accuracy_summary_table = ttk.Treeview(self.accuracy_summary_frame, columns=columns, show="headings")
+            for col in columns:
+                self.accuracy_summary_table.heading(col, text=col)
+                self.accuracy_summary_table.column(col, anchor="center", width=120)
+            self.accuracy_summary_table.pack(fill="x", expand=True)
+
+        # Add or update the row for the device
+        row = (
+            device_name,
+            cep_stats['num_points'],
+            f"{cep_stats['CEP50']:.2f}",
+            f"{cep_stats['CEP68']:.2f}",
+            f"{cep_stats['CEP95']:.2f}",
+            f"{cep_stats['CEP99']:.2f}",
+            "dynamic"        )
 
         # Check if the device already has a row
         if device_name in self.accuracy_table_data:
