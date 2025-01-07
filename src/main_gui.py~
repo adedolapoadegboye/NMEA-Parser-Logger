@@ -447,13 +447,19 @@ class GNSSTestTool:
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def update_serial_config_dynamic_frames(self, event=None):
-        """Update the serial configuration frames based on the selected number of devices."""
+        """Update the serial configuration frames dynamically based on the selected number of devices."""
         # Clear existing frames
         for widget in self.serial_config_frame_holder.winfo_children():
             widget.destroy()
 
         # Get the number of devices
         num_devices = int(self.num_devices_var.get())
+
+        # Initialize a list to store individual device port configurations
+        self.port_vars = [tk.StringVar(value="Select Port") for _ in range(num_devices)]
+        self.baudrate_vars = [tk.IntVar(value=115200) for _ in range(num_devices)]
+        self.timeout_vars = [tk.DoubleVar(value=1) for _ in range(num_devices)]
+        self.duration_vars = [tk.DoubleVar(value=30) for _ in range(num_devices)]
 
         # Generate serial config frames
         for device_index in range(1, num_devices + 1):
@@ -462,24 +468,26 @@ class GNSSTestTool:
             )
             config_frame.pack(fill="x", padx=10, pady=5)
 
-           # Serial Port
-            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w",
-                                                                                 padx=10,
-                                                                                 pady=5)
-            self.port_var = tk.StringVar(value="Select Port")
-            port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30, font=("Arial", 10)
-)
+            # Serial Port
+            ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10,
+                                                                                  pady=5)
+            port_dropdown = ttk.Combobox(
+                config_frame,
+                textvariable=self.port_vars[device_index - 1],
+                state="readonly",
+                width=30,
+                font=("Arial", 10)
+            )
             port_dropdown.grid(row=0, column=1, padx=10, pady=5)
             self.refresh_serial_ports(port_dropdown)
 
             # Baudrate
             ttk.Label(config_frame, text="Baudrate:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10,
-                                                                              pady=5)
+                                                                               pady=5)
             baudrates = ["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"]
-            self.baudrate_var = tk.IntVar(value=115200)  # Default value
             baudrate_dropdown = ttk.Combobox(
                 config_frame,
-                textvariable=self.baudrate_var,
+                textvariable=self.baudrate_vars[device_index - 1],
                 state="readonly",
                 values=baudrates,
                 width=30,
@@ -488,31 +496,45 @@ class GNSSTestTool:
             baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
 
             # Timeout
-            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
-                                                                                 padx=10,
-                                                                                 pady=5)
-            self.timeout_var = tk.DoubleVar(value=1)
-            ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 10)).grid(row=2, column=1, padx=10, pady=5)
+            ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w", padx=10,
+                                                                                  pady=5)
+            ttk.Entry(
+                config_frame,
+                textvariable=self.timeout_vars[device_index - 1],
+                width=30,
+                font=("Arial", 10)
+            ).grid(row=2, column=1, padx=10, pady=5)
 
             # Duration
-            ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
-                                                                                  padx=10,
-                                                                                  pady=5)
-            self.duration_var = tk.DoubleVar(value=30)
-            ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 10)).grid(row=3, column=1, padx=10, pady=5)
+            ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w", padx=10,
+                                                                                   pady=5)
+            ttk.Entry(
+                config_frame,
+                textvariable=self.duration_vars[device_index - 1],
+                width=30,
+                font=("Arial", 10)
+            ).grid(row=3, column=1, padx=10, pady=5)
 
             # Reference Device Checkbox
             self.ref_var = tk.BooleanVar(value=(self.reference_device_index == device_index))
             ref_checkbox = ttk.Checkbutton(
                 config_frame,
                 text="Reference Device",
-                variable=self.ref_var,  # Bind the checkbox to this variable
+                variable=self.ref_var,
                 command=lambda idx=device_index: self.toggle_reference(idx)
             )
             ref_checkbox.grid(row=4, column=0, columnspan=2, sticky="w", padx=10, pady=5)
+
             # Save device configuration variables
-            config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var, "timeout_var": self.timeout_var,
-                                 "duration_var": self.duration_var, "ref_var": self.ref_var, "device_index": device_index, "ref_checkbox": ref_checkbox}
+            config_frame.vars = {
+                "port_var": self.port_vars[device_index - 1],
+                "baudrate_var": self.baudrate_vars[device_index - 1],
+                "timeout_var": self.timeout_vars[device_index - 1],
+                "duration_var": self.duration_vars[device_index - 1],
+                "ref_var": self.ref_var,
+                "ref_checkbox": ref_checkbox,
+                "device_index": device_index
+            }
 
         # Frame to hold the buttons
         button_frame = ttk.Frame(self.serial_config_frame_holder)
@@ -527,7 +549,7 @@ class GNSSTestTool:
         stop_button.grid(row=0, column=1, padx=5)
 
         # Add Clear Button
-        clear_button = ttk.Button(button_frame, text="Clear Settings", command=self.clear_all_configs)
+        clear_button = ttk.Button(button_frame, text="Clear", command=self.clear_all_configs)
         clear_button.grid(row=0, column=2, padx=5)
 
         # Bind window close to stop tests
@@ -827,7 +849,7 @@ class GNSSTestTool:
         self.lon_entry.grid(row=3, column=1, padx=10, pady=5)
 
         # Process Button
-        ttk.Button(file_frame, text="Process", command=self.start_file_mode).grid(row=4, column=0, columnspan=3, pady=15)
+        ttk.Button(file_frame, text="Process", command=self.start_file_mode_2).grid(row=4, column=0, columnspan=3, pady=15)
 
     def start_live_mode(self):
         """Start live data collection."""
@@ -895,13 +917,14 @@ class GNSSTestTool:
 
     def start_live_mode_2(self):
         """Start live data collection."""
-        self.mode = "live static"
+        self.mode = "live dynamic"
         try:
             # Reset stop event
             self.stop_event.clear()
 
             # Validate port selection for each device
-            num_devices = len(self.port_vars)  # Ensure the number of devices matches
+            num_devices = int(self.num_devices_var.get())
+
             devices = {}
             for i in range(num_devices):
                 port = self.port_vars[i].get()
@@ -927,6 +950,60 @@ class GNSSTestTool:
                     "duration": duration
                 }
 
+            if self.use_reference is not None:
+                try:
+                    ref_lat = self.lat_var.get()
+                    ref_lon = self.lon_var.get()
+                    reference_point = (float(ref_lat), float(ref_lon))
+                except ValueError as e:
+                    messagebox.showerror("Error", f"Invalid reference point: {e}")
+                    return
+            else:
+                reference_point = None
+
+            self.fresh_start()
+
+            # Setup logging
+            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S%f')
+            log_folder = f"logs/NMEA_{timestamp}"
+            os.makedirs(log_folder, exist_ok=True)
+            self.setup_logging(log_folder, timestamp)
+
+            # Run the test in a separate thread
+            test_thread = threading.Thread(
+                target=self.run_live_test_2, args=(devices, log_folder, timestamp, reference_point)
+            )
+            test_thread.start()
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to start dynamic live test: {e}")
+            logging.error(f"Failed to start live test: {e}")
+
+    def start_file_mode(self):
+        """Process the selected log files."""
+        self.mode = "file static"
+        try:
+            # Reset stop event
+            self.stop_event.clear()
+            self.fresh_start()
+            # Validate file path selection
+            if int(self.num_devices_var.get()) != len(self.file_var):
+                messagebox.showerror("Error", "Please provide the same number of log files indicated in the general config section.")# Ensure the number of selected logfiles matches the selected number
+            else:
+                pass
+            devices = {}
+            for i in range(int(self.num_devices_var.get())):
+                file_var = self.file_var[i].get()
+                if file_var == "Select Log File" or file_var == "":
+                    messagebox.showerror("Error", f"Please select a valid file for Logfile {i + 1}.")
+                    return
+
+                #Add logfile to the dictionary
+                devices[f"device_{i + 1}"] = {
+                    "name": f"Device {i + 1}",
+                    "file": file_var,
+                }
+
             # Validate reference point if enabled
             if self.use_reference.get():
                 try:
@@ -949,17 +1026,17 @@ class GNSSTestTool:
 
             # Run the test in a separate thread
             test_thread = threading.Thread(
-                target=self.run_live_test, args=(devices, log_folder, timestamp, reference_point)
+                target=self.run_file_test, args=(devices, log_folder, timestamp, reference_point)
             )
             test_thread.start()
 
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to start live test: {e}")
-            logging.error(f"Failed to start live test: {e}")
+            messagebox.showerror("Error", f"Failed to start file mode: {e}")
+            logging.error(f"Failed to start file mode: {e}")
 
-    def start_file_mode(self):
+    def start_file_mode_2(self):
         """Process the selected log files."""
-        self.mode = "file static"
+        self.mode = "file dynamic"
         try:
             # Reset stop event
             self.stop_event.clear()
@@ -1095,6 +1172,46 @@ class GNSSTestTool:
                 # Create and start a thread for each device
                 thread = threading.Thread(
                     target=self.read_nmea_data,
+                    args=(
+                        config["port"], config["baudrate"], config["timeout"], config["duration"],
+                        log_folder, timestamp, reference_point, self.stop_event, device_logs[device_name]
+                    )
+                )
+                threads.append(thread)
+                thread.start()
+
+            # Wait for threads to finish
+            for thread in threads:
+                thread.join()
+
+            # Call the final plot function with aggregated data
+            self.finalize_accuracy_plot()
+
+            # Notify the user if not stopped
+            if not self.stop_event.is_set():
+                messagebox.showinfo("Success", "Data Analysis completed successfully.")
+            else:
+                pass
+                # messagebox.showinfo("Stop action completed", "Test stopped by the user.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred during the test: {e}")
+
+    def run_live_test_2(self, devices, log_folder, timestamp, reference_point):
+        """Run the test on a separate thread."""
+        try:
+            # Dictionary to map device names to their corresponding text widgets
+            device_logs = {}
+
+            # Create dynamic tabs for each device in the nested device_notebook
+            for device_name, config in devices.items():
+                self.create_device_tab(device_name, device_logs)
+
+            threads = []
+
+            for device_name, config in devices.items():
+                # Create and start a thread for each device
+                thread = threading.Thread(
+                    target=self.read_nmea_data_2,
                     args=(
                         config["port"], config["baudrate"], config["timeout"], config["duration"],
                         log_folder, timestamp, reference_point, self.stop_event, device_logs[device_name]
@@ -1383,6 +1500,192 @@ class GNSSTestTool:
                 logging.info(f"Connected to serial port {port} with baudrate {baudrate}.")
             except serial.SerialException as e:
                 logging.error(f"Error opening serial port {port}: {e}")
+                self.append_to_console_specific(console_widget, f"Error opening serial port {port}: {e}")
+                return  # Exit function if serial port cannot be opened
+
+            # Continuously read from serial port until duration expires or stop_event is set
+            while time() - start_time < duration:
+                if stop_event and stop_event.is_set():  # Check if stop_event is set
+                    logging.info(f"Stop signal received. Ending data collection on {port}.")
+                    if console_widget:
+                        self.append_to_console_specific(console_widget, f"Stop signal received for {port}.")
+                    break
+                try:
+                    nmea_sentence = ser.readline().decode('ascii', errors='replace').strip()
+
+                    try:
+                        raw_nmea_log.write(nmea_sentence + "\n")
+                    except Exception as e:
+                        logging.error(f"Error writing NMEA sentence to log file: {e}")
+
+                    # Handle proprietary NMEA sentences
+                    if nmea_sentence.startswith('$PQTM'):
+                        logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
+                        if console_widget:
+                            self.append_to_console_specific(console_widget, f"Proprietary NMEA Message: {nmea_sentence}")
+                        try:
+                            msg = pynmea2.parse(nmea_sentence)
+                            if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                                raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence",
+                                                         msg)
+
+                            nmea_data.sentence_type = msg.sentence_type
+                            nmea_data.data = msg
+                            nmea_data.add_sentence_data()
+                            nmea_data.add_coordinates()
+                            logging.info(nmea_data)
+                        except pynmea2.ParseError as e:
+                            logging.warning(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                        continue
+
+                    # Handle standard NMEA sentences
+                    if nmea_sentence.startswith('$G'):
+                        logging.info(f"Standard NMEA Message: {nmea_sentence}")
+                        self.append_to_console_specific(console_widget, f"Standard NMEA Message: {nmea_sentence}")
+                        try:
+                            msg = pynmea2.parse(nmea_sentence)
+                            if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                                raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence",
+                                                         msg)
+
+                            nmea_data.sentence_type = msg.sentence_type
+                            nmea_data.data = msg
+                            nmea_data.add_sentence_data()
+                            nmea_data.add_coordinates()
+                            logging.info(nmea_data)
+                            self.append_to_console_specific(console_widget, nmea_data)
+                        except pynmea2.ParseError as e:
+                            logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+                    else:
+                        logging.info(f"Unknown Message: {nmea_sentence}")
+                        self.append_to_console_specific(console_widget, f"Unknown Message: {nmea_sentence}")
+
+                except serial.SerialException as e:
+                    logging.error(f"Error reading from serial port: {e}")
+                    self.append_to_console_specific(console_widget, f"Error reading from serial port: {e}")
+                    break
+
+        except Exception as e:
+            logging.error(f"Unexpected error during serial read: {e}")
+            self.append_to_console_specific(console_widget, f"Unexpected error during serial read: {e}")
+
+        finally:
+            # Ensure the log file is closed properly
+            raw_nmea_log.close()
+            logging.info(f"Log file {raw_nmea_log_path} closed.")
+            self.append_to_console_specific(console_widget, f"Log file {raw_nmea_log_path} closed.")
+
+        # Calculate CEP and log the results
+        cep_value = nmea_data.calculate_cep(reference_point)
+        if cep_value:
+            self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{port}")
+            self.update_accuracy_summary_table(f"Device-{port}", cep_value)
+            logging.info(f"Mode 1: CEP statistics for port {port}:")
+            self.append_to_console_specific(console_widget, f"Mode 1: CEP statistics for port {port}:")
+            logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
+            self.append_to_console_specific(console_widget, f"CEP50: {cep_value['CEP50']:.2f} meters")
+            logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
+            self.append_to_console_specific(console_widget, f"CEP68: {cep_value['CEP68']:.2f} meters")
+            logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
+            self.append_to_console_specific(console_widget, f"CEP90: {cep_value['CEP90']:.2f} meters")
+            logging.info(f"CEP95: {cep_value['CEP95']:.2f} meters")
+            self.append_to_console_specific(console_widget, f"CEP95: {cep_value['CEP95']:.2f} meters")
+            logging.info(f"CEP99: {cep_value['CEP99']:.2f} meters")
+            self.append_to_console_specific(console_widget, f"CEP99: {cep_value['CEP99']:.2f} meters")
+        else:
+            logging.info(f"No coordinates available for CEP calculation for port {port}.")
+            self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for port {port}).")
+
+        # Calculate sats summary and log the results
+        gsv_sats_summary_stats = nmea_data.calculate_satellite_statistics()
+
+        # GSV Satellite Statistics
+        if not gsv_sats_summary_stats.empty:
+            self.update_satellites_summary_table(f"Device-{port}", gsv_sats_summary_stats)
+
+            # Extract statistics for logging
+            gsv_avg_cnr = gsv_sats_summary_stats["Average CNR (SNR) (dB)"].iloc[0]
+            gsv_min_cnr = gsv_sats_summary_stats["Min CNR (SNR) (dB)"].iloc[0]
+            gsv_max_cnr = gsv_sats_summary_stats["Max CNR (SNR) (dB)"].iloc[0]
+            gsv_total_tracked = gsv_sats_summary_stats["Total Satellites Tracked"].iloc[0]
+
+            # Log and append to console
+            logging.info(f"GSV Satellite Statistics for port {port}:")
+            self.append_to_console_specific(console_widget, f"GSV Satellite Statistics for port {port}:")
+            logging.info(f"Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+            self.append_to_console_specific(console_widget, f"GSV Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+            logging.info(f"Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+            self.append_to_console_specific(console_widget, f"GSV Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+            logging.info(f"Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+            self.append_to_console_specific(console_widget, f"GSV Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+            logging.info(f"Total Satellites Tracked: {gsv_total_tracked}")
+            self.append_to_console_specific(console_widget, f"Total Satellites Tracked: {gsv_total_tracked}")
+        else:
+            logging.info(f"No GSV satellite information available for statistics calculation for port {port}.")
+            self.append_to_console_specific(console_widget,
+                                            f"No GSV satellite information available for statistics calculation for port {port}.")
+
+
+            # Save parsed data to Excel
+        nmea_data.write_to_excel_mode_1(port, baudrate, timestamp, cep_value)
+
+    def read_nmea_data_2(self, port, baudrate, timeout, duration, log_folder, timestamp, reference_point=None, stop_event=None, console_widget=None):
+        """
+        Reads live NMEA data from a serial port and processes it.
+
+        Args:
+            port (str): Serial port to read from (e.g., "COM3").
+            baudrate (int): Baud rate for serial communication.
+            timeout (float): Timeout for serial port reads (in seconds).
+            duration (float): Duration to read data (in seconds).
+            log_folder (str): Directory to save log files.
+            timestamp (str): Timestamp to append to file names.
+            reference_point (tuple, optional): Custom reference point for CEP calculation.
+            stop_event (threading.Event, optional): Event to signal the function to stop.
+            :param stop_event:
+            :param reference_point:
+            :param timestamp:
+            :param log_folder:
+            :param duration:
+            :param timeout:
+            :param port:
+            :param baudrate:
+            :param console_widget:
+        """
+        parsed_sentences = []
+        start_time = time()
+        nmea_data = NMEAData(None, None, parsed_sentences)
+
+        # Ensure log folder exists
+        os.makedirs(log_folder, exist_ok=True)
+
+        safe_port = port.replace("/", "_")
+
+        # Open raw NMEA log file
+        raw_nmea_log_path = os.path.join(log_folder, f"nmea_raw_log_mode_1_{safe_port}_{baudrate}_{timestamp}.txt")
+        try:
+            raw_nmea_log = open(raw_nmea_log_path, "a", encoding="utf-8")
+        except Exception as e:
+            logging.error(f"Error opening log file {raw_nmea_log_path}: {e}")
+            return
+
+        try:
+            # Attempt to configure and open the serial port
+            try:
+                ser = serial.Serial(
+                    port=port,
+                    baudrate=baudrate,
+                    bytesize=serial.EIGHTBITS,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    timeout=timeout
+                )
+                logging.info(f"Connected to serial port {port} with baudrate {baudrate}.")
+            except serial.SerialException as e:
+                logging.error(f"Error opening serial port {port}: {e}")
+                self.append_to_console_specific(console_widget, f"Error opening serial port {port}: {e}")
                 return  # Exit function if serial port cannot be opened
 
             # Continuously read from serial port until duration expires or stop_event is set
