@@ -1105,7 +1105,7 @@ class GNSSTestTool:
         """Ensure only one reference device checkbox can be selected."""
         # Update the reference device index
         if self.reference_device_index == selected_index:
-            self.reference_device_index = None  # Deselect if the same device is clicked again
+            self.reference_device_index = 0  # Deselect if the same device is clicked again
         else:
             self.reference_device_index = selected_index  # Set the new reference device
 

@@ -1275,17 +1275,12 @@ class GNSSTestTool:
         if messagebox.askyesno("Confirm Stop", "Are you sure you want to stop all running tests?"):
             self.stop_event.set()  # Signal threads to stop
             messagebox.showinfo("Stop action completed","All tests have been stopped.")
-        else:
-            messagebox.showinfo("Stop action canceled","Stop action canceled by the user.")
 
     def on_close(self):
         """Handle window close."""
         if messagebox.askyesno("Quit", "Are you sure you want to quit?"):
             self.stop_all_tests()  # Stop all threads
             self.root.destroy()  # Close the application
-        else:
-            messagebox.showinfo("Close action canceled","Window close action canceled by the user.")
-            print("Window close action canceled.")
 
     def clear_all_configs(self):
         """Reset all configurations to their default values."""
@@ -1762,8 +1757,6 @@ class GNSSTestTool:
 
         if dynamic_reference:
             self.dynamic_reference_points = dynamic_fix_points
-
-        print(name, self.dynamic_reference_points, dynamic_fix_points)
 
         # Calculate CEP and log the results
         for _ in range(5):
