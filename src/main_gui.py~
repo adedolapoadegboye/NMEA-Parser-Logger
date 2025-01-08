@@ -19,6 +19,7 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 class GNSSTestTool:
     def __init__(self, root):
         # Initialize a list to store individual device port configurations
+        self.toggle_refresher = False
         self.dynamic_reference_points = []
         self.mode = None
         self.file_config_frame_holder = None
@@ -458,11 +459,15 @@ class GNSSTestTool:
         # Get the number of devices
         num_devices = int(self.num_devices_var.get())
 
-        # Initialize a list to store individual device port configurations
-        self.port_vars = [tk.StringVar(value="Select Port") for _ in range(num_devices)]
-        self.baudrate_vars = [tk.IntVar(value=115200) for _ in range(num_devices)]
-        self.timeout_vars = [tk.DoubleVar(value=1) for _ in range(num_devices)]
-        self.duration_vars = [tk.DoubleVar(value=30) for _ in range(num_devices)]
+
+
+        if not self.toggle_refresher:
+            # Initialize a list to store individual device port configurations
+            self.port_vars = [tk.StringVar(value="Select Port") for _ in range(num_devices)]
+            self.baudrate_vars = [tk.IntVar(value=115200) for _ in range(num_devices)]
+            self.timeout_vars = [tk.DoubleVar(value=1) for _ in range(num_devices)]
+            self.duration_vars = [tk.DoubleVar(value=30) for _ in range(num_devices)]
+
 
         # Generate serial config frames
         for device_index in range(1, num_devices + 1):
@@ -1110,6 +1115,8 @@ class GNSSTestTool:
         else:
             self.reference_device_index = selected_index  # Set the new reference device
 
+        # Ensure only one checkbox is selected
+        self.toggle_refresher = True
 
         # Refresh frames to update the checkboxes
         self.update_serial_config_dynamic_frames()
