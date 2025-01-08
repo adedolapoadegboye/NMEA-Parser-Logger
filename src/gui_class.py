@@ -1294,7 +1294,7 @@ class NMEAData:
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
 
-    def write_to_excel_mode_2(self, timestamp, cep_value, filename="nmea_data_mode_2"):
+    def write_to_excel_mode_2(self, timestamp, cep_value, filename):
         """
         MODE 2: Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
         Also includes a new sheet "Satellites summary" for satellite CNR summary.

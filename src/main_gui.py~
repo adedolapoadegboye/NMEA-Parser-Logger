@@ -19,7 +19,7 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 class GNSSTestTool:
     def __init__(self, root):
         # Initialize a list to store individual device port configurations
-        self.toggle_refresher = False
+        self.ref_dynamic_var = None
         self.dynamic_reference_points = []
         self.mode = None
         self.file_config_frame_holder = None
@@ -459,15 +459,11 @@ class GNSSTestTool:
         # Get the number of devices
         num_devices = int(self.num_devices_var.get())
 
-
-
-        if not self.toggle_refresher:
-            # Initialize a list to store individual device port configurations
-            self.port_vars = [tk.StringVar(value="Select Port") for _ in range(num_devices)]
-            self.baudrate_vars = [tk.IntVar(value=115200) for _ in range(num_devices)]
-            self.timeout_vars = [tk.DoubleVar(value=1) for _ in range(num_devices)]
-            self.duration_vars = [tk.DoubleVar(value=30) for _ in range(num_devices)]
-
+        # Initialize a list to store individual device port configurations
+        self.port_vars = [tk.StringVar(value="Select Port") for _ in range(num_devices)]
+        self.baudrate_vars = [tk.IntVar(value=115200) for _ in range(num_devices)]
+        self.timeout_vars = [tk.DoubleVar(value=1) for _ in range(num_devices)]
+        self.duration_vars = [tk.DoubleVar(value=30) for _ in range(num_devices)]
 
         # Generate serial config frames
         for device_index in range(1, num_devices + 1):
@@ -712,152 +708,96 @@ class GNSSTestTool:
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def update_file_config_dynamic_frames(self, event=None):
-            """Update the serial configuration frames based on the selected number of devices."""
-            # Clear existing frames
-            for widget in self.serial_config_frame_holder.winfo_children():
-                widget.destroy()
+        """Update the file configuration frames based on the selected number of devices."""
 
-            # Get the number of devices
-            num_devices = int(self.num_devices_var.get())
+        # Clear existing frames
+        for widget in self.file_config_frame_holder.winfo_children():
+            widget.destroy()
 
-            # Generate serial config frames
-            for device_index in range(1, num_devices + 1):
-                config_frame = ttk.LabelFrame(
-                    self.serial_config_frame_holder, text=f"Device {device_index} Configuration", padding=10
-                )
-                config_frame.pack(fill="x", padx=10, pady=5)
+        # Get the number of devices
+        num_devices = int(self.num_devices_var.get())
 
-                # Serial Port
-                ttk.Label(config_frame, text="Serial Port:", font=("Arial", 10)).grid(row=0, column=0, sticky="w",
-                                                                                      padx=10,
-                                                                                      pady=5)
-                self.port_var = tk.StringVar(value="Select Port")
-                port_dropdown = ttk.Combobox(config_frame, textvariable=self.port_var, state="readonly", width=30,
-                                             font=("Arial", 10)
-                                             )
-                port_dropdown.grid(row=0, column=1, padx=10, pady=5)
-                self.refresh_serial_ports(port_dropdown)
+        # Initialize a list to store individual file configurations
+        self.file_var = [tk.StringVar(value="Select Log File") for _ in range(num_devices)]
 
-                # Baudrate
-                ttk.Label(config_frame, text="Baudrate:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10,
-                                                                                   pady=5)
-                baudrates = ["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"]
-                self.baudrate_var = tk.IntVar(value=115200)  # Default value
-                baudrate_dropdown = ttk.Combobox(
-                    config_frame,
-                    textvariable=self.baudrate_var,
-                    state="readonly",
-                    values=baudrates,
-                    width=30,
-                    font=("Arial", 10)
-                )
-                baudrate_dropdown.grid(row=1, column=1, padx=10, pady=5)
+        # Generate file config frames
+        for device_index in range(1, num_devices + 1):
+            config_frame = ttk.LabelFrame(
+                self.file_config_frame_holder, text=f"Device {device_index} File Configuration", padding=10
+            )
+            config_frame.pack(fill="x", padx=10, pady=5)
 
-                # Timeout
-                ttk.Label(config_frame, text="Timeout (s):", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
-                                                                                      padx=10,
-                                                                                      pady=5)
-                self.timeout_var = tk.DoubleVar(value=1)
-                ttk.Entry(config_frame, textvariable=self.timeout_var, width=30, font=("Arial", 10)).grid(row=2,
-                                                                                                          column=1,
-                                                                                                          padx=10,
-                                                                                                          pady=5)
+            # File Path Selection
+            ttk.Label(config_frame, text="Log File:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10,
+                                                                               pady=5)
+            ttk.Entry(
+                config_frame,
+                textvariable=self.file_var[device_index - 1],  # Use individual file variable
+                state="readonly",
+                width=30,
+                font=("Arial", 10)
+            ).grid(row=0, column=1, padx=10, pady=5)
 
-                # Duration
-                ttk.Label(config_frame, text="Duration (s):", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
-                                                                                       padx=10,
-                                                                                       pady=5)
-                self.duration_var = tk.DoubleVar(value=30)
-                ttk.Entry(config_frame, textvariable=self.duration_var, width=30, font=("Arial", 10)).grid(row=3,
-                                                                                                           column=1,
-                                                                                                           padx=10,
-                                                                                                           pady=5)
+            ttk.Button(
+                config_frame,
+                text="Browse",
+                command=lambda idx=device_index - 1: self.browse_file(idx)
+            ).grid(row=0, column=2, padx=10, pady=5)
 
-                # Reference Device Checkbox
-                self.ref_var = tk.BooleanVar(value=(self.reference_device_index == device_index))
-                ref_checkbox = ttk.Checkbutton(
-                    config_frame,
-                    text="Reference Device",
-                    variable=self.ref_var,  # Bind the checkbox to this variable
-                    command=lambda idx=device_index: self.toggle_reference(idx)
-                )
-                ref_checkbox.grid(row=4, column=0, columnspan=2, sticky="w", padx=10, pady=5)
-                # Save device configuration variables
-                config_frame.vars = {"port_var": self.port_var, "baudrate_var": self.baudrate_var,
-                                     "timeout_var": self.timeout_var,
-                                     "duration_var": self.duration_var, "ref_var": self.ref_var,
-                                     "device_index": device_index, "ref_checkbox": ref_checkbox}
+        # Frame to hold the buttons
+        button_frame = ttk.Frame(self.file_config_frame_holder)
+        button_frame.pack(fill="x", padx=10, pady=15)
 
-            # Frame to hold the buttons
-            button_frame = ttk.Frame(self.serial_config_frame_holder)
-            button_frame.pack(fill="x", padx=10, pady=15)
+        # Add Start Button
+        start_button = ttk.Button(button_frame, text="Start Test", command=self.start_file_mode)
+        start_button.grid(row=0, column=0, padx=5)
 
-            # Add Start Button
-            start_button = ttk.Button(button_frame, text="Start Test", command=self.start_file_mode)
-            start_button.grid(row=0, column=0, padx=5)
+        # Add Stop Button
+        stop_button = ttk.Button(button_frame, text="Stop Test", command=self.stop_all_tests)
+        stop_button.grid(row=0, column=1, padx=5)
 
-            # Add Stop Button
-            stop_button = ttk.Button(button_frame, text="Stop Test", command=self.stop_all_tests)
-            stop_button.grid(row=0, column=1, padx=5)
+        # Add Clear Button
+        clear_button = ttk.Button(button_frame, text="Clear", command=self.clear_all_configs)
+        clear_button.grid(row=0, column=2, padx=5)
 
-            # Add Clear Button
-            clear_button = ttk.Button(button_frame, text="Clear Settings", command=self.clear_all_configs)
-            clear_button.grid(row=0, column=2, padx=5)
-
-            # Bind window close to stop tests
-            self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+        # Bind window close to stop tests
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def show_dynamic_file_mode(self):
 
+        """Show UI for dynamic file load setup"""
+
         self.clear_setup_content()
 
-        """Show UI for log file processing."""
-
         # Header
-        tk.Label(self.setup_frame, text="Load Static Test Data", font=("Arial", 14, "bold"), fg="#FE5F55").pack(pady=5, padx=5)
-        file_frame = ttk.LabelFrame(self.setup_frame, text="Log File Selection", padding=10)
-        file_frame.pack(fill="x", padx=10, pady=10)
+        tk.Label(self.setup_frame, text="Load Dynamic Test Files", font=("Arial", 14, "bold"), fg="#FE5F55").pack(pady=5,
+                                                                                                                 padx=5)
 
-        # File Selection
-        ttk.Label(file_frame, text="Log File:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10, pady=5)
-        self.file_var = tk.StringVar(value="Select Log File")
-        ttk.Entry(file_frame, textvariable=self.file_var, state="readonly", width=20).grid(row=0, column=1, padx=10, pady=5)
-        ttk.Button(file_frame, text="Browse", command=self.browse_file).grid(row=0, column=2, padx=10, pady=5)
+        # General Configuration
+        general_config_frame = ttk.LabelFrame(self.setup_frame, text="General Configuration", padding=10)
+        general_config_frame.pack(fill="x", padx=10, pady=10)
 
-        # Reference Coordinates (Ground Truth)
-        self.use_reference = tk.BooleanVar(value=False)
-        use_reference_checkbox = ttk.Checkbutton(
-            file_frame,
-            text="Use Custom Reference Point",
-            variable=self.use_reference,
-            command=self.toggle_reference_entries,
+        # Number of devices
+        ttk.Label(general_config_frame, text="Number of Test logs:", font=("Arial", 10)).grid(row=0, column=0,
+                                                                                                 sticky="w",
+                                                                                                 padx=5, pady=5)
+        self.num_devices_var = tk.StringVar(value="1")
+        self.num_devices_dropdown = ttk.Combobox(
+            general_config_frame,
+            textvariable=self.num_devices_var,
+            state="readonly",
+            values=[str(i) for i in range(1, 11)],
+            width=10,
         )
-        use_reference_checkbox.grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        self.num_devices_dropdown.grid(row=0, column=1, padx=10, pady=5)
+        self.num_devices_dropdown.bind("<<ComboboxSelected>>", self.update_file_config_dynamic_frames)
 
-        # Info Icon with Tooltip
-        info_label = tk.Label(file_frame, text="?", font=("Arial", 10, "bold"), fg="#FE5F55", cursor="hand2")
-        info_label.grid(row=1, column=1, sticky="w", padx=5)
+        # File Configuration Frame Holder
+        self.file_config_frame_holder = ttk.LabelFrame(self.setup_frame, text="Logfile Configuration", padding=10)
+        self.file_config_frame_holder.pack(fill="both", padx=10, pady=10)
 
-        # Bind tooltip to info icon
-        info_label.bind("<Enter>", self.show_reference_tooltip)
-        info_label.bind("<Leave>", self.hide_reference_tooltip)
-
-        # Latitude Entry
-        ttk.Label(file_frame, text="Latitude:", font=("Arial", 10)).grid(row=2, column=0, sticky="w",
-                                                                                    padx=10, pady=5)
-        self.lat_var = tk.DoubleVar(value=0.0000000)
-        self.lat_entry = ttk.Entry(file_frame, textvariable=self.lat_var, width=20, state="disabled")
-        self.lat_entry.grid(row=2, column=1, padx=10, pady=5)
-
-        # Longitude Entry
-        ttk.Label(file_frame, text="Longitude:", font=("Arial", 10)).grid(row=3, column=0, sticky="w",
-                                                                                    padx=10, pady=5)
-        self.lon_var = tk.DoubleVar(value=0.0000000)
-        self.lon_entry = ttk.Entry(file_frame, textvariable=self.lon_var, width=20, state="disabled")
-        self.lon_entry.grid(row=3, column=1, padx=10, pady=5)
-
-        # Process Button
-        ttk.Button(file_frame, text="Process", command=self.start_file_mode_2).grid(row=4, column=0, columnspan=3, pady=15)
+        # Initialize Serial Configuration Frames
+        self.update_file_config_dynamic_frames()
 
     def start_live_mode(self):
         """Start live data collection."""
@@ -1092,9 +1032,24 @@ class GNSSTestTool:
         Args:
             idx (int): Index of the file input to update.
         """
-        file_path = filedialog.askopenfilename(title="Select Log File",
-                                               filetypes=[("Log Files", "*.log"), ("All Files", "*.*")])
+        file_path = filedialog.askopenfilename(
+            title="Select Log File",
+            filetypes=[
+                ("Log Files", "*.log"),
+                ("Text Files", "*.txt"),
+                ("CSV Files", "*.csv"),
+                ("JSON Files", "*.json"),
+                ("XML Files", "*.xml"),
+                ("All Files", "*.*")
+            ]
+        )
         if file_path:
+            # Ensure the file has a recognized extension, default to .txt if not
+            extensions = [".log", ".txt", ".csv", ".json", ".xml"]
+            file_name, ext = os.path.splitext(file_path)
+            if ext not in extensions:
+                file_path = f"{file_name}.txt"
+
             self.file_var[idx].set(file_path)
 
     def clear_setup_content(self):
@@ -1115,11 +1070,12 @@ class GNSSTestTool:
         else:
             self.reference_device_index = selected_index  # Set the new reference device
 
-        # Ensure only one checkbox is selected
-        self.toggle_refresher = True
 
         # Refresh frames to update the checkboxes
-        self.update_serial_config_dynamic_frames()
+        if self.mode == "live dynamic":
+            self.update_serial_config_dynamic_frames()
+        elif self.mode == "file dynamic":
+            self.update_file_config_dynamic_frames()
 
         # Log reference device selection
         print(f"Selected reference device: {self.reference_device_index or 'None'}")
@@ -1966,7 +1922,10 @@ class GNSSTestTool:
             :param reference_point:
             :param timestamp:
         """
-        logging.info(f"Starting log processing for file: {file_path}")
+
+        filename = os.path.splitext(os.path.basename(file_path))[0]
+
+        logging.info(f"Starting log processing for file: {filename} at {timestamp}")
 
         # Check if the file exists
         if not os.path.exists(file_path):
@@ -1977,9 +1936,9 @@ class GNSSTestTool:
         os.makedirs(log_folder, exist_ok=True)
 
         if stop_event and stop_event.is_set():  # Check if stop_event is set
-            logging.info(f"Stop signal received. Ending file processing for {file_path}.")
+            logging.info(f"Stop signal received. Ending file processing for {filename}.")
             if console_widget:
-                self.append_to_console_specific(console_widget, f"Stop signal received for {file_path}.")
+                self.append_to_console_specific(console_widget, f"Stop signal received for {filename}.")
                 return
 
         # Process the file to get parsed sentences
@@ -1992,9 +1951,9 @@ class GNSSTestTool:
             return
 
         if not parsed_sentences:
-            logging.error(f"No valid NMEA sentences found in log file: {file_path}")
+            logging.error(f"No valid NMEA sentences found in log file: {filename}")
             if console_widget:
-                self.append_to_console_specific(console_widget, f"No valid NMEA sentences found in log file: {file_path}")
+                self.append_to_console_specific(console_widget, f"No valid NMEA sentences found in log file: {filename}")
             return
 
         logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
@@ -2022,10 +1981,10 @@ class GNSSTestTool:
         try:
             cep_value = nmea_data.calculate_cep(reference_point)
             if cep_value is not None:
-                self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{file_path}")
-                self.update_accuracy_summary_table(f"Device-{file_path}", cep_value)
-                logging.info(f"Mode 2: CEP statistics for logfile {file_path}:")
-                self.append_to_console_specific(console_widget, f"Mode 2: CEP statistics for logfile {file_path}:")
+                self.update_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{filename}")
+                self.update_accuracy_summary_table(f"Device-{filename}", cep_value)
+                logging.info(f"Mode 2: CEP statistics for logfile {filename}:")
+                self.append_to_console_specific(console_widget, f"Mode 2: CEP statistics for logfile {filename}:")
                 logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
                 self.append_to_console_specific(console_widget, f"CEP50: {cep_value['CEP50']:.2f} meters")
                 logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
@@ -2051,7 +2010,7 @@ class GNSSTestTool:
 
             # GSV Satellite Statistics
             if not gsv_sats_summary_stats.empty:
-                self.update_satellites_summary_table(f"Device-{file_path}", gsv_sats_summary_stats)
+                self.update_satellites_summary_table(f"Device-{filename}", gsv_sats_summary_stats)
 
                 # Extract statistics for logging
                 gsv_avg_cnr = gsv_sats_summary_stats["Average CNR (SNR) (dB)"].iloc[0]
@@ -2060,8 +2019,8 @@ class GNSSTestTool:
                 gsv_total_tracked = gsv_sats_summary_stats["Total Satellites Tracked"].iloc[0]
 
                 # Log and append to console
-                logging.info(f"GSV Satellite Statistics for file {file_path}:")
-                self.append_to_console_specific(console_widget, f"GSV Satellite Statistics for file {file_path}:")
+                logging.info(f"GSV Satellite Statistics for file {filename}:")
+                self.append_to_console_specific(console_widget, f"GSV Satellite Statistics for file {filename}:")
                 logging.info(f"Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
                 self.append_to_console_specific(console_widget, f"GSV Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
                 logging.info(f"Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
@@ -2079,13 +2038,13 @@ class GNSSTestTool:
             logging.error(f"Error calculating GSV Satellite Statistics: {e}")
             self.append_to_console_specific(console_widget, f"Error calculating GSV Satellite Statistics: {e}")
 
-        logging.info(f"Finished log processing for file: {file_path}")
+        logging.info(f"Finished log processing for file: {filename}")
         if console_widget:
-            self.append_to_console_specific(console_widget, f"Finished log processing for file: {file_path}")
+            self.append_to_console_specific(console_widget, f"Finished log processing for file: {filename}")
 
         # Write results to an Excel file
         try:
-            nmea_data.write_to_excel_mode_2(timestamp, cep_value)
+            nmea_data.write_to_excel_mode_2(timestamp, cep_value, filename)
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
             self.append_to_console_specific(console_widget, f"Error writing to Excel file: {e}")
