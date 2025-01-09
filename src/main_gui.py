@@ -1297,7 +1297,7 @@ class GNSSTestTool:
     def clear_all_configs(self):
         """Reset all configurations to their default values."""
         try:
-            if self.mode == "file static" or self.mode == "file dynamic":
+            if self.mode == "file static":
                 if self.file_var:
                     self.file_var = tk.StringVar(value="Select Log Path")  # Reset file path
 
@@ -1321,6 +1321,35 @@ class GNSSTestTool:
 
                 # Clear plots
                 self.fresh_start()
+                self.reference_device_index = 0
+                self.update_file_config_static_frames()
+
+            elif self.mode == "file dynamic":
+                if self.file_var:
+                    self.file_var = tk.StringVar(value="Select Log Path")  # Reset file path
+
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
+
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
+
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
+
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
+
+                # Clear plots
+                self.fresh_start()
+                self.reference_device_index = 0
+                self.update_file_config_dynamic_frames()
 
             elif self.mode == "live static":
                 # Reset serial configuration settings
@@ -1355,7 +1384,7 @@ class GNSSTestTool:
 
                 # Clear plots
                 self.fresh_start()
-
+                self.reference_device_index = 0
                 # Reinitialize serial configuration frames
                 self.update_serial_config_static_frames()
 
@@ -1392,7 +1421,7 @@ class GNSSTestTool:
 
                 # Clear plots
                 self.fresh_start()
-
+                self.reference_device_index = 0
                 # Reinitialize serial configuration frames
                 self.update_serial_config_dynamic_frames()
 
