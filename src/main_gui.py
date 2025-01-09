@@ -765,7 +765,7 @@ class GNSSTestTool:
         button_frame.pack(fill="x", padx=10, pady=15)
 
         # Add Start Button
-        start_button = ttk.Button(button_frame, text="Start Test", command=self.start_file_mode)
+        start_button = ttk.Button(button_frame, text="Start Test", command=self.start_file_mode_2)
         start_button.grid(row=0, column=0, padx=5)
 
         # Add Stop Button
@@ -1008,21 +1008,9 @@ class GNSSTestTool:
 
                 #Add logfile to the dictionary
                 devices[f"device_{i + 1}"] = {
-                    "name": f"Device {i + 1}",
+                    "name": f"{i + 1}",
                     "file": file_var,
                 }
-
-            # Validate reference point if enabled
-            if self.use_reference.get():
-                try:
-                    ref_lat = self.lat_var.get()
-                    ref_lon = self.lon_var.get()
-                    reference_point = (float(ref_lat), float(ref_lon))
-                except ValueError as e:
-                    messagebox.showerror("Error", f"Invalid reference point: {e}")
-                    return
-            else:
-                reference_point = None
 
             self.fresh_start()
 
@@ -1034,7 +1022,7 @@ class GNSSTestTool:
 
             # Run the test in a separate thread
             test_thread = threading.Thread(
-                target=self.run_file_test, args=(devices, log_folder, timestamp, reference_point)
+                target=self.run_file_test_2, args=(devices, log_folder, timestamp)
             )
             test_thread.start()
 
@@ -1240,6 +1228,49 @@ class GNSSTestTool:
 
             # Call the final plot function with aggregated data
             self.finalize_accuracy_plot()
+
+            # Notify the user if not stopped
+            if not self.stop_event.is_set():
+                messagebox.showinfo("Success", "Data Analysis completed successfully.")
+            else:
+                pass
+                # messagebox.showinfo("Stop action completed", "Test stopped by the user.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred during the log analysis: {e}")
+            logging.error(f"An error occurred during the log analysis: {e}")
+
+    def run_file_test_2(self, devices, log_folder, timestamp):
+        """Run the test on a separate thread."""
+        try:
+            # Dictionary to map device names to their corresponding text widgets
+            device_logs = {}
+
+            # Create dynamic tabs for each device in the nested device_notebook
+            for device_name, config in devices.items():
+                self.create_device_tab(device_name, device_logs)
+
+            threads = []
+
+            for device_name, config in devices.items():
+                # Create and start a thread for each device
+                thread = threading.Thread(
+                    target=self.process_nmea_log_2,
+                    args=(
+                        config["file"], log_folder, timestamp, self.stop_event, device_logs[device_name], config["name"]
+                    )
+                )
+                threads.append(thread)
+                thread.start()
+
+            # Wait for threads to finish
+            for thread in threads:
+                thread.join()
+
+            if self.stop_event and self.stop_event.is_set() and self.mode == "file dynamic":  # Check if stop_event is set
+                return
+
+            # Call the final plot function with aggregated data
+            self.finalize_dynamic_accuracy_plot()
 
             # Notify the user if not stopped
             if not self.stop_event.is_set():
@@ -1924,6 +1955,132 @@ class GNSSTestTool:
                                         f"Total parsed sentences: {len(parsed_sentences)}")
         return parsed_sentences, nmea_data
 
+    def parse_nmea_from_log_2(self,file_path, console_widget, stop_event):
+        """
+        Reads a log file in .txt, .log, .nmea, .csv, or Excel format and parses valid NMEA sentences.
+
+        Args:
+            file_path (str): Path to the log file to be parsed.
+
+        Returns:
+            tuple: A list of parsed sentences and an NMEAData object.
+            :param stop_event:
+            :param file_path:
+            :param console_widget:
+        """
+        parsed_sentences = []
+        dynamic_fix_points = []
+        nmea_data = NMEAData(None, None, parsed_sentences)
+        logging.info(f"Processing log file: {file_path}")
+        if console_widget:
+            self.append_to_console_specific(console_widget, f"Processing log file: {file_path}")
+
+        try:
+            # Handle different file types based on the file extension
+            if file_path.endswith(('.txt', '.log', '.nmea')):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                logging.info(f"Total lines read from file: {len(lines)}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Total lines read from file: {len(lines)}")
+
+            elif file_path.endswith('.csv'):
+                df = pd.read_csv(file_path, header=None)
+                lines = df[0].astype(str).tolist()
+                logging.info(f"Total lines read from CSV: {len(df)}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Total lines read from file: {len(df)}")
+
+            elif file_path.endswith('.xlsx'):
+                df = pd.read_excel(file_path, header=None)
+                lines = df[0].astype(str).tolist()
+                logging.info(f"Total lines read from Excel: {len(df)}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Total lines read from file: {len(df)}")
+
+            else:
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Unsupported file type: {file_path}")
+                logging.error(f"Unsupported file type: {file_path}")
+                raise ValueError("Unsupported file type. Supported formats: .txt, .log, .nmea, .csv, .xlsx")
+
+            if stop_event and stop_event.is_set():  # Check if stop_event is set
+                logging.info(f"Stop signal received. Ending file processing for {file_path}.")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Stop signal received for {file_path}.")
+                    return
+
+            # Process each line in the file
+            for nmea_sentence in lines:
+                nmea_sentence = nmea_sentence.strip()
+                logging.info(f"Processing sentence: {nmea_sentence}")
+                if console_widget:
+                    self.append_to_console_specific(console_widget, f"Processing sentence: {nmea_sentence}")
+
+                if stop_event and stop_event.is_set():  # Check if stop_event is set
+                    logging.info(f"Stop signal received. Ending file processing for {file_path}.")
+                    if console_widget:
+                        self.append_to_console_specific(console_widget, f"Stop signal received for {file_path}.")
+                        return
+                try:
+                    if nmea_sentence.startswith('$PQTM'):
+                        logging.info(f"Proprietary NMEA Message: {nmea_sentence}")
+                        if console_widget:
+                            self.append_to_console_specific(console_widget, f"Proprietary NMEA Message: {nmea_sentence}")
+                        try:
+                            msg = pynmea2.parse(nmea_sentence)
+                            if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                                raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence",
+                                                         msg)
+
+                            nmea_data.sentence_type = msg.sentence_type
+                            nmea_data.data = msg
+                            nmea_data.add_sentence_data()
+                            nmea_data.add_coordinates()
+                            logging.info(nmea_data)
+                        except pynmea2.ParseError as e:
+                            logging.warning(f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse proprietary NMEA sentence: {nmea_sentence} - {e}")
+                        continue
+
+                    elif nmea_sentence.startswith('$G'):
+                        logging.info(f"Standard NMEA Message: {nmea_sentence}")
+                        self.append_to_console_specific(console_widget, f"Standard NMEA Message: {nmea_sentence}")
+                        try:
+                            msg = pynmea2.parse(nmea_sentence)
+                            if not hasattr(msg, 'sentence_type') or not msg.sentence_type:
+                                raise pynmea2.ParseError("Invalid or missing sentence_type in parsed NMEA sentence",
+                                                         msg)
+                            nmea_data.sentence_type = msg.sentence_type
+                            nmea_data.data = msg
+                            nmea_data.add_sentence_data()
+                            nmea_data.add_coordinates()
+                            dynamic_fix_points = nmea_data.coordinates
+                            logging.info(nmea_data)
+                            self.append_to_console_specific(console_widget, nmea_data)
+                        except pynmea2.ParseError as e:
+                            logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+                            self.append_to_console_specific(console_widget, f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+
+                    else:
+                        logging.info(f"Received Unknown Message: {nmea_sentence}")
+                        self.append_to_console_specific(console_widget,
+                                                        f"Received Unknown Message: {nmea_sentence}")
+
+                except pynmea2.ParseError as e:
+                    logging.warning(f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+                    self.append_to_console_specific(console_widget,
+                                                    f"Failed to parse NMEA sentence: {nmea_sentence} - {e}")
+        except Exception as e:
+            logging.error(f"Failed to read or process file: {file_path}. Error: {e}")
+            self.append_to_console_specific(console_widget,
+                                            f"Failed to read or process file: {file_path}. Error: {e}")
+
+        logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
+        self.append_to_console_specific(console_widget,
+                                        f"Total parsed sentences: {len(parsed_sentences)}")
+        return parsed_sentences, nmea_data, dynamic_fix_points
+
     def process_nmea_log(self, file_path, log_folder, timestamp, reference_point=None, stop_event=None, console_widget=None):
         """
         Process pre-collected NMEA log file and calculate CEP.
@@ -2061,6 +2218,138 @@ class GNSSTestTool:
         # Write results to an Excel file
         try:
             nmea_data.write_to_excel_mode_2(timestamp, cep_value, filename)
+        except Exception as e:
+            logging.error(f"Error writing to Excel file: {e}")
+            self.append_to_console_specific(console_widget, f"Error writing to Excel file: {e}")
+
+    def process_nmea_log_2(self, file_path, log_folder, timestamp, stop_event=None, console_widget=None, name=None):
+        """
+        Process pre-collected NMEA log file and calculate CEP.
+
+        Args:
+            file_path (str): Path to the NMEA log file.
+            reference_point (tuple, optional): Custom reference point (latitude, longitude). Defaults to None.
+            :param name:
+            :param console_widget:
+            :param stop_event:
+            :param log_folder:
+            :param file_path:
+            :param timestamp:
+        """
+
+        filename = os.path.splitext(os.path.basename(file_path))[0]
+
+        logging.info(f"Starting log processing for file: {filename} at {timestamp}")
+
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            logging.error(f"File does not exist: {file_path}")
+            return
+
+        # Ensure log folder exists
+        os.makedirs(log_folder, exist_ok=True)
+
+        if stop_event and stop_event.is_set():  # Check if stop_event is set
+            logging.info(f"Stop signal received. Ending file processing for {filename}.")
+            if console_widget:
+                self.append_to_console_specific(console_widget, f"Stop signal received for {filename}.")
+                return
+
+        if int(name) == int(self.reference_device_index):
+            dynamic_reference = True
+        else:
+            dynamic_reference = False
+
+        # Process the file to get parsed sentences
+        try:
+            parsed_sentences, nmea_data, dynamic_fix_points = self.parse_nmea_from_log_2(file_path, console_widget, stop_event)
+        except Exception as e:
+            logging.error(f"Error during parsing NMEA log file or test stopped: {file_path}. Exception: {e}")
+            if console_widget:
+                self.append_to_console_specific(console_widget, f"Error during parsing NMEA log file or test stopped: {file_path}. Exception: {e}")
+            return
+
+        if not parsed_sentences:
+            logging.error(f"No valid NMEA sentences found in log file: {filename}")
+            if console_widget:
+                self.append_to_console_specific(console_widget, f"No valid NMEA sentences found in log file: {filename}")
+            return
+
+        logging.info(f"Total parsed sentences: {len(parsed_sentences)}")
+        if console_widget:
+            self.append_to_console_specific(console_widget, f"Total parsed sentences: {len(parsed_sentences)}")
+
+        if dynamic_reference:
+            self.dynamic_reference_points = dynamic_fix_points
+
+        # Calculate CEP values
+        try:
+            cep_value = nmea_data.calculate_dynamic_cep(self.dynamic_reference_points, dynamic_fix_points)
+            if cep_value is not None:
+                self.update_dynamic_accuracy_plot(cep_value['distances'], cep_value['coordinates'], f"Device-{filename}")
+                self.update_dynamic_accuracy_summary_table(f"Device-{filename}", cep_value)
+                logging.info(f"Mode 2: CEP statistics for logfile {filename}:")
+                self.append_to_console_specific(console_widget, f"Mode 2: CEP statistics for logfile {filename}:")
+                logging.info(f"CEP50: {cep_value['CEP50']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP50: {cep_value['CEP50']:.2f} meters")
+                logging.info(f"CEP68: {cep_value['CEP68']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP68: {cep_value['CEP68']:.2f} meters")
+                logging.info(f"CEP90: {cep_value['CEP90']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP90: {cep_value['CEP90']:.2f} meters")
+                logging.info(f"CEP95: {cep_value['CEP95']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP95: {cep_value['CEP95']:.2f} meters")
+                logging.info(f"CEP99: {cep_value['CEP99']:.2f} meters")
+                self.append_to_console_specific(console_widget, f"CEP99: {cep_value['CEP99']:.2f} meters")
+            else:
+                logging.info(f"No coordinates available for CEP calculation for log {file_path}.")
+                self.append_to_console_specific(console_widget, f"No coordinates available for CEP calculation for log {file_path}.")
+        except Exception as e:
+            logging.error(f"Error calculating CEP values: {e}")
+            self.append_to_console_specific(console_widget, f"Error calculating CEP values: {e}")
+            return
+
+        # Calculate Satellite Summary
+        try:
+            # Calculate sats summary and log the results
+            gsv_sats_summary_stats = nmea_data.calculate_satellite_statistics()
+
+            # GSV Satellite Statistics
+            if not gsv_sats_summary_stats.empty:
+                self.update_satellites_summary_table(f"Device-{filename}", gsv_sats_summary_stats)
+
+                # Extract statistics for logging
+                gsv_avg_cnr = gsv_sats_summary_stats["Average CNR (SNR) (dB)"].iloc[0]
+                gsv_min_cnr = gsv_sats_summary_stats["Min CNR (SNR) (dB)"].iloc[0]
+                gsv_max_cnr = gsv_sats_summary_stats["Max CNR (SNR) (dB)"].iloc[0]
+                gsv_total_tracked = gsv_sats_summary_stats["Total Satellites Tracked"].iloc[0]
+
+                # Log and append to console
+                logging.info(f"GSV Satellite Statistics for file {filename}:")
+                self.append_to_console_specific(console_widget, f"GSV Satellite Statistics for file {filename}:")
+                logging.info(f"Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+                self.append_to_console_specific(console_widget, f"GSV Average CNR (SNR) (dB): {gsv_avg_cnr:.2f}")
+                logging.info(f"Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+                self.append_to_console_specific(console_widget, f"GSV Minimum CNR (SNR) (dB): {gsv_min_cnr:.2f}")
+                logging.info(f"Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+                self.append_to_console_specific(console_widget, f"GSV Maximum CNR (SNR) (dB): {gsv_max_cnr:.2f}")
+                logging.info(f"Total Satellites Tracked: {gsv_total_tracked}")
+                self.append_to_console_specific(console_widget, f"Total Satellites Tracked: {gsv_total_tracked}")
+            else:
+                logging.info(f"No GSV satellite information available for statistics calculation for file {file_path}.")
+                self.append_to_console_specific(console_widget,
+                                                f"No GSV satellite information available for statistics calculation for file {file_path}.")
+
+        except Exception as e:
+            logging.error(f"Error calculating GSV Satellite Statistics: {e}")
+            self.append_to_console_specific(console_widget, f"Error calculating GSV Satellite Statistics: {e}")
+
+        logging.info(f"Finished log processing for file: {filename}")
+        if console_widget:
+            self.append_to_console_specific(console_widget, f"Finished log processing for file: {filename}")
+
+        # Write results to an Excel file
+        try:
+            nmea_data.write_to_excel_mode_2_dynamic(timestamp, cep_value, filename)
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
             self.append_to_console_specific(console_widget, f"Error writing to Excel file: {e}")

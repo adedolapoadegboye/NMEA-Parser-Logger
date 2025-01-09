@@ -1561,7 +1561,123 @@ class NMEAData:
             logging.info(f"Data written to {filepath}")
 
         except Exception as e:
-            logging.error(f"Error writing to Excel file sss: {e}")
+            logging.error(f"Error writing to live mode dynamic test results Excel file sss: {e}")
+
+    def write_to_excel_mode_2_dynamic(self, timestamp, cep_value, filename):
+        """
+        MODE 2: Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
+        Also includes a new sheet "Satellites summary" for satellite CNR summary.
+        """
+        try:
+
+            # Prepare the data for the summary sheet
+            summary_data = {
+                'Number of Data Points': cep_value['num_points'],
+                'CEP50 (m)': cep_value['CEP50'],
+                'CEP68 (m)': cep_value['CEP68'],
+                'CEP90 (m)': cep_value['CEP90'],
+                'CEP95 (m)': cep_value['CEP95'],
+                'CEP99 (m)': cep_value['CEP99'],
+            }
+
+            # Create a dataframe for parsed sentences
+            df_parsed = pd.DataFrame(self.parsed_sentences)
+
+            # Create a dataframe for the summary data
+            df_summary = pd.DataFrame([summary_data])
+
+            def deg_to_meters(lat1, lon1, lat2, lon2):
+                lat_dist = (lat1 - lat2) * 111139  # Approximation for meters/degree latitude
+                lon_dist = (lon1 - lon2) * (111139 * np.cos(np.radians(lat1)))  # Latitude dependent
+                return np.sqrt(lat_dist ** 2 + lon_dist ** 2)
+
+            # Create a dataframe for data points with distances and timestamps
+            reference_dict = {fix_time: (lat, lon) for lat, lon, fix_time in cep_value['reference_point']}
+            data_points = []
+
+            for entry in self.parsed_sentences:
+                if "Latitude" in entry and "Longitude" in entry and "Timestamp" in entry:
+                    try:
+                        lat = float(entry.get("Latitude", "0").split()[0])
+                        lon = float(entry.get("Longitude", "0").split()[0])
+                        time = entry.get("Timestamp")
+
+                        if time in reference_dict:
+                            ref_lat, ref_lon = reference_dict[time]
+                            distance = deg_to_meters(ref_lat, ref_lon, lat, lon)
+                            data_points.append({
+                                "Timestamp": time,
+                                "Latitude": entry.get("Latitude"),
+                                "Longitude": entry.get("Longitude"),
+                                "Distance from Reference (m)": distance
+                            })
+                        else:
+                            data_points.append({
+                                "Timestamp": time,
+                                "Latitude": entry.get("Latitude"),
+                                "Longitude": entry.get("Longitude"),
+                                "Distance from Reference (m)": None
+                            })
+                    except ValueError:
+                        logging.error(f"Invalid data point for latitude/longitude in entry: {entry}")
+                        data_points.append({
+                            "Timestamp": entry.get("Timestamp"),
+                            "Latitude": entry.get("Latitude"),
+                            "Longitude": entry.get("Longitude"),
+                            "Distance from Reference (m)": None
+                        })
+
+            df_data_points = pd.DataFrame(data_points)
+
+            # Create a dataframe for the satellite CNR summary
+            df_sat_summary = pd.DataFrame(self.gsv_satellite_info)
+
+            # Default statistics for satellites
+            df_sat_summary_stats = pd.DataFrame()  # Initialize to avoid 'referenced before assignment'
+
+            # Calculate satellite statistics for the "Satellites summary" sheet
+            if not df_sat_summary.empty:
+                avg_cnr = df_sat_summary["CNR (SNR) (dB)"].mean()
+                min_cnr = df_sat_summary["CNR (SNR) (dB)"].min()
+                max_cnr = df_sat_summary["CNR (SNR) (dB)"].max()
+
+                unique_prns = df_sat_summary["Satellite PRN"].nunique()
+
+                sat_summary_stats = {
+                    "Average CNR (SNR) (dB)": avg_cnr,
+                    "Min CNR (SNR) (dB)": min_cnr,
+                    "Max CNR (SNR) (dB)": max_cnr,
+                    "Total Satellites Tracked": unique_prns
+                }
+
+                df_sat_summary_stats = pd.DataFrame([sat_summary_stats])
+
+            # Write data to Excel
+            filepath = f"logs/NMEA_{timestamp}/{filename}_{timestamp}.xlsx"
+            max_rows = 1048576  # Excel row limit
+
+            with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
+                for i in range(0, len(df_parsed), max_rows):
+                    chunk = df_parsed.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"Parsed_{i // max_rows + 1}")
+
+                df_summary.to_excel(writer, index=False, sheet_name="CEP Summary")
+
+                for i in range(0, len(df_data_points), max_rows):
+                    chunk = df_data_points.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"DataPoints_{i // max_rows + 1}")
+
+                for i in range(0, len(df_sat_summary), max_rows):
+                    chunk = df_sat_summary.iloc[i:i + max_rows]
+                    chunk.to_excel(writer, index=False, sheet_name=f"SatSummary_{i // max_rows + 1}")
+
+                if not df_sat_summary_stats.empty:
+                    df_sat_summary_stats.to_excel(writer, index=False, sheet_name="SatSummaryStats")
+
+            logging.info(f"Data written to {filepath}")
+
+        except Exception as e:
+            logging.error(f"Error writing file mode dynamic results to results to Excel file: {e}")
 
     @staticmethod
     def setup_logging(log_folder, timestamp):
