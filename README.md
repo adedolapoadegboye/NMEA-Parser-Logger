@@ -8,10 +8,12 @@ The **NMEA Data Parser and Logger** program is a Python-based application design
 - **Live NMEA Data Reading**: Read and parse live NMEA data from one or more serial ports simultaneously.
 - **Log File Parsing**: Parse NMEA sentences from various log file formats (e.g., `.txt`, `.log`, `.nmea`, `.csv`, and `.xlsx`).
 - **Comprehensive NMEA Sentence Support**: Handles multiple NMEA sentence types like GGA, RMC, GSV, GSA, VTG, GLL, ZDA, GNS, GST, and others.
+- **GGA and GSV Extractor Tool**: Extract GGA or GSV lines from large files to reduce parsing time significantly. GGA data typically takes up 10x less space than GSV data, leading to a >10x reduction in test time.
 - **CEP Calculation**: Calculates Circular Error Probable (CEP) statistics such as CEP50, CEP68, CEP90, CEP95, and CEP99, based on user-defined reference point or the mean point of the GPS data.
 - **Excel Export**: Outputs parsed data, summary statistics, and satellite information to Excel for reference and further analysis.
 - **Multi-threading Support**: Supports reading from multiple devices in parallel in live data mode.
 - **Customizable Reference Point**: Users can provide a custom reference point for CEP calculation or allow the program to calculate the mean point from data.
+- **Two Application Types**: The program supports both a **Console Application** and a **GUI Application** built with Tkinter.
 
 ---
 
@@ -21,12 +23,14 @@ The **NMEA Data Parser and Logger** program is a Python-based application design
    - [Running the Program](#running-the-program)
    - [Live Serial Data Mode](#live-serial-data-mode)
    - [Log File Mode](#log-file-mode)
+   - [Using the GGA and GSV Extractor Tool](#using-the-gga-and-gsv-extractor-tool)
 3. [NMEA Sentences Supported](#nmea-sentences-supported)
 4. [CEP Calculation](#cep-calculation)
 5. [Output Files](#output-files)
 6. [Error Handling](#error-handling)
 7. [Logging](#logging)
-8. [License](#license)
+8. [Known Limitations](#known-limitations)
+9. [License](#license)
 
 ---
 
@@ -74,37 +78,11 @@ In **Mode 1**, the program reads live NMEA data from one or more defined serial 
 4. **Test Duration** (e.g., 10, 30, 60): Test duration in seconds. The program will continuously read and parse NMEA sentences until the specified duration is reached.
 5. **Custom Reference Point**: You can either provide a true test point (latitude and longitude) or let the program calculate the mean point of the GPS data. This point will be used as the reference point for CEP calculation.
 
-Once the configuration is set, the program will continuously read and parse NMEA sentences and log the raw and parsed data for the defined Test Duration. An example on how to configure two serial ports is shown below:
+Once the configuration is set, the program will continuously read and parse NMEA sentences and log the raw and parsed data for the defined Test Duration.
 
-```console
-C:\PythonProjects\NMEA-Parser-Logger\.venv\Scripts\python.exe C:\PythonProjects\NMEA-Parser-Logger\main.py 
-2024-10-15 16:15:41,040 [INFO] Logging setup complete. Logs are being saved to logs/NMEA_20241015_161541039428/console_output_20241015_161541039428.txt
-Choose data input mode: 1 = Live Serial Data, 2 = Log file
-1
-How many devices would you like to configure? (e.g., 1, 2, 3)
-2
-Configure device 1:
-Enter the port for device 1 (e.g., COM9): 
-COM9
-Enter the baudrate for device 1 (e.g., 115200): 
-115200
-Enter the timeout for device 1 (in seconds, e.g., 1): 
-1
-Enter the test duration for device 1 (in seconds): 
-60
-Configure device 2:
-Enter the port for device 2 (e.g., COM9): 
-COM10
-Enter the baudrate for device 2 (e.g., 115200): 
-115200
-Enter the timeout for device 2 (in seconds, e.g., 1): 
-1
-Enter the test duration for device 2 (in seconds): 
-60
-Do you want to provide a custom reference point for CEP calculations? (y/n): 
-n
-```
+Special Note: When selecting the reference device in dynamic live mode, ensure the box for the reference log is ticked first before inputting all other parameters. The program refreshes when this box is toggled to avoid losing data.
 
+---
 
 ### Mode 2 - Log File Mode
 
@@ -115,20 +93,41 @@ In **Mode 2**, you can parse previously collected NMEA log files. The program ac
 
 You will also have the option to provide a custom reference point for CEP calculation or let the program calculate it from the log data.
 
-```console
-C:\PythonProjects\NMEA-Parser-Logger\.venv\Scripts\python.exe C:\PythonProjects\NMEA-Parser-Logger\main.py 
-2024-10-15 15:49:12,338 [INFO] Logging setup complete. Logs are being saved to logs/NMEA_20241015_154912338000/console_output_20241015_154912338000.txt
-Choose data input mode: 1 = Live Serial Data, 2 = Log file
-2
-Enter the path to the log file (.txt, .log, .nmea, .csv, or .xlsx): 
-"C:\PythonProjects\NMEA-Parser-Logger\logs\NMEA_20241015_152059723703\nmea_raw_log_COM7_115200_20241015_152059723703.txt"
-Do you want to provide a custom reference point for CEP calculations? (y/n): 
-y
-Enter reference latitude: 
-49.00000000
-Enter reference longitude: 
-123.00000000
-```
+Special Note: When selecting the reference log in dynamic file mode, ensure the box for the log file is ticked first before inputting all other parameters. The program refreshes when this box is toggled to avoid losing data.
+
+---
+
+### Using the GGA and GSV Extractor Tool
+
+For large files, it is recommended to use the **GGA and GSV Extractor Tool** to filter and extract only the necessary NMEA sentences. This significantly reduces test time, as GGA data typically occupies 10x less space than GSV data. Test times are therefore reduced by more than 10x for GGA-only data compared to GSV-only data.
+
+To use the extractor tool:
+1. Run the `extract_gga_gsv_lines` function in the provided script.
+2. Specify the input file and choose the output file location.
+3. Select whether to extract **GGA**, **GSV**, or both types of sentences.
+
+---
+
+## Application Types
+
+The program supports two application types:
+1. **Main Console Application**: A terminal-based app for parsing NMEA data.
+   - **Limitations**:
+     - Does not support dynamic testing.
+     - Does not perform satellite analysis.
+2. **GNSS Test Tool (GUI)**: A graphical interface built with Tkinter that supports all features, including dynamic testing and satellite analysis.
+
+To launch the `.exe` versions of the applications:
+1. Navigate to the `dist` folder:
+   ```bash
+   cd dist
+   ```
+2. Run the desired application:
+   - **Main Console Application**: `main.exe`
+   - **GNSS Test Tool (GUI)**: `GNSS_Test_Tool.exe`
+   - **GGA and GSV Extractor Tool**: `extractor.exe`
+
+Example data are provided in the `example` directory in the root folder for user reference.
 
 ---
 
@@ -149,23 +148,6 @@ This program supports parsing the following NMEA sentence types:
 
 Each sentence is parsed into its respective fields and stored for further processing. The full parsed sentence is saved in the `logs/{.xlsx}` directory.
 
-Example showing fully parsed GGA sentence:
-
-```console
-2024-10-15 16:17:51,985 [INFO] Received Standard NMEA Message: $GNGGA,231752.000,4910.428474,N,12304.404546,W,2,21,0.64,5.644,M,-16.817,M,,*43
-2024-10-15 16:17:51,985 [INFO] GGA - Fix Data:
-  Timestamp: 23:17:52+00:00
-  Latitude: 49.1738079 N
-  Longitude: -123.0734091 W
-  GPS Quality Indicator: 2
-  Number of Satellites in Use: 21
-  Horizontal Dilution of Precision (HDOP): 0.64
-  Antenna Altitude (Above Mean Sea Level): 5.644 M
-  Geoidal Separation: -16.817 M
-  Age of Differential GPS Data: 
-  Differential Reference Station ID: 
-```
-
 ---
 
 ## CEP Calculation
@@ -177,17 +159,6 @@ The program calculates **Circular Error Probable (CEP)** statistics to quantify 
 The program supports the following reference points:
 - **Mean Point of dataset**: The mean point of the GPS data. A key indicator for precision estimation.
 - **True Point**: The true reference point provided by the user. A key indicator for accuracy estimation.
-
-Example of CEP statistics for a live serial data port:
-
-```console
-2024-10-15 16:17:52,001 [INFO] CEP statistics for port COM9:
-2024-10-15 16:17:52,002 [INFO] CEP50: 2.05 meters
-2024-10-15 16:17:52,002 [INFO] CEP68: 2.18 meters
-2024-10-15 16:17:52,002 [INFO] CEP90: 2.98 meters
-2024-10-15 16:17:52,002 [INFO] CEP95: 3.50 meters
-2024-10-15 16:17:52,002 [INFO] CEP99: 3.77 meters
-```
 
 ---
 
@@ -211,6 +182,7 @@ Where `X` refers to the mode (1 for live data, 2 for log parsing).
 
 - **Invalid Data**: Proprietary or unrecognized NMEA sentences are ignored, and errors in parsing are logged.
 - **Serial Connection Errors**: Issues with the serial port are caught and logged without crashing the program.
+- **File Formatting**: Ensure there are no spaces between consecutive lines in input files. Spaces are treated as end-of-file and may cause parsing issues.
 
 ---
 
@@ -226,8 +198,9 @@ All NMEA raw sentences and detailed execution logs are stored for post-processin
 
 ## Known Limitations
 
-- **Checksum Check**: The program does not support checksum check for NMEA sentences so ensure sentences are properly formatted.
+- **Checksum Check**: The program does not support checksum checks for NMEA sentences, so ensure sentences are properly formatted.
 - **Data Plotting**: The program does not support data plotting.
+- **Multiple Files with Different Dates**: When loading multiple static or dynamic files for analysis, ensure their timestamps align. Data will be plotted on the same graph, which may lead to awkward visualizations if dates differ significantly.
 
 ---
 
