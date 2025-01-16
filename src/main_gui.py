@@ -730,7 +730,7 @@ class GNSSTestTool:
             f"{cep_stats['CEP68']:.2f}",
             f"{cep_stats['CEP95']:.2f}",
             f"{cep_stats['CEP99']:.2f}",
-            f"({cep_stats['reference_point'][0]:.6f}, {cep_stats['reference_point'][1]:.6f})"        )
+            f"({cep_stats['reference_point'][0]:.8f}, {cep_stats['reference_point'][1]:.8f})"        )
 
         # Check if the device already has a row
         if device_name in self.accuracy_table_data:
