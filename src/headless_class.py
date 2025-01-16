@@ -17,7 +17,6 @@ class NMEAData:
         self.MIN_POINTS_FOR_CEP = 50  # Minimum number of points for CEP calculation
         self.satellite_info = []  # To store satellite CNR and related info from GSV sentences
 
-
     def __str__(self):
         # Pretty print the data based on sentence type
         if self.sentence_type == "GGA":

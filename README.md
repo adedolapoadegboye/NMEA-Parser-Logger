@@ -5,15 +5,17 @@
 The **NMEA Data Parser and Logger** program is a Python-based application designed to read, parse, and analyze NMEA sentences from live serial data or pre-recorded log files. The program provides functionalities to calculate various metrics (like Circular Error Probable - CEP) and outputs the parsed data into Excel files for further analysis.
 
 ### Key Features:
+- **Dual Application Types**: The program supports both a **Console Application** and a **GUI Application** built with Tkinter.
 - **Live NMEA Data Reading**: Read and parse live NMEA data from one or more serial ports simultaneously.
 - **Log File Parsing**: Parse NMEA sentences from various log file formats (e.g., `.txt`, `.log`, `.nmea`, `.csv`, and `.xlsx`).
-- **Comprehensive NMEA Sentence Support**: Handles multiple NMEA sentence types like GGA, RMC, GSV, GSA, VTG, GLL, ZDA, GNS, GST, and others.
-- **GGA and GSV Extractor Tool**: Extract GGA or GSV lines from large files to reduce parsing time significantly. GGA data typically takes up 10x less space than GSV data, leading to a >10x reduction in test time.
-- **CEP Calculation**: Calculates Circular Error Probable (CEP) statistics such as CEP50, CEP68, CEP90, CEP95, and CEP99, based on user-defined reference point or the mean point of the GPS data.
+- **Comprehensive NMEA Sentence Support**: Handles multiple standard NMEA sentence types like GGA, RMC, GSV, GSA, VTG, GLL, ZDA, GNS, GST, and others.
+- **Extensive PQTM Sentence Support**: Handles common proprietary NMEA sentence types like VERNO, EPE, different CFG types, and others.
+- **GGA and GSV Extractor Tool**: Extract GGA only, GSV only, or both lines from large files to reduce parsing time significantly. GGA data typically takes up 10x less space than GSV data, leading to a >10x reduction in test time.
+- **CEP Calculation**: Calculates Circular Error Probable (CEP) statistics such as CEP50, CEP68, CEP90, CEP95, and CEP99, based on static or dynamic user-defined reference point or the mean point of the GPS data (if no reference point is provided).
 - **Excel Export**: Outputs parsed data, summary statistics, and satellite information to Excel for reference and further analysis.
-- **Multi-threading Support**: Supports reading from multiple devices in parallel in live data mode.
-- **Customizable Reference Point**: Users can provide a custom reference point for CEP calculation or allow the program to calculate the mean point from data.
-- **Two Application Types**: The program supports both a **Console Application** and a **GUI Application** built with Tkinter.
+- **Error Handling**: Handles exceptions gracefully, providing clear error messages to the user.
+- **Logging**: Logs important events and errors to a file for easy debugging and troubleshooting.
+- **Data Visualization**: Provides a user-friendly interface for visualizing the parsed data, summary statistics, and the error plot in a user-friendly format.
 
 ---
 
@@ -56,16 +58,9 @@ cd NMEA-Parser-GUI
 
 ### Running the Program
 
-1. **Launch the Program**:  
-   Run the main script `nmea_data.py` to start the program:
-   ```bash
-   python main.py
-   ```
+1. **GUI Application**: Run the "GNSS Test Tool.exe" in the root/dist folder to start the GUI version
 
-2. **Choose Mode**:  
-   The program will prompt you to choose between two modes of operation:
-   - **Mode 1**: Live Serial Data
-   - **Mode 2**: Existing Log File Parsing
+2. **Console Application**: Run the "GNSS Test Tool Console.exe" in the root/dist folder to start the console version
 
 ---
 
@@ -80,29 +75,29 @@ In **Mode 1**, the program reads live NMEA data from one or more defined serial 
 
 Once the configuration is set, the program will continuously read and parse NMEA sentences and log the raw and parsed data for the defined Test Duration.
 
-Special Note: When selecting the reference device in dynamic live mode, ensure the box for the reference log is ticked first before inputting all other parameters. The program refreshes when this box is toggled to avoid losing data.
+Special Note for GUI Application: When selecting the reference device in dynamic live mode, ensure the box for the reference log is ticked first before inputting all other parameters. The program refreshes when this box is toggled to avoid losing data.
 
 ---
 
 ### Mode 2 - Log File Mode
 
-In **Mode 2**, you can parse previously collected NMEA log files. The program accepts files in the following formats:
+In **Mode 2**, you can parse live data (GUI application only) or previously collected NMEA log files. The program accepts files in the following formats:
 - `.txt`, `.log`, `.nmea` (Plain text)
 - `.csv` (Comma-separated values)
 - `.xlsx` (Excel)
 
 You will also have the option to provide a custom reference point for CEP calculation or let the program calculate it from the log data.
 
-Special Note: When selecting the reference log in dynamic file mode, ensure the box for the log file is ticked first before inputting all other parameters. The program refreshes when this box is toggled to avoid losing data.
+Special Note for GUI Application only: When selecting the reference log in dynamic file mode, ensure the box for the log file is ticked first before inputting all other parameters. The program refreshes when this box is toggled to avoid losing data.
 
 ---
 
 ### Using the GGA and GSV Extractor Tool
 
-For large files, it is recommended to use the **GGA and GSV Extractor Tool** to filter and extract only the necessary NMEA sentences. This significantly reduces test time, as GGA data typically occupies 10x less space than GSV data. Test times are therefore reduced by more than 10x for GGA-only data compared to GSV-only data.
+For large files, it is recommended to use the **GGA and GSV Extractor Tool** to filter and extract only the necessary NMEA sentences. This significantly reduces test time, as GGA data typically occupies 10x less space than GGA+GSV data. Test times are therefore reduced by more than 10x for GGA-only data compared to GGA+GSV only data.
 
 To use the extractor tool:
-1. Run the `extract_gga_gsv_lines` function in the provided script.
+1. Run the `GGA and GSV Extractor.exe` in the root/dist folder.
 2. Specify the input file and choose the output file location.
 3. Select whether to extract **GGA**, **GSV**, or both types of sentences.
 
@@ -133,7 +128,7 @@ Example data are provided in the `example` directory in the root folder for user
 
 ## NMEA Sentences Supported
 
-This program supports parsing the following NMEA sentence types:
+This program supports parsing the following standard NMEA sentence types:
 - **GGA**: GPS Fix Data
 - **RMC**: Recommended Minimum Navigation Information
 - **GSV**: Satellites in View
@@ -146,6 +141,42 @@ This program supports parsing the following NMEA sentence types:
 - **GRS**: GNSS Range Residuals
 - **RLM**: Return Link Message
 
+This program supports parsing the following Quectel proprietary NMEA sentence types:
+- **VERNO**: Version Information
+- **SAVEPAR**: Save Parameters
+- **RESTOREPAR**: Restore Parameters
+- **EPE**: Estimated Position Error
+- **CFGGEOFENCE**: Geofence Configuration
+- **GEOFENCESTATUS**: Geofence Status
+- **CFGSVIN**: Survey-In Configuration
+- **SVINSTATUS**: Survey-In Status
+- **GNSSSTART**: Start GNSS Engine
+- **GNSSSTOP**: Stop GNSS Engine
+- **PVT**: Position, Velocity, Time
+- **CFGNMEADP**: NMEA Decimal Places Configuration
+- **CFGRCVRMODE**: Receiver Mode Configuration
+- **PL**: Protection Levels
+- **CFGSBAS**: SBAS Configuration
+- **CFGCNST**: Constellation Configuration
+- **DOP**: Dilution of Precision
+- **CFGFIXRATE**: Fix Rate Configuration
+- **VEL**: Velocity Information
+- **CFGODO**: Odometer Configuration
+- **ODO**: Odometer Information
+- **LS**: Leap Second Information
+- **DRCAL**: DR Calibration State
+- **IMUTYPE**: IMU Initialization Status
+- **VEHMSG**: Vehicle Information
+- **INS**: Inertial Navigation Solution
+- **GPS**: GNSS Position Status
+- **VEHMOT**: Vehicle Motion Information
+- **SENMSG**: IMU Sensor Data
+- **DRPVA**: DR Position, Velocity, and Attitude
+- **VEHATT**: Vehicle Attitude
+- **ANTENNASTATUS**: Antenna Status Information
+- **JAMMINGSTATUS**: Jamming Detection Status
+- **UNIQID**: Chip Unique ID Information
+
 Each sentence is parsed into its respective fields and stored for further processing. The full parsed sentence is saved in the `logs/{.xlsx}` directory.
 
 ---
@@ -156,9 +187,9 @@ The program calculates **Circular Error Probable (CEP)** statistics to quantify 
 - **CEP50**: 50% of the points are within this radius from the reference point.
 - **CEP68**, **CEP90**, **CEP95**, **CEP99**: The corresponding percentages of points within these radii.
 
-The program supports the following reference points:
+The program supports using the following reference points:
 - **Mean Point of dataset**: The mean point of the GPS data. A key indicator for precision estimation.
-- **True Point**: The true reference point provided by the user. A key indicator for accuracy estimation.
+- **True Point**: The reference data provided by the user. A key indicator for accuracy estimation.
 
 ---
 
@@ -169,12 +200,6 @@ The program exports the following data to Excel files in the `logs/` directory:
 2. **CEP Summary**: CEP metrics and GPS statistics.
 3. **Satellite Data**: Information about satellites tracked (e.g., PRN, SNR).
 
-**File Naming Convention**:  
-The output files are saved in the format:  
-```
-logs/NMEA_YYYYMMDD_HHMMSS/nmea_data_mode_X.xlsx
-```
-Where `X` refers to the mode (1 for live data, 2 for log parsing).
 
 ---
 
@@ -182,7 +207,7 @@ Where `X` refers to the mode (1 for live data, 2 for log parsing).
 
 - **Invalid Data**: Proprietary or unrecognized NMEA sentences are ignored, and errors in parsing are logged.
 - **Serial Connection Errors**: Issues with the serial port are caught and logged without crashing the program.
-- **File Formatting**: Ensure there are no spaces between consecutive lines in input files. Spaces are treated as end-of-file and may cause parsing issues.
+- **File Formatting**: Ensure there are no spaces between consecutive lines in input files. Spaces are treated as end-of-file and may cause premature termination of program execution.
 
 ---
 
@@ -190,16 +215,14 @@ Where `X` refers to the mode (1 for live data, 2 for log parsing).
 
 The program logs important actions and errors to both the console and log files. Log files are stored in the `logs/` directory and named in the format:  
 ```
-console_output_YYYYMMDD_HHMMSS.txt
+console_output.txt
 ```
-All NMEA raw sentences and detailed execution logs are stored for post-processing.
 
 ---
 
 ## Known Limitations
 
 - **Checksum Check**: The program does not support checksum checks for NMEA sentences, so ensure sentences are properly formatted.
-- **Data Plotting**: The program does not support data plotting.
 - **Multiple Files with Different Dates**: When loading multiple static or dynamic files for analysis, ensure their timestamps align. Data will be plotted on the same graph, which may lead to awkward visualizations if dates differ significantly.
 
 ---
