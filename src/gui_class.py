@@ -16,7 +16,6 @@ class NMEAData:
         self.coordinates = []  # To store latitude and longitude tuples
         self.MIN_POINTS_FOR_CEP = 50  # Minimum number of points for CEP calculation
         self.gsv_satellite_info = []  # To store satellite CNR and related info from GSV sentences
-
     def __str__(self):
         # Pretty print the data based on sentence type
         if self.sentence_type == "GGA":
@@ -493,7 +492,6 @@ class NMEAData:
             )
         else:
             return f"Unsupported NMEA sentence type: {self.sentence_type}\n"
-
     def add_sentence_data(self):
         # Pretty print the data based on sentence type
         if self.sentence_type == "GGA":
@@ -988,7 +986,6 @@ class NMEAData:
             })
         else:
             return f"Unsupported NMEA sentence type: {self.sentence_type}"
-
     def add_coordinates(self):
         # Add GLL or GGA coordinates to the coordinates list
         if self.sentence_type == "GGA":
@@ -999,7 +996,6 @@ class NMEAData:
             return
 
         self.coordinates.append((lat, lon, fix_time))
-
     def add_dynamic_coordinates(self):
         # Add GLL or GGA coordinates to the coordinates list
         if self.sentence_type == "GGA":
@@ -1011,7 +1007,6 @@ class NMEAData:
 
         self.coordinates.append((lat, lon, fix_time))
         return self.coordinates
-
     def calculate_mean_point(self):
         # Filter out coordinates with zero values
         valid_coords = [(lat, lon) for lat, lon, *_ in self.coordinates if lat != 0 and lon != 0]
@@ -1022,7 +1017,6 @@ class NMEAData:
         latitudes = [coord[0] for coord in valid_coords]
         longitudes = [coord[1] for coord in valid_coords]
         return np.mean(latitudes), np.mean(longitudes)
-
     def calculate_cep(self, reference_point=None):
         """
         Calculate the Circular Error Probable (CEP) metrics (CEP50, CEP68, CEP90, CEP95, CEP99).
@@ -1073,7 +1067,6 @@ class NMEAData:
             'distances': distances,  # All distances to the reference point
             'coordinates': valid_coords
         }
-
     def calculate_dynamic_cep(self, reference_points, fix_points):
         """
         Calculate the Circular Error Probable (CEP) metrics (CEP50, CEP68, CEP90, CEP95, CEP99) for dynamic reference points.
@@ -1113,7 +1106,6 @@ class NMEAData:
             'reference_point': reference_points,  # Reference points used
             'coordinates': fix_points  # Fix points used
         }
-
     @staticmethod
     def calculate_distance(point1, point2):
         """
@@ -1138,7 +1130,6 @@ class NMEAData:
         radius_earth = 6371000  # Earth's radius in meters
 
         return radius_earth * c
-
     def write_to_excel_mode_1(self, port, baudrate, timestamp, cep_value, filename="nmea_data_mode_1"):
         """
         MODE 1:Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
@@ -1293,7 +1284,6 @@ class NMEAData:
 
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
-
     def write_to_excel_mode_2(self, timestamp, cep_value, filename):
         """
         MODE 2: Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
@@ -1444,7 +1434,6 @@ class NMEAData:
 
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
-
     def write_to_excel_mode_1_dynamic(self, port, baudrate, timestamp, cep_value, filename="nmea_data_mode_1"):
         """
         MODE 1: Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
@@ -1562,7 +1551,6 @@ class NMEAData:
 
         except Exception as e:
             logging.error(f"Error writing to live mode dynamic test results Excel file sss: {e}")
-
     def write_to_excel_mode_2_dynamic(self, timestamp, cep_value, filename):
         """
         MODE 2: Write NMEA parsed data, summary statistics (CEP), and individual data points with distances to an Excel file.
@@ -1678,7 +1666,6 @@ class NMEAData:
 
         except Exception as e:
             logging.error(f"Error writing file mode dynamic results to results to Excel file: {e}")
-
     @staticmethod
     def setup_logging(log_folder, timestamp):
         """
@@ -1705,7 +1692,6 @@ class NMEAData:
         )
 
         logging.info(f"Console logging setup complete. Logs are being saved to {log_file}")
-
     def calculate_satellite_statistics(self):
         # Create a dataframe for the satellite CNR summary
         df_gsv_sat_summary = pd.DataFrame(self.gsv_satellite_info)
@@ -1732,4 +1718,3 @@ class NMEAData:
             df_gsv_satellite_summary_stats = pd.DataFrame([gsv_satellite_summary_stats])
 
         return df_gsv_satellite_summary_stats
-
