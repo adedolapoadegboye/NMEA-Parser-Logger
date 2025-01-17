@@ -21,6 +21,7 @@ class GNSSTestTool:
     # General
     def __init__(self, root):
         # Initialize a list to store individual device port configurations
+        self.running_threads = []
         self.dynamic_reference_points = []
         self.mode = None
         self.file_config_frame_holder = None
@@ -345,11 +346,159 @@ class GNSSTestTool:
         if hasattr(self, "tooltip") and self.tooltip:
             self.tooltip.destroy()
             self.tooltip = None
+    def stop_all_tests(self):
+        """Stop all running tests."""
+        if messagebox.askyesno("Confirm Stop", "Are you sure you want to stop all running tests?"):
+            self.stop_event.set()  # Signal threads to stop
+            messagebox.showinfo("Stop action completed","All tests have been stopped.")
+    def clear_all_configs(self):
+        """Reset all configurations to their default values."""
+        try:
+            if self.mode == "file static":
+                if self.file_var:
+                    self.file_var = tk.StringVar(value="Select Log Path")  # Reset file path
+
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
+
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
+
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
+
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
+
+                # Clear plots
+                self.fresh_start()
+                self.reference_device_index = 0
+                self.update_file_config_static_frames()
+
+            elif self.mode == "file dynamic":
+                if self.file_var:
+                    self.file_var = tk.StringVar(value="Select Log Path")  # Reset file path
+
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
+
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
+
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
+
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
+
+                # Clear plots
+                self.fresh_start()
+                self.reference_device_index = 0
+                self.update_file_config_dynamic_frames()
+
+            elif self.mode == "live static":
+                # Reset serial configuration settings
+                if self.port_var:
+                    self.port_var.set("Select Port")  # Default port option
+                if self.baudrate_var:
+                    self.baudrate_var.set(115200)  # Default baudrate
+                if self.timeout_var:
+                    self.timeout_var.set(1.0)  # Default timeout
+                if self.duration_var:
+                    self.duration_var.set(30.0)  # Default duration
+                # Clear the serial configuration frame holder
+                for widget in self.serial_config_frame_holder.winfo_children():
+                    widget.destroy()
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
+
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
+
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
+
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
+
+                # Clear plots
+                self.fresh_start()
+                self.reference_device_index = 0
+                # Reinitialize serial configuration frames
+                self.update_serial_config_static_frames()
+
+            elif self.mode == "live dynamic":
+                # Reset serial configuration settings
+                if self.port_var:
+                    self.port_var.set("Select Port")  # Default port option
+                if self.baudrate_var:
+                    self.baudrate_var.set(115200)  # Default baudrate
+                if self.timeout_var:
+                    self.timeout_var.set(1.0)  # Default timeout
+                if self.duration_var:
+                    self.duration_var.set(30.0)  # Default duration
+                # Clear the serial configuration frame holder
+                for widget in self.serial_config_frame_holder.winfo_children():
+                    widget.destroy()
+                # Reset number of devices
+                if self.num_devices_var:
+                    self.num_devices_var.set("1")  # Default to 1 device
+
+                # Reset reference point settings
+                if self.use_reference:
+                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
+                    self.toggle_reference_entries()  # Disable lat/lon entries
+
+                if self.lat_var:
+                    self.lat_var.set(0.0)  # Reset latitude
+                if self.lon_var:
+                    self.lon_var.set(0.0)  # Reset longitude
+
+                # Clear the device notebook
+                for tab in self.device_notebook.tabs():
+                    self.device_notebook.forget(tab)
+
+                # Clear plots
+                self.fresh_start()
+                self.reference_device_index = 0
+                # Reinitialize serial configuration frames
+                self.update_serial_config_dynamic_frames()
+
+            messagebox.showinfo("Clear", "All configurations have been reset.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while clearing configurations: {e}")
     def on_close(self):
         """Handle window close."""
         if messagebox.askyesno("Quit", "Are you sure you want to quit?"):
-            self.stop_all_tests()  # Stop all threads
-            self.root.destroy()  # Close the application
+            # Signal all threads to stop
+            self.stop_all_tests()
+
+            # Join all running threads
+            if hasattr(self, "running_threads"):
+                for thread in self.running_threads:
+                    if thread.is_alive():  # Ensure the thread is still running
+                        thread.join()  # Wait for the thread to finish
+
+            # Destroy the main Tkinter window
+            self.root.destroy()
     @staticmethod
     def append_to_console_specific(console_widget, message):
         """
@@ -1096,152 +1245,14 @@ class GNSSTestTool:
 
             # Run the test in a separate thread
             test_thread = threading.Thread(
-                target=self.run_live_test, args=(devices, log_folder, timestamp, reference_point)
+                target=self.run_live_test, args=(devices, log_folder, timestamp, reference_point), daemon=True
             )
+            self.running_threads.append(test_thread)
             test_thread.start()
 
         except Exception as e:
             messagebox.showerror("Error", f"Failed to start live test: {e}")
             logging.error(f"Failed to start live test: {e}")
-    def stop_all_tests(self):
-        """Stop all running tests."""
-        if messagebox.askyesno("Confirm Stop", "Are you sure you want to stop all running tests?"):
-            self.stop_event.set()  # Signal threads to stop
-            messagebox.showinfo("Stop action completed","All tests have been stopped.")
-    def clear_all_configs(self):
-        """Reset all configurations to their default values."""
-        try:
-            if self.mode == "file static":
-                if self.file_var:
-                    self.file_var = tk.StringVar(value="Select Log Path")  # Reset file path
-
-                # Reset number of devices
-                if self.num_devices_var:
-                    self.num_devices_var.set("1")  # Default to 1 device
-
-                # Reset reference point settings
-                if self.use_reference:
-                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
-                    self.toggle_reference_entries()  # Disable lat/lon entries
-
-                if self.lat_var:
-                    self.lat_var.set(0.0)  # Reset latitude
-                if self.lon_var:
-                    self.lon_var.set(0.0)  # Reset longitude
-
-                # Clear the device notebook
-                for tab in self.device_notebook.tabs():
-                    self.device_notebook.forget(tab)
-
-                # Clear plots
-                self.fresh_start()
-                self.reference_device_index = 0
-                self.update_file_config_static_frames()
-
-            elif self.mode == "file dynamic":
-                if self.file_var:
-                    self.file_var = tk.StringVar(value="Select Log Path")  # Reset file path
-
-                # Reset number of devices
-                if self.num_devices_var:
-                    self.num_devices_var.set("1")  # Default to 1 device
-
-                # Reset reference point settings
-                if self.use_reference:
-                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
-                    self.toggle_reference_entries()  # Disable lat/lon entries
-
-                if self.lat_var:
-                    self.lat_var.set(0.0)  # Reset latitude
-                if self.lon_var:
-                    self.lon_var.set(0.0)  # Reset longitude
-
-                # Clear the device notebook
-                for tab in self.device_notebook.tabs():
-                    self.device_notebook.forget(tab)
-
-                # Clear plots
-                self.fresh_start()
-                self.reference_device_index = 0
-                self.update_file_config_dynamic_frames()
-
-            elif self.mode == "live static":
-                # Reset serial configuration settings
-                if self.port_var:
-                    self.port_var.set("Select Port")  # Default port option
-                if self.baudrate_var:
-                    self.baudrate_var.set(115200)  # Default baudrate
-                if self.timeout_var:
-                    self.timeout_var.set(1.0)  # Default timeout
-                if self.duration_var:
-                    self.duration_var.set(30.0)  # Default duration
-                # Clear the serial configuration frame holder
-                for widget in self.serial_config_frame_holder.winfo_children():
-                    widget.destroy()
-                # Reset number of devices
-                if self.num_devices_var:
-                    self.num_devices_var.set("1")  # Default to 1 device
-
-                # Reset reference point settings
-                if self.use_reference:
-                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
-                    self.toggle_reference_entries()  # Disable lat/lon entries
-
-                if self.lat_var:
-                    self.lat_var.set(0.0)  # Reset latitude
-                if self.lon_var:
-                    self.lon_var.set(0.0)  # Reset longitude
-
-                # Clear the device notebook
-                for tab in self.device_notebook.tabs():
-                    self.device_notebook.forget(tab)
-
-                # Clear plots
-                self.fresh_start()
-                self.reference_device_index = 0
-                # Reinitialize serial configuration frames
-                self.update_serial_config_static_frames()
-
-            elif self.mode == "live dynamic":
-                # Reset serial configuration settings
-                if self.port_var:
-                    self.port_var.set("Select Port")  # Default port option
-                if self.baudrate_var:
-                    self.baudrate_var.set(115200)  # Default baudrate
-                if self.timeout_var:
-                    self.timeout_var.set(1.0)  # Default timeout
-                if self.duration_var:
-                    self.duration_var.set(30.0)  # Default duration
-                # Clear the serial configuration frame holder
-                for widget in self.serial_config_frame_holder.winfo_children():
-                    widget.destroy()
-                # Reset number of devices
-                if self.num_devices_var:
-                    self.num_devices_var.set("1")  # Default to 1 device
-
-                # Reset reference point settings
-                if self.use_reference:
-                    self.use_reference.set(False)  # Uncheck 'Use Custom Reference Point'
-                    self.toggle_reference_entries()  # Disable lat/lon entries
-
-                if self.lat_var:
-                    self.lat_var.set(0.0)  # Reset latitude
-                if self.lon_var:
-                    self.lon_var.set(0.0)  # Reset longitude
-
-                # Clear the device notebook
-                for tab in self.device_notebook.tabs():
-                    self.device_notebook.forget(tab)
-
-                # Clear plots
-                self.fresh_start()
-                self.reference_device_index = 0
-                # Reinitialize serial configuration frames
-                self.update_serial_config_dynamic_frames()
-
-            messagebox.showinfo("Clear", "All configurations have been reset.")
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while clearing configurations: {e}")
     def run_live_test(self, devices, log_folder, timestamp, reference_point):
         """Run the test on a separate thread."""
         try:
@@ -1261,7 +1272,8 @@ class GNSSTestTool:
                     args=(
                         config["port"], config["baudrate"], config["timeout"], config["duration"],
                         log_folder, timestamp, reference_point, self.stop_event, device_logs[device_name]
-                    )
+                    ),
+                    daemon=True
                 )
                 threads.append(thread)
                 thread.start()
@@ -1344,6 +1356,7 @@ class GNSSTestTool:
                     logging.info(f"Stop signal received. Ending data collection on {port}.")
                     if console_widget:
                         self.append_to_console_specific(console_widget, f"Stop signal received for {port}.")
+                        ser.close()
                     break
                 try:
                     nmea_sentence = ser.readline().decode('ascii', errors='replace').strip()
@@ -1401,7 +1414,7 @@ class GNSSTestTool:
                     logging.error(f"Error reading from serial port: {e}")
                     self.append_to_console_specific(console_widget, f"Error reading from serial port: {e}")
                     break
-
+            ser.close()
         except Exception as e:
             logging.error(f"Unexpected error during serial read: {e}")
             self.append_to_console_specific(console_widget, f"Unexpected error during serial read: {e}")
@@ -1571,6 +1584,7 @@ class GNSSTestTool:
             test_thread = threading.Thread(
                 target=self.run_file_test, args=(devices, log_folder, timestamp, reference_point)
             )
+            self.running_threads.append(test_thread)
             test_thread.start()
 
         except Exception as e:
@@ -2039,6 +2053,7 @@ class GNSSTestTool:
             test_thread = threading.Thread(
                 target=self.run_dynamic_live_mode, args=(devices, log_folder, timestamp)
             )
+            self.running_threads.append(test_thread)
             test_thread.start()
 
         except Exception as e:
@@ -2395,6 +2410,7 @@ class GNSSTestTool:
             test_thread = threading.Thread(
                 target=self.run_dynamic_file_test, args=(devices, log_folder, timestamp)
             )
+            self.running_threads.append(test_thread)
             test_thread.start()
 
         except Exception as e:
