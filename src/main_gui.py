@@ -1091,7 +1091,6 @@ class GNSSTestTool:
         # Draw the canvas
         self.canvas.draw()
 
-
     # Static Live Mode
     def update_serial_config_static_frames(self, event=None):
         """Update the serial configuration frames based on the selected number of devices."""
@@ -2241,9 +2240,9 @@ class GNSSTestTool:
 
         # Calculate CEP and log the results
         for _ in range(2880):
-            if self.dynamic_reference_points:
+            if len(self.dynamic_reference_points) > 0:
                 break
-            sleep(30)
+            sleep(10)
             logging.info("Waiting for dynamic_reference_points to be populated...")
         cep_value = nmea_data.calculate_dynamic_cep(self.dynamic_reference_points, dynamic_fix_points)
         if cep_value:
@@ -2298,7 +2297,6 @@ class GNSSTestTool:
             # Save parsed data to Excel
 
         nmea_data.write_to_excel_mode_1_dynamic(port, baudrate, timestamp, cep_value)
-
 
     # Dynamic File Mode
     def update_file_config_dynamic_frames(self, event=None):
@@ -2644,6 +2642,12 @@ class GNSSTestTool:
             self.dynamic_reference_points = dynamic_fix_points
 
         # Calculate CEP values
+        for _ in range(2880):
+            if len(self.dynamic_reference_points) > 0:
+                break
+            sleep(30)
+            logging.info("Waiting for dynamic_reference_points to be populated...")
+            self.append_to_console_specific(console_widget, "Waiting for dynamic_reference_points to be populated...")
         try:
             cep_value = nmea_data.calculate_dynamic_cep(self.dynamic_reference_points, dynamic_fix_points)
             if cep_value is not None:
@@ -2714,7 +2718,6 @@ class GNSSTestTool:
         except Exception as e:
             logging.error(f"Error writing to Excel file: {e}")
             self.append_to_console_specific(console_widget, f"Error writing to Excel file: {e}")
-
 
     # Cleaners
     def clear_accuracy_summary_table(self):
