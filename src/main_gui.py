@@ -2240,10 +2240,10 @@ class GNSSTestTool:
             self.dynamic_reference_points = dynamic_fix_points
 
         # Calculate CEP and log the results
-        for _ in range(5):
+        for _ in range(2880):
             if self.dynamic_reference_points:
                 break
-            sleep(1)
+            sleep(30)
             logging.info("Waiting for dynamic_reference_points to be populated...")
         cep_value = nmea_data.calculate_dynamic_cep(self.dynamic_reference_points, dynamic_fix_points)
         if cep_value:

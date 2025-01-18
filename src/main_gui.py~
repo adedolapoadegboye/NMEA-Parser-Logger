@@ -80,7 +80,6 @@ class GNSSTestTool:
         self.root.bind("<Escape>", lambda e: root.attributes('-fullscreen', False))
         self.root.configure(bg="#B8D8D8")  # Background color
         self.create_widgets()
-
     def create_widgets(self):
         # Configure root grid layout
         self.root.grid_rowconfigure(0, weight=1)  # Row 0 (Test Config) gets 10% height
