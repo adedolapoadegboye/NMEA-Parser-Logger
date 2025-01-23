@@ -2240,7 +2240,6 @@ class GNSSTestTool:
 
         # Calculate CEP and log the results
         for _ in range(2880):
-            print(len(self.dynamic_reference_points))
             if len(self.dynamic_reference_points) > 0:
                 break
             sleep(10)
@@ -2644,7 +2643,6 @@ class GNSSTestTool:
 
         # Calculate CEP values
         for _ in range(2880):
-            print(self.dynamic_reference_points)
             if len(self.dynamic_reference_points) > 0:
                 break
             sleep(30)

@@ -499,6 +499,7 @@ class GNSSTestTool:
 
             # Destroy the main Tkinter window
             self.root.destroy()
+            sys.exit()  # Exit the application
     @staticmethod
     def append_to_console_specific(console_widget, message):
         """
