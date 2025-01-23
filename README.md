@@ -10,11 +10,11 @@ The **NMEA Data Parser and Logger** program is a Python-based application design
 - **Log File Parsing**: Parse NMEA sentences from various log file formats (e.g., `.txt`, `.log`, `.nmea`, `.csv`, and `.xlsx`).
 - **Comprehensive NMEA Sentence Support**: Handles multiple standard NMEA sentence types like GGA, RMC, GSV, GSA, VTG, GLL, ZDA, GNS, GST, and others.
 - **Extensive PQTM Sentence Support**: Handles common proprietary NMEA sentence types like VERNO, EPE, different CFG types, and others.
-- **GGA and GSV Extractor Tool**: Extract GGA only, GSV only, or both lines from large files to reduce parsing time significantly. GGA data typically takes up 10x less space than GSV data, leading to a >10x reduction in test time.
+- **NMEA Message Type Extractor Tool**: Extract GGA only, GSV only, or both lines from large files to reduce parsing time significantly. GGA data typically takes up 10x less space than GSV data, leading to a >10x reduction in test time.
 - **CEP Calculation**: Calculates Circular Error Probable (CEP) statistics such as CEP50, CEP68, CEP90, CEP95, and CEP99, based on static or dynamic user-defined reference point or the mean point of the GPS data (if no reference point is provided).
 - **Excel Export**: Outputs parsed data, summary statistics, and satellite information to Excel for reference and further analysis.
 - **Error Handling**: Handles exceptions gracefully, providing clear error messages to the user.
-- **Logging**: Logs important events and errors to a file for easy debugging and troubleshooting.
+- **Logging**: Logs important events and errors to a file for custom debugging and troubleshooting.
 - **Data Visualization**: Provides a user-friendly interface for visualizing the parsed data, summary statistics, and the error plot in a user-friendly format.
 
 ---
