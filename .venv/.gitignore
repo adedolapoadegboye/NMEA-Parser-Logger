@@ -1,8 +1,0 @@
-# Ignore all hidden files (starting with a dot)
-.*
-
-# Do not ignore any directories
-!*/
-
-# Keep the .gitignore file itself tracked
-!.gitignore
